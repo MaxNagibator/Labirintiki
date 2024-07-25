@@ -1,5 +1,6 @@
 ﻿@page "/weather"
 @inject HttpClient Http
+@using LabirintBlazorApp.Components
 
 <PageTitle>Weather</PageTitle>
 
@@ -7,41 +8,66 @@
 
 <p>This component demonstrates fetching data from the server.</p>
 
-@if (forecasts == null)
+@if (isInit == false)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
+    <div style="position: relative">
+        @{
+            var step = 10;
+            for (int i = 1; i < labSize - 1; i = i + 2)
             {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
+                for (int j = 1; j < labSize - 1; j = j + 2)
+                {
+                    if (lab[i, j - 1] == 0)
+                    {
+                        <DrawLine X1="@(j * step - step)"
+                                  Y1="@(i * step - step * 11 / 10)"
+                                  X2="@(j * step - step)"
+                                  Y2="@(i * step + step * 11 / 10)" />
+                    } //leftborder
+                    if (lab[i - 1, j] == 0)
+                    {
+                        <DrawLine X1="@( j * step - step * 11 / 10)"
+                                  Y1="@(i * step - step)"
+                                  X2="@(j * step + step * 11 / 10)"
+                                  Y2="@(i * step - step)" />
+                    } //upborder
+                    if (i == labSize - 2 || j == labSize - 2)
+                    {
+                        if (lab[i, j + 1] == 0)
+                        {
+                            <DrawLine X1="@( j * step + step)"
+                                      Y1="@(i * step - step * 11 / 10)"
+                                      X2="@(j * step + step)"
+                                      Y2="@(i * step + step * 11 / 10)" />
+                        } //rightborder
+                        if (lab[i + 1, j] == 0)
+                        {
+                            <DrawLine X1="@( j * step - step * 11 / 10)"
+                                      Y1="@(i * step + step)"
+                                      X2="@(j * step + step * 11 / 10)"
+                                      Y2="@( i * step + step)" />
+                        } //downborder
+                    }
+                }
             }
-        </tbody>
-    </table>
+        }
+
+    </div>
 }
 
 @code {
-    private WeatherForecast[]? forecasts;
+    private bool isInit;
+    private int labSize;
+    private int[,] lab;
+    private int[,] lab2;
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+        Generate();
     }
 
     public class WeatherForecast
@@ -53,5 +79,54 @@ else
         public string? Summary { get; set; }
 
         public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    }
+
+
+
+    public void Generate()
+    {
+        var rnd = new Random();
+        int originalSize = 16;
+        int size = originalSize * 2 + 1;
+        var density = 3;
+        int n = size * 2 + 1;
+        lab = new int[n, n];
+        labSize = n;
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                if (i == 0 || i == n - 1)
+                {
+                    lab[i, j] = 0;
+                }
+                if (j == 0 || j == n - 1)
+                {
+                    lab[i, j] = 0;
+                }
+                if (i % 2 == 1 && j % 2 == 1)
+                {
+                    lab[i, j] = 2;
+                }
+                if ((i > 0 && i % 2 == 0 && i < n - 1 && j > 0 && j % 2 == 1 && j < n - 1) ||
+                    (i > 0 && i % 2 == 1 && i < n - 1 && j > 0 && j % 2 == 0 && j < n - 1))
+                {
+                    lab[i, j] = rnd.Next(0, density);
+                }
+            }
+            lab[n - 1, n / 2] = 1;
+            lab[n - 1, n / 2 - 1] = 1;
+            //if (size > 1)
+            //lab[1, 2] = 1;lab[2, 1] = 1;
+        }
+        lab2 = new int[n, n];
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                lab2[i, j] = 1;
+            }
+        }
+        isInit = true;
     }
 }
