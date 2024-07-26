@@ -106,3 +106,7 @@ code {
     background: darkred;
     position: absolute;
 }
+
+.base-main-lab-div:focus {
+    outline: none !important;
+}

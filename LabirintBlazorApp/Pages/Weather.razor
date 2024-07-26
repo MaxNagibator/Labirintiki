@@ -8,90 +8,221 @@
 
 <p>This component demonstrates fetching data from the server.</p>
 
-@if (isInit == false)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <div style="position: relative">
-        @{
-            var step = 10;
-            for (int i = 1; i < labSize - 1; i = i + 2)
-            {
-                for (int j = 1; j < labSize - 1; j = j + 2)
+<div @ref="testRef" @onkeydown="OnKeyDown" tabindex="0" class="base-main-lab-div">
+    @if (isInit == false)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <div style="position: relative">
+            @{
+                var boxSize = 370 / _originalSize;
+                var wallWidth = boxSize / 10 * 2;
+                for (int i = 1; i < _labSize - 1; i = i + 2)
                 {
-                    if (lab[i, j - 1] == 0)
+                    for (int j = 1; j < _labSize - 1; j = j + 2)
                     {
-                        <DrawLine X1="@(j * step - step)"
-                                  Y1="@(i * step - step * 11 / 10)"
-                                  X2="@(j * step - step)"
-                                  Y2="@(i * step + step * 11 / 10)" />
-                    } //leftborder
-                    if (lab[i - 1, j] == 0)
-                    {
-                        <DrawLine X1="@( j * step - step * 11 / 10)"
-                                  Y1="@(i * step - step)"
-                                  X2="@(j * step + step * 11 / 10)"
-                                  Y2="@(i * step - step)" />
-                    } //upborder
-                    if (i == labSize - 2 || j == labSize - 2)
-                    {
-                        if (lab[i, j + 1] == 0)
+                        if (lab[i, j - 1] == 0)
                         {
-                            <DrawLine X1="@( j * step + step)"
-                                      Y1="@(i * step - step * 11 / 10)"
-                                      X2="@(j * step + step)"
-                                      Y2="@(i * step + step * 11 / 10)" />
-                        } //rightborder
-                        if (lab[i + 1, j] == 0)
+                            <DrawLine X1="@(j * boxSize - boxSize)"
+                                      Y1="@(i * boxSize - boxSize)"
+                                      X2="@(j * boxSize - boxSize)"
+                                      Y2="@(i * boxSize + boxSize)"
+                                      Width="@(wallWidth)" />
+                        } //leftborder
+                        if (lab[i - 1, j] == 0)
                         {
-                            <DrawLine X1="@( j * step - step * 11 / 10)"
-                                      Y1="@(i * step + step)"
-                                      X2="@(j * step + step * 11 / 10)"
-                                      Y2="@( i * step + step)" />
-                        } //downborder
+                            <DrawLine X1="@( j * boxSize - boxSize)"
+                                      Y1="@(i * boxSize - boxSize)"
+                                      X2="@(j * boxSize + boxSize)"
+                                      Y2="@(i * boxSize - boxSize)"
+                                      Width="@(wallWidth)" />
+                        } //upborder
+                        if (i == _labSize - 2 || j == _labSize - 2)
+                        {
+                            if (lab[i, j + 1] == 0)
+                            {
+                                <DrawLine X1="@( j * boxSize + boxSize)"
+                                          Y1="@(i * boxSize - boxSize)"
+                                          X2="@(j * boxSize + boxSize)"
+                                          Y2="@(i * boxSize + boxSize)"
+                                          Width="@(wallWidth)" />
+                            } //rightborder
+                            if (lab[i + 1, j] == 0)
+                            {
+                                <DrawLine X1="@( j * boxSize - boxSize)"
+                                          Y1="@(i * boxSize + boxSize)"
+                                          X2="@(j * boxSize + boxSize)"
+                                          Y2="@( i * boxSize + boxSize)"
+                                          Width="@(wallWidth)" />
+                            } //downborder
+                        }
                     }
                 }
-            }
-        }
 
-    </div>
-}
+                <div style="position:absolute; background-color: green;
+                                left: @(boxSize / 2 + (_myPositionY - 1) * boxSize)px;
+                                top: @(boxSize / 2 + (_myPositionX - 1) * boxSize)px;
+                            width: 20px;
+                            height: 20px;">
+                </div>
+            }
+        </div>
+    }
+
+</div>
 
 @code {
+
+    private ElementReference testRef;
+
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
     private bool isInit;
-    private int labSize;
+    private int _originalSize;
+    private int _labSize;
     private int[,] lab;
     private int[,] lab2;
+    private int _myPositionX;
+    private int _myPositionY;
 
     protected override async Task OnInitializedAsync()
     {
         Generate();
     }
 
-    public class WeatherForecast
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        public DateOnly Date { get; set; }
-
-        public int TemperatureC { get; set; }
-
-        public string? Summary { get; set; }
-
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        if (firstRender)
+        {
+            await testRef.FocusAsync();
+        }
     }
 
-
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        if (true)//Global.exit)
+        {
+            // int step = _step;
+            // if (e.KeyCode == Keys.A && Global.molot > 0)
+            // {
+            //     Global.ataka = true;
+            //     Global.molot--;
+            //     textmolot.Text = Convert.ToString(Global.molot);
+            // }
+            // Graphics g = this.CreateGraphics();
+            // Pen p = new Pen(BackColor, Global.step / 5);
+            // if (e.KeyCode == Keys.B && Global.bomba > 0)
+            // {
+            //     if (_myPositionX != Global.size * 2 - 1)
+            //     {
+            //         Global.lab[_myPositionX + 1, _myPositionY] = 1;
+            //     }
+            //     if (_myPositionX != 1)
+            //     {
+            //         Global.lab[_myPositionX - 1, _myPositionY] = 1;
+            //     }
+            //     if (_myPositionY != 1)
+            //     {
+            //         Global.lab[_myPositionX, _myPositionY - 1] = 1;
+            //     }
+            //     if (_myPositionY != Global.size * 2 - 1)
+            //     {
+            //         Global.lab[_myPositionX, _myPositionY + 1] = 1;
+            //     }
+            //     clear();
+            //     Global.bomba--;
+            //     textbomb.Text = Convert.ToString(Global.bomba);
+            //     Global.ataka = false;
+            // }
+            // if (Global.ataka && e.KeyCode != Keys.A)
+            // {
+            //     if (e.KeyCode == Keys.Down && _myPositionX != Global.size * 2 - 1)
+            //     {
+            //         Global.lab[_myPositionX + 1, _myPositionY] = 1;
+            //     }
+            //     if (e.KeyCode == Keys.Up && _myPositionX != 1)
+            //     {
+            //         Global.lab[_myPositionX - 1, _myPositionY] = 1;
+            //     }
+            //     if (e.KeyCode == Keys.Left && _myPositionY != 1)
+            //     {
+            //         Global.lab[_myPositionX, _myPositionY - 1] = 1;
+            //     }
+            //     if (e.KeyCode == Keys.Right && _myPositionY != Global.size * 2 - 1)
+            //     {
+            //         Global.lab[_myPositionX, _myPositionY + 1] = 1;
+            //     }
+            //     clear();
+            //     Global.ataka = false;
+            // }
+            if (true)//!Global.ataka)
+            {
+                if (e.Key == "ArrowDown")
+                {
+                    if (lab[_myPositionX + 1, _myPositionY] != 0)
+                    {
+                        _myPositionX += 2;
+                        //pictureBo_myPositionX.Location = new System.Drawing.Point(Global.step / 2 + (_myPositionY - 1) * step, Global.step / 2 + (_myPositionX - 1) * step);
+                    }
+                }
+                if (e.Key == "ArrowUp")
+                {
+                    if (lab[_myPositionX - 1, _myPositionY] != 0)
+                    {
+                        _myPositionX -= 2;
+                        //pictureBo_myPositionX.Location = new System.Drawing.Point(Global.step / 2 + (_myPositionY - 1) * step, Global.step / 2 + (_myPositionX - 1) * step);
+                    }
+                }
+                if (e.Key == "ArrowLeft")
+                {
+                    if (lab[_myPositionX, _myPositionY - 1] != 0)
+                    {
+                        _myPositionY -= 2;
+                        //pictureBo_myPositionX.Location = new System.Drawing.Point(Global.step / 2 + (_myPositionY - 1) * step, Global.step / 2 + (_myPositionX - 1) * step);
+                    }
+                }
+                if (e.Key == "ArrowRight")
+                {
+                    if (lab[_myPositionX, _myPositionY + 1] != 0)
+                    {
+                        _myPositionY += 2;
+                        //pictureBo_myPositionX.Location = new System.Drawing.Point(Global.step / 2 + (_myPositionY - 1) * step, Global.step / 2 + (_myPositionX - 1) * step);
+                    }
+                }
+            }
+        }
+        // if ((_myPositionX == Global.n && _myPositionY == Global.n / 2) || (_myPositionX == Global.n && _myPositionY == Global.n / 2 - 1))
+        // {
+        //     Global.exit = false;
+        //     textresult.Text = "exit: true";
+        // }
+        // else
+        // {
+        //     if (Global.sand[_myPositionY, _myPositionX] == 0)
+        //     {
+        //         Global.sand[_myPositionY, _myPositionX] = 1;
+        //         Global.sgore += 100;
+        //         textSgore.Text = Convert.ToString(Global.sgore);
+        //     }
+        // }
+    }
 
     public void Generate()
     {
+        _myPositionX = 1;
+        _myPositionY = 1;
         var rnd = new Random();
-        int originalSize = 16;
-        int size = originalSize * 2 + 1;
+        _originalSize = 16;
         var density = 3;
-        int n = size * 2 + 1;
+        int n = _originalSize * 2 + 1;
         lab = new int[n, n];
-        labSize = n;
+        _labSize = n;
         for (int i = 0; i < n; i++)
         {
             for (int j = 0; j < n; j++)
