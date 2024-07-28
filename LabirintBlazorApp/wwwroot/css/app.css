@@ -102,11 +102,3 @@ code {
     color: #c02d76;
 }
 
-.bolt {
-    background: darkred;
-    position: absolute;
-}
-
-.base-main-lab-div:focus {
-    outline: none !important;
-}

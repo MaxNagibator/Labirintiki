@@ -1,69 +1,72 @@
-﻿@page "/weather"
-@inject HttpClient Http
-@using LabirintBlazorApp.Components
+﻿@page "/labirint"
 
-<PageTitle>Weather</PageTitle>
+<PageTitle>Лабиринт</PageTitle>
 
-<h1>Weather</h1>
+<h1>Лабиринт</h1>
 
-<p>This component demonstrates fetching data from the server.</p>
-
-<div @ref="testRef" @onkeydown="OnKeyDown" tabindex="0" class="base-main-lab-div">
-    @if (isInit == false)
+<div class="key-interceptor" @onkeydown="OnKeyDown" @ref="_keyInterceptorRef" tabindex="0">
+    @if (_isInit == false)
     {
-        <p><em>Loading...</em></p>
+        <p>
+            <em>Загрузка...</em>
+        </p>
     }
     else
     {
-        <div style="position: relative">
+        <div class="field">
             @{
                 var boxSize = 370 / _originalSize;
                 var wallWidth = boxSize / 10 * 2;
-                for (int i = 1; i < _labSize - 1; i = i + 2)
+
+                for (int i = 1; i < _labSize - 1; i += 2)
                 {
-                    for (int j = 1; j < _labSize - 1; j = j + 2)
+                    for (int j = 1; j < _labSize - 1; j += 2)
                     {
                         if (lab[i, j - 1] == 0)
                         {
-                            <DrawLine X1="@(j * boxSize - boxSize)"
-                                      Y1="@(i * boxSize - boxSize)"
+                            <DrawLine Width="@(wallWidth)"
+                                      X1="@(j * boxSize - boxSize)"
                                       X2="@(j * boxSize - boxSize)"
-                                      Y2="@(i * boxSize + boxSize)"
-                                      Width="@(wallWidth)" />
+                                      Y1="@(i * boxSize - boxSize)"
+                                      Y2="@(i * boxSize + boxSize)"/>
                         } //leftborder
+
                         if (lab[i - 1, j] == 0)
                         {
-                            <DrawLine X1="@( j * boxSize - boxSize)"
-                                      Y1="@(i * boxSize - boxSize)"
+                            <DrawLine Width="@(wallWidth)"
+                                      X1="@(j * boxSize - boxSize)"
                                       X2="@(j * boxSize + boxSize)"
-                                      Y2="@(i * boxSize - boxSize)"
-                                      Width="@(wallWidth)" />
+                                      Y1="@(i * boxSize - boxSize)"
+                                      Y2="@(i * boxSize - boxSize)"/>
                         } //upborder
+
                         if (i == _labSize - 2 || j == _labSize - 2)
                         {
                             if (lab[i, j + 1] == 0)
                             {
-                                <DrawLine X1="@( j * boxSize + boxSize)"
-                                          Y1="@(i * boxSize - boxSize)"
+                                <DrawLine Width="@(wallWidth)"
+                                          X1="@(j * boxSize + boxSize)"
                                           X2="@(j * boxSize + boxSize)"
-                                          Y2="@(i * boxSize + boxSize)"
-                                          Width="@(wallWidth)" />
+                                          Y1="@(i * boxSize - boxSize)"
+                                          Y2="@(i * boxSize + boxSize)"/>
                             } //rightborder
+
                             if (lab[i + 1, j] == 0)
                             {
-                                <DrawLine X1="@( j * boxSize - boxSize)"
-                                          Y1="@(i * boxSize + boxSize)"
+                                <DrawLine Width="@(wallWidth)"
+                                          X1="@(j * boxSize - boxSize)"
                                           X2="@(j * boxSize + boxSize)"
-                                          Y2="@( i * boxSize + boxSize)"
-                                          Width="@(wallWidth)" />
+                                          Y1="@(i * boxSize + boxSize)"
+                                          Y2="@(i * boxSize + boxSize)"/>
                             } //downborder
                         }
                     }
                 }
 
-                <div style="position:absolute; background-color: green;
-                                left: @(boxSize / 2 + (_myPositionY - 1) * boxSize)px;
-                                top: @(boxSize / 2 + (_myPositionX - 1) * boxSize)px;
+                <div style="position:absolute; 
+                            background-color: green;
+                            left: @(boxSize / 2 + (_myPositionY - 1) * boxSize)px;
+                            top: @(boxSize / 2 + (_myPositionX - 1) * boxSize)px;
                             width: 20px;
                             height: 20px;">
                 </div>
@@ -74,39 +77,40 @@
 </div>
 
 @code {
+    const string MoveUpKey = "ArrowUp";
+    const string MoveDownKey = "ArrowDown";
+    const string MoveLeftKey = "ArrowLeft";
+    const string MoveRightKey = "ArrowRight";
 
-    private ElementReference testRef;
-
-    private int currentCount = 0;
-
-    private void IncrementCount()
-    {
-        currentCount++;
-    }
-    private bool isInit;
-    private int _originalSize;
-    private int _labSize;
-    private int[,] lab;
-    private int[,] lab2;
     private int _myPositionX;
     private int _myPositionY;
 
-    protected override async Task OnInitializedAsync()
+    private ElementReference _keyInterceptorRef;
+    private bool _isInit;
+
+    private int _originalSize;
+    private int _labSize;
+
+    private int[,] lab;
+    private int[,] lab2;
+
+    protected override Task OnInitializedAsync()
     {
         Generate();
+        return Task.CompletedTask;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await testRef.FocusAsync();
+            await _keyInterceptorRef.FocusAsync();
         }
     }
 
     private void OnKeyDown(KeyboardEventArgs e)
     {
-        if (true)//Global.exit)
+        if (true) //Global.exit)
         {
             // int step = _step;
             // if (e.KeyCode == Keys.A && Global.molot > 0)
@@ -161,39 +165,25 @@
             //     clear();
             //     Global.ataka = false;
             // }
-            if (true)//!Global.ataka)
+            if (true) //!Global.ataka)
             {
-                if (e.Key == "ArrowDown")
+                switch (e.Key)
                 {
-                    if (lab[_myPositionX + 1, _myPositionY] != 0)
-                    {
-                        _myPositionX += 2;
-                        //pictureBo_myPositionX.Location = new System.Drawing.Point(Global.step / 2 + (_myPositionY - 1) * step, Global.step / 2 + (_myPositionX - 1) * step);
-                    }
-                }
-                if (e.Key == "ArrowUp")
-                {
-                    if (lab[_myPositionX - 1, _myPositionY] != 0)
-                    {
-                        _myPositionX -= 2;
-                        //pictureBo_myPositionX.Location = new System.Drawing.Point(Global.step / 2 + (_myPositionY - 1) * step, Global.step / 2 + (_myPositionX - 1) * step);
-                    }
-                }
-                if (e.Key == "ArrowLeft")
-                {
-                    if (lab[_myPositionX, _myPositionY - 1] != 0)
-                    {
-                        _myPositionY -= 2;
-                        //pictureBo_myPositionX.Location = new System.Drawing.Point(Global.step / 2 + (_myPositionY - 1) * step, Global.step / 2 + (_myPositionX - 1) * step);
-                    }
-                }
-                if (e.Key == "ArrowRight")
-                {
-                    if (lab[_myPositionX, _myPositionY + 1] != 0)
-                    {
-                        _myPositionY += 2;
-                        //pictureBo_myPositionX.Location = new System.Drawing.Point(Global.step / 2 + (_myPositionY - 1) * step, Global.step / 2 + (_myPositionX - 1) * step);
-                    }
+                    case MoveUpKey:
+                        Move(-1, 0);
+                        break;
+
+                    case MoveDownKey:
+                        Move(1, 0);
+                        break;
+
+                    case MoveLeftKey:
+                        Move(0, -1);
+                        break;
+
+                    case MoveRightKey:
+                        Move(0, 1);
+                        break;
                 }
             }
         }
@@ -213,16 +203,30 @@
         // }
     }
 
-    public void Generate()
+    private void Move(int xOffset, int yOffset)
     {
+        if (lab[_myPositionX + xOffset, _myPositionY + yOffset] == 0)
+            return;
+
+        _myPositionX += xOffset * 2;
+        _myPositionY += yOffset * 2;
+        //pictureBo_myPositionX.Location = new System.Drawing.Point(Global.step / 2 + (_myPositionY - 1) * step, Global.step / 2 + (_myPositionX - 1) * step);
+    }
+
+    private void Generate()
+    {
+        var rnd = new Random();
+
         _myPositionX = 1;
         _myPositionY = 1;
-        var rnd = new Random();
+
         _originalSize = 16;
         var density = 3;
+
         int n = _originalSize * 2 + 1;
         lab = new int[n, n];
         _labSize = n;
+
         for (int i = 0; i < n; i++)
         {
             for (int j = 0; j < n; j++)
@@ -231,26 +235,32 @@
                 {
                     lab[i, j] = 0;
                 }
+
                 if (j == 0 || j == n - 1)
                 {
                     lab[i, j] = 0;
                 }
+
                 if (i % 2 == 1 && j % 2 == 1)
                 {
                     lab[i, j] = 2;
                 }
-                if ((i > 0 && i % 2 == 0 && i < n - 1 && j > 0 && j % 2 == 1 && j < n - 1) ||
-                    (i > 0 && i % 2 == 1 && i < n - 1 && j > 0 && j % 2 == 0 && j < n - 1))
+
+                if (i > 0 && i % 2 == 0 && i < n - 1 && j > 0 && j % 2 == 1 && j < n - 1 ||
+                    i > 0 && i % 2 == 1 && i < n - 1 && j > 0 && j % 2 == 0 && j < n - 1)
                 {
                     lab[i, j] = rnd.Next(0, density);
                 }
             }
+
             lab[n - 1, n / 2] = 1;
             lab[n - 1, n / 2 - 1] = 1;
             //if (size > 1)
             //lab[1, 2] = 1;lab[2, 1] = 1;
         }
+
         lab2 = new int[n, n];
+
         for (int i = 0; i < n; i++)
         {
             for (int j = 0; j < n; j++)
@@ -258,6 +268,8 @@
                 lab2[i, j] = 1;
             }
         }
-        isInit = true;
+
+        _isInit = true;
     }
+
 }
