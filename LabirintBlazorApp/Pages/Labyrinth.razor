@@ -28,7 +28,7 @@
                                       X1="@(j * boxSize - boxSize)"
                                       X2="@(j * boxSize - boxSize)"
                                       Y1="@(i * boxSize - boxSize)"
-                                      Y2="@(i * boxSize + boxSize)"/>
+                                      Y2="@(i * boxSize + boxSize)" />
                         } //leftborder
 
                         if (lab[i - 1, j] == 0)
@@ -37,7 +37,7 @@
                                       X1="@(j * boxSize - boxSize)"
                                       X2="@(j * boxSize + boxSize)"
                                       Y1="@(i * boxSize - boxSize)"
-                                      Y2="@(i * boxSize - boxSize)"/>
+                                      Y2="@(i * boxSize - boxSize)" />
                         } //upborder
 
                         if (i == _labSize - 2 || j == _labSize - 2)
@@ -48,7 +48,7 @@
                                           X1="@(j * boxSize + boxSize)"
                                           X2="@(j * boxSize + boxSize)"
                                           Y1="@(i * boxSize - boxSize)"
-                                          Y2="@(i * boxSize + boxSize)"/>
+                                          Y2="@(i * boxSize + boxSize)" />
                             } //rightborder
 
                             if (lab[i + 1, j] == 0)
@@ -57,20 +57,38 @@
                                           X1="@(j * boxSize - boxSize)"
                                           X2="@(j * boxSize + boxSize)"
                                           Y1="@(i * boxSize + boxSize)"
-                                          Y2="@(i * boxSize + boxSize)"/>
+                                          Y2="@(i * boxSize + boxSize)" />
                             } //downborder
+                        }
+
+
+                        if (_sand[i, j] == 0)
+                        {
+                            var top = i * boxSize - boxSize / 2;
+                            var left = j * boxSize - boxSize / 3;
+                            <div style="position:absolute;
+                                        left: @(left)px;
+                                        top: @(top)px;
+                                        width: @(boxSize)px;
+                                        height: @(boxSize)px;">
+                                <img src="/images/sand.png" style="width: @(boxSize)px; height: @(boxSize)px;" />
+                            </div>
                         }
                     }
                 }
 
-                <div style="position:absolute; 
-                            background-color: green;
-                            left: @(boxSize / 2 + (_myPositionY - 1) * boxSize)px;
-                            top: @(boxSize / 2 + (_myPositionX - 1) * boxSize)px;
-                            width: 20px;
-                            height: 20px;">
+                <div style="position:absolute;
+                            left: @(boxSize * 3 / 5 + (_myPositionX - 1) * boxSize)px;
+                            top: @(boxSize * 3 / 5 + (_myPositionY - 1) * boxSize)px;
+                            width: @(boxSize)px;
+                            height: @(boxSize)px;">
+                    <img src="/images/runner.png" style="width: @(boxSize)px; height: @(boxSize)px;" />
                 </div>
             }
+        </div>
+
+        <div style="position: absolute; right: 20px;">
+            <label>@_score</label>
         </div>
     }
 
@@ -93,6 +111,11 @@
 
     private int[,] lab;
     private int[,] lab2;
+    private int[,] _sand;
+    private bool _exitNotFound;
+    private int _exitBoxPostionX;
+    private int _exitBoxPostionY;
+    private int _score = 0;
 
     protected override Task OnInitializedAsync()
     {
@@ -110,9 +133,8 @@
 
     private void OnKeyDown(KeyboardEventArgs e)
     {
-        if (true) //Global.exit)
+        if (_exitNotFound)
         {
-            // int step = _step;
             // if (e.KeyCode == Keys.A && Global.molot > 0)
             // {
             //     Global.ataka = true;
@@ -170,47 +192,45 @@
                 switch (e.Key)
                 {
                     case MoveUpKey:
-                        Move(-1, 0);
-                        break;
-
-                    case MoveDownKey:
-                        Move(1, 0);
-                        break;
-
-                    case MoveLeftKey:
                         Move(0, -1);
                         break;
 
-                    case MoveRightKey:
+                    case MoveDownKey:
                         Move(0, 1);
+                        break;
+
+                    case MoveLeftKey:
+                        Move(-1, 0);
+                        break;
+
+                    case MoveRightKey:
+                        Move(1, 0);
                         break;
                 }
             }
         }
-        // if ((_myPositionX == Global.n && _myPositionY == Global.n / 2) || (_myPositionX == Global.n && _myPositionY == Global.n / 2 - 1))
-        // {
-        //     Global.exit = false;
-        //     textresult.Text = "exit: true";
-        // }
-        // else
-        // {
-        //     if (Global.sand[_myPositionY, _myPositionX] == 0)
-        //     {
-        //         Global.sand[_myPositionY, _myPositionX] = 1;
-        //         Global.sgore += 100;
-        //         textSgore.Text = Convert.ToString(Global.sgore);
-        //     }
-        // }
     }
 
     private void Move(int xOffset, int yOffset)
     {
-        if (lab[_myPositionX + xOffset, _myPositionY + yOffset] == 0)
+        if (lab[_myPositionY + yOffset, _myPositionX + xOffset] == 0)
             return;
 
         _myPositionX += xOffset * 2;
         _myPositionY += yOffset * 2;
-        //pictureBo_myPositionX.Location = new System.Drawing.Point(Global.step / 2 + (_myPositionY - 1) * step, Global.step / 2 + (_myPositionX - 1) * step);
+
+        if (_myPositionX == _exitBoxPostionX && _myPositionY == _exitBoxPostionY)
+        {
+            _exitNotFound = false;
+        }
+        else
+        {
+            if (_sand[_myPositionY, _myPositionX] == 0)
+            {
+                _sand[_myPositionY, _myPositionX] = 1;
+                _score += 100;
+            }
+        }
     }
 
     private void Generate()
@@ -219,6 +239,7 @@
 
         _myPositionX = 1;
         _myPositionY = 1;
+        _exitNotFound = true;
 
         _originalSize = 16;
         var density = 3;
@@ -253,10 +274,9 @@
                 }
             }
 
-            lab[n - 1, n / 2] = 1;
-            lab[n - 1, n / 2 - 1] = 1;
-            //if (size > 1)
-            //lab[1, 2] = 1;lab[2, 1] = 1;
+            _exitBoxPostionX = n / 2 - (_originalSize % 2 == 0 ? 1 : 0);
+            _exitBoxPostionY = n;
+            lab[_exitBoxPostionY - 1, _exitBoxPostionX] = 1;
         }
 
         lab2 = new int[n, n];
@@ -267,6 +287,13 @@
             {
                 lab2[i, j] = 1;
             }
+        }
+
+        _sand = lab2;
+
+        for (int i = 1; i < _labSize; i++)
+        {
+            _sand[rnd.Next(1, n / 2 + 1) * 2 - 1, rnd.Next(1, n / 2 + 1) * 2 - 1] = 0;
         }
 
         _isInit = true;
