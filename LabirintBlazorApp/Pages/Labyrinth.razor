@@ -17,7 +17,7 @@
             @{
                 var boxSize = 370 / _originalSizeDisplay;
                 var wallWidth = Math.Max(1, boxSize / 10 * 2);
-                var shift = boxSize - wallWidth * 2;
+                int entityBoxSize = boxSize * 2 - wallWidth;
 
                 for (int i = 1; i < _labSize - 1; i += 2)
                 {
@@ -65,48 +65,65 @@
 
                         if (_sand[i, j] == 0)
                         {
-                            var top = (i) * boxSize - wallWidth;
-                            var left = (j - 1) * boxSize + shift - wallWidth;
+                            int left = (j - 1) * boxSize + wallWidth;
+                            int top = (i - 1) * boxSize + wallWidth;
+
                             <div style="position:absolute;
-                                                        left: @(left)px;
-                                                        top: @(top)px;
-                                                        width: @(boxSize)px;
-                                                        height: @(boxSize)px;">
-                                <img src="/images/sand.png" style="width: @(boxSize)px; height: @(boxSize)px;" />
+                                        display: flex;
+                                        justify-content: center;
+                                        align-items: flex-end;
+                                        left: @(left)px;
+                                        top: @(top)px;
+                                        width: @(entityBoxSize)px;
+                                        height: @(entityBoxSize)px;">
+                                <img src="/images/sand.png" style="width: @(boxSize)px; height: @(boxSize)px;"/>
                             </div>
                         }
                     }
                 }
-
-                var myTop = (_myPositionX - 1) * boxSize + (shift * 2 / 3 + wallWidth);
-                var myLeft = (_myPositionY - 1) * boxSize + (shift / 2 + wallWidth);
-                <div style="position:absolute;
-                                                left: @(myTop)px;
-                                                top: @(myLeft)px;
-                                            width: @(boxSize)px;
-                                            height: @(boxSize)px;">
-                    <img src="/images/runner.png" style="width: @(boxSize)px; height: @(boxSize)px;" />
-                </div>
+                
+               int myLeft = (_myPositionX - 1) * boxSize + wallWidth;
+               int myTop = (_myPositionY - 1) * boxSize + wallWidth;
+               
+               <div style="position:absolute;
+                           display: flex;
+                           justify-content: center;
+                           align-items: center;
+                           left: @(myLeft)px;
+                           top: @(myTop)px;
+                           width: @(entityBoxSize)px;
+                           height: @(entityBoxSize)px;">
+                   <img src="/images/runner.png" style="width: @(boxSize)px; height: @(boxSize)px;"/>
+               </div>
+                
             }
         </div>
 
         <div style="position: absolute; right: 20px; width: 250px;">
-            <label>size:</label>
-            <input type="text" @bind="@_originalSize" @oninput="@(ui => {
-                var size = int.Parse(ui.Value.ToString());
-                if(size < 1){ size = 1;}
-                if(size > 100){size = 100; }
-                    _originalSize = size;
-                    StateHasChanged();
-                })" />
-            <div>
-                <input type="range" id="volume" name="volume"
-                    @onchange="@(ui => {_originalSize = int.Parse(ui.Value.ToString());})" 
-                min="1" max="100" />
-                <label for="volume">Volume</label>
+            <div>Score: @_score</div>
+
+            <div style="display: flex; flex-direction: column; margin: 10px 0">
+                <label>Size (@MinSize..@MaxSize):</label>
+                <input @bind:event="oninput"
+                       @bind:get="_originalSize"
+                       @bind:set="value => { _originalSize = ClampSize(value); }"
+                       @onchange="@UpdateSize"
+                       type="number"/>
+
+                <input @bind:event="oninput"
+                       @bind:get="_originalSize"
+                       @bind:set="value => { _originalSize = ClampSize(value); }"
+                       @onchange="@UpdateSize"
+                       min="@MinSize"
+                       max="@MaxSize"
+                       type="range"/>
+
             </div>
-            <label>@_score</label>
-            <button @onclick="Generate">generate</button>
+
+            <div style="margin-bottom: 10px">
+                <button @onclick="Generate">Generate</button>
+                <button @onclick="FocusField">Play</button>
+            </div>
         </div>
     }
 
@@ -117,6 +134,9 @@
     const string MoveDownKey = "ArrowDown";
     const string MoveLeftKey = "ArrowLeft";
     const string MoveRightKey = "ArrowRight";
+    
+    const int MinSize = 1;
+    const int MaxSize = 100;
 
     private int _myPositionX;
     private int _myPositionY;
@@ -136,18 +156,17 @@
     private int _exitBoxPostionY;
     private int _score = 0;
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         _originalSize = 16;
-        Generate();
-        return Task.CompletedTask;
+        await Generate();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await _keyInterceptorRef.FocusAsync();
+            await FocusField();
         }
     }
 
@@ -253,21 +272,14 @@
         }
     }
 
-    private void Generate()
+    private async Task Generate()
     {
         var rnd = new Random();
 
         _myPositionX = 1;
         _myPositionY = 1;
         _exitNotFound = true;
-        if (_originalSize < 1)
-        {
-            _originalSize = 1;
-        }
-        else if (_originalSize > 100)
-        {
-            _originalSize = 100;
-        }
+        _originalSize = ClampSize(_originalSize);
         _originalSizeDisplay = _originalSize;
 
         var density = 3;
@@ -295,8 +307,8 @@
                     lab[i, j] = 2;
                 }
 
-                if (i > 0 && i % 2 == 0 && i < n - 1 && j > 0 && j % 2 == 1 && j < n - 1 ||
-                    i > 0 && i % 2 == 1 && i < n - 1 && j > 0 && j % 2 == 0 && j < n - 1)
+                if ((i > 0 && i % 2 == 0 && i < n - 1 && j > 0 && j % 2 == 1 && j < n - 1) || 
+                    (i > 0 && i % 2 == 1 && i < n - 1 && j > 0 && j % 2 == 0 && j < n - 1))
                 {
                     lab[i, j] = rnd.Next(0, density);
                 }
@@ -325,6 +337,38 @@
         }
 
         _isInit = true;
+        
+        await FocusField();
+    }
+
+    private async Task FocusField()
+    {
+        if (_keyInterceptorRef is { Id: not null, Context: not null })
+        {
+            await _keyInterceptorRef.FocusAsync();
+        }
+    }
+
+    private void UpdateSize(ChangeEventArgs eventArgs)
+    {
+        int size = int.Parse(eventArgs.Value?.ToString() ?? "1");
+        _originalSize = ClampSize(size);
+    }
+
+    private int ClampSize(int size)
+    {
+        switch (size)
+        {
+            case < MinSize:
+                size = MinSize;
+                break;
+
+            case > MaxSize:
+                size = MaxSize;
+                break;
+        }
+
+        return size;
     }
 
 }
