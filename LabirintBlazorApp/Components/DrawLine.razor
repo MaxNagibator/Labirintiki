@@ -1,4 +1,5 @@
 ﻿<div class="bolt" style="
+    background:@(Parameters.Labyrinth.Color);
     left: @(X1)px; 
     top: @(Y1)px; 
     width: @(X2 - X1 + Width)px; 
@@ -6,7 +7,6 @@
 </div>
 
 @code {
-
     [Parameter] [EditorRequired]
     public int X1 { get; set; }
 
@@ -20,6 +20,5 @@
     public int Y2 { get; set; }
 
     [Parameter] [EditorRequired]
-    public int Width { get; set; }
-
+    public int Width { get; set; } 
 }

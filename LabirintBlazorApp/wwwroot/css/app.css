@@ -101,4 +101,36 @@ a, .btn-link {
 code {
     color: #c02d76;
 }
+.mud-nav-link:hover:not(.mud-nav-link-disable) {
+    cursor: pointer;
+    text-decoration: none;
+    background-color: var(--mud-palette-action-default-hover);
+    color: var(--mud-palette-drawer-text);
+}
+
+.docs-appbar-filter {
+    backdrop-filter: blur(12px);
+}
+
+.mud-appbar {
+    width: 100%;
+    display: flex;
+    z-index: var(--mud-zindex-appbar);
+    position: relative;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    flex-direction: column;
+    color: var(--mud-palette-appbar-text);
+    background-color: var(--mud-palette-appbar-background);
+    transition: margin 225ms cubic-bezier(0,0,.2,1) 0ms,width 225ms cubic-bezier(0,0,.2,1) 0ms;
+}
+
+.mud-elevation-0 {
+    box-shadow: var(--mud-elevation-0);
+}
+
+.mud-theme-transparent {
+    color: inherit !important;
+    background-color: transparent !important;
+}
 
