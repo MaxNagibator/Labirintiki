@@ -1,8 +1,7 @@
-﻿
-.key-interceptor:focus {
+﻿.key-interceptor:focus {
     outline: none !important;
 }
 
-.field {
+.field { 
     position: relative;
 }

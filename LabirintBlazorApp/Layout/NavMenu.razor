@@ -1,35 +1,7 @@
-﻿<div class="navbar navbar-dark ps-3 top-row">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Лабиринт</a>
-        <button class="navbar-toggler" @onclick="ToggleNavMenu" title="Navigation menu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
-
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span aria-hidden="true" class="bi bi-house-door-fill-nav-menu"></span> Дом
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="labirint">
-                <span aria-hidden="true" class="bi bi-list-nested-nav-menu"></span> Лабиринт
-            </NavLink>
-        </div>
-    </nav>
-</div>
-
-@code {
-    private bool _collapseNavMenu = true;
-
-    private string? NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        _collapseNavMenu = !_collapseNavMenu;
-    }
-
-}
+﻿<MudNavMenu Rounded="true" Color="Color.Info" Bordered="false">
+    <MudText Typo="Typo.h6" Class="px-4">Лабиринт</MudText>
+    <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">MaxNagibator эдишен</MudText>
+    <MudDivider Class="mt-3 mb-3" DividerType="DividerType.Middle" />
+    <MudNavLink Icon="@MaterialDesignIcons.Outline.HomeLightbulb" Href=@("/") Match="NavLinkMatch.All">Главная</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.VideogameAsset" Href=@("/labirint") Match="NavLinkMatch.All">Лабиринт</MudNavLink>
+</MudNavMenu> 

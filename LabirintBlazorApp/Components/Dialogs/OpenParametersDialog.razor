@@ -1,0 +1,60 @@
+﻿@inject ISnackbar _snackbarService
+@inject IDialogService _dialogService
+@inject Blazored.LocalStorage.ILocalStorageService _localStorage
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            Параметры
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudText>Цвет лабиринта</MudText>
+        <MudStack>
+            <MudColorPicker Rounded="true" ShowToolbar="true" ShowAlpha="true" ShowColorField="true" ShowPreview="true" ShowSliders="true" ShowInputs="true" ShowModeSwitch="true"
+                            ColorPickerMode="ColorPickerMode.HEX" PickerVariant="PickerVariant.Static" @bind-Text="@Parameters.Labyrinth.Color" />
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Отмена</MudButton>
+        <MudButton Disabled="@_processing" Color="Color.Warning" OnClick="Reset">Сбросить</MudButton>
+        <MudButton Disabled="@_processing" Color="Color.Success" OnClick="Update">
+            @if (_processing)
+            {
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+            }
+            else
+            {
+                <MudText Typo="Typo.button">Сохранить</MudText>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } 
+    private bool _processing { get; set; } = false;
+
+    private async Task Update()
+    {
+        _processing = true;
+        try
+        {
+            await _localStorage.SetItemAsync<LabyrinthParametersDto>("LabyrinthParameters", Parameters.Labyrinth);
+            _snackbarService.Add("Сохранено! Применится с следующей генерации", Severity.Success); 
+            MudDialog.Close();
+        }
+        catch
+        {
+            _snackbarService.Add("Не удалось сохранить", Severity.Error);
+        }
+        _processing = false;
+    }
+    private void Reset()
+    {
+        Parameters.Labyrinth = new();
+    }
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}
