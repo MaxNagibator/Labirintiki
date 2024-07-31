@@ -1,122 +1,118 @@
-﻿@page "/labirint"
+﻿@page "/labirint" 
 
 <PageTitle>Лабиринт</PageTitle>
+<MudStack Spacing="3">
+    <MudText Typo="Typo.h4">Лабиринт!</MudText>
+    <div class="key-interceptor" @onkeydown="OnKeyDown" @ref="_keyInterceptorRef" tabindex="0">
+        @if (_isInit == false)
+        {
+            <MudStack AlignItems="AlignItems.Center" Row>
+                <MudProgressCircular Indeterminate />
+                <MudText Typo="Typo.body1">Загрузка..</MudText>
+            </MudStack>
+        }
+        else
+        {
+            <div class="field">
+                @{
+                    var boxSize = 370 / _originalSizeDisplay;
+                    var wallWidth = Math.Max(1, boxSize / 10 * 2);
+                    var shift = boxSize - wallWidth * 2;
 
-<h1>Лабиринт</h1>
-
-<div class="key-interceptor" @onkeydown="OnKeyDown" @ref="_keyInterceptorRef" tabindex="0">
-    @if (_isInit == false)
-    {
-        <p>
-            <em>Загрузка...</em>
-        </p>
-    }
-    else
-    {
-        <div class="field">
-            @{
-                var boxSize = 370 / _originalSizeDisplay;
-                var wallWidth = Math.Max(1, boxSize / 10 * 2);
-                var shift = boxSize - wallWidth * 2;
-
-                for (int i = 1; i < _labSize - 1; i += 2)
-                {
-                    for (int j = 1; j < _labSize - 1; j += 2)
+                    for (int i = 1; i < _labSize - 1; i += 2)
                     {
-                        if (lab[i, j - 1] == 0)
+                        for (int j = 1; j < _labSize - 1; j += 2)
                         {
-                            <DrawLine Width="@(wallWidth)"
-                                      X1="@(j * boxSize - boxSize)"
-                                      X2="@(j * boxSize - boxSize)"
-                                      Y1="@(i * boxSize - boxSize)"
-                                      Y2="@(i * boxSize + boxSize)" />
-                        } //leftborder
-
-                        if (lab[i - 1, j] == 0)
-                        {
-                            <DrawLine Width="@(wallWidth)"
-                                      X1="@(j * boxSize - boxSize)"
-                                      X2="@(j * boxSize + boxSize)"
-                                      Y1="@(i * boxSize - boxSize)"
-                                      Y2="@(i * boxSize - boxSize)" />
-                        } //upborder
-
-                        if (i == _labSize - 2 || j == _labSize - 2)
-                        {
-                            if (lab[i, j + 1] == 0)
+                            if (lab[i, j - 1] == 0)
                             {
                                 <DrawLine Width="@(wallWidth)"
-                                          X1="@(j * boxSize + boxSize)"
-                                          X2="@(j * boxSize + boxSize)"
+                                          X1="@(j * boxSize - boxSize)"
+                                          X2="@(j * boxSize - boxSize)"
                                           Y1="@(i * boxSize - boxSize)"
                                           Y2="@(i * boxSize + boxSize)" />
-                            } //rightborder
+                            } //leftborder
 
-                            if (lab[i + 1, j] == 0)
+                            if (lab[i - 1, j] == 0)
                             {
                                 <DrawLine Width="@(wallWidth)"
                                           X1="@(j * boxSize - boxSize)"
                                           X2="@(j * boxSize + boxSize)"
-                                          Y1="@(i * boxSize + boxSize)"
-                                          Y2="@(i * boxSize + boxSize)" />
-                            } //downborder
-                        }
+                                          Y1="@(i * boxSize - boxSize)"
+                                          Y2="@(i * boxSize - boxSize)" />
+                            } //upborder
+
+                            if (i == _labSize - 2 || j == _labSize - 2)
+                            {
+                                if (lab[i, j + 1] == 0)
+                                {
+                                    <DrawLine Width="@(wallWidth)"
+                                              X1="@(j * boxSize + boxSize)"
+                                              X2="@(j * boxSize + boxSize)"
+                                              Y1="@(i * boxSize - boxSize)"
+                                              Y2="@(i * boxSize + boxSize)" />
+                                } //rightborder
+
+                                if (lab[i + 1, j] == 0)
+                                {
+                                    <DrawLine Width="@(wallWidth)"
+                                              X1="@(j * boxSize - boxSize)"
+                                              X2="@(j * boxSize + boxSize)"
+                                              Y1="@(i * boxSize + boxSize)"
+                                              Y2="@(i * boxSize + boxSize)" />
+                                } //downborder
+                            }
 
 
-                        if (_sand[i, j] == 0)
-                        {
-                            var top = (i) * boxSize - wallWidth;
-                            var left = (j - 1) * boxSize + shift - wallWidth;
-                            <div style="position:absolute;
-                                                        left: @(left)px;
-                                                        top: @(top)px;
-                                                        width: @(boxSize)px;
-                                                        height: @(boxSize)px;">
-                                <img src="/images/sand.png" style="width: @(boxSize)px; height: @(boxSize)px;" />
-                            </div>
+                            if (_sand[i, j] == 0)
+                            {
+                                var top = (i) * boxSize - wallWidth;
+                                var left = (j - 1) * boxSize + shift - wallWidth;
+                                <div style="position:absolute;
+                                                                left: @(left)px;
+                                                                top: @(top)px;
+                                                                width: @(boxSize)px;
+                                                                height: @(boxSize)px;">
+                                    <img src="/images/sand.png" style="width: @(boxSize)px; height: @(boxSize)px;" />
+                                </div>
+                            }
                         }
                     }
+
+                    var myTop = (_myPositionX - 1) * boxSize + (shift * 2 / 3 + wallWidth);
+                    var myLeft = (_myPositionY - 1) * boxSize + (shift / 2 + wallWidth);
+                    <div style="position:absolute;
+                                                        left: @(myTop)px;
+                                                        top: @(myLeft)px;
+                                                    width: @(boxSize)px;
+                                                    height: @(boxSize)px;">
+                        <img src="/images/runner.png" style="width: @(boxSize)px; height: @(boxSize)px;" />
+                    </div>
                 }
-
-                var myTop = (_myPositionX - 1) * boxSize + (shift * 2 / 3 + wallWidth);
-                var myLeft = (_myPositionY - 1) * boxSize + (shift / 2 + wallWidth);
-                <div style="position:absolute;
-                                                left: @(myTop)px;
-                                                top: @(myLeft)px;
-                                            width: @(boxSize)px;
-                                            height: @(boxSize)px;">
-                    <img src="/images/runner.png" style="width: @(boxSize)px; height: @(boxSize)px;" />
-                </div>
-            }
-        </div>
-
-        <div style="position: absolute; right: 20px; width: 250px;">
-            <label>size:</label>
-            <input type="text" @bind="@_originalSize" @oninput="@(ui => {
-                var size = int.Parse(ui.Value.ToString());
-                if(size < 1){ size = 1;}
-                if(size > 100){size = 100; }
-                    _originalSize = size;
-                    StateHasChanged();
-                })" />
-            <div>
-                <input type="range" id="volume" name="volume"
-                    @onchange="@(ui => {_originalSize = int.Parse(ui.Value.ToString());})" 
-                min="1" max="100" />
-                <label for="volume">Volume</label>
             </div>
-            <label>@_score</label>
-            <button @onclick="Generate">generate</button>
-        </div>
-    }
 
-</div>
-
+            <div style="position: absolute; right: 20px; width: 250px;">
+                <MudStack Spacing="3">
+                    <MudText Typo="Typo.h6">Очки: @_score</MudText>
+                    <MudDivider Class="my-2" Style="height:2px" DividerType="DividerType.FullWidth" />
+                    <MudText Typo="Typo.h5">Параметры:</MudText>
+                    <MudStack>
+                        <MudNumericField Label="Размер" Min="@_minSize" Max="@_maxSize" DebounceInterval="300" Value="@_originalSize" HelperText="Попробуй тут шифт + колесо мыши" />
+                        <MudSlider @bind-Value="_originalSize" Min="@_minSize" Max="@_maxSize" Color="Color.Info" Size="Size.Medium" />
+                    </MudStack> 
+                    <MudButton OnClick="Generate" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Генерировать</MudButton>
+                </MudStack>
+            </div>
+        }
+    </div>
+</MudStack> 
 @code {
     const string MoveUpKey = "ArrowUp";
     const string MoveDownKey = "ArrowDown";
     const string MoveLeftKey = "ArrowLeft";
     const string MoveRightKey = "ArrowRight";
+
+    private int _minSize = 1;
+    private int _maxSize = 100;
 
     private int _myPositionX;
     private int _myPositionY;
@@ -136,21 +132,16 @@
     private int _exitBoxPostionY;
     private int _score = 0;
 
-    protected override Task OnInitializedAsync()
-    {
-        _originalSize = 16;
-        Generate();
-        return Task.CompletedTask;
-    }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await _keyInterceptorRef.FocusAsync();
+            _originalSize = 16; 
+            await Generate();
+            StateHasChanged();
         }
     }
-
     private void OnKeyDown(KeyboardEventArgs e)
     {
         if (_exitNotFound)
@@ -253,10 +244,15 @@
         }
     }
 
-    private void Generate()
+    private async Task Generate()
     {
-        var rnd = new Random();
-
+        //todo Костыль чтоб цвет обновлялся, надо больше времени подумать. 
+        // (Не перерисовывает если стена осталась на прежнем месте)
+        // Но в принципе то работает))))))
+        _labSize = 0;
+        StateHasChanged();
+        await Task.Delay(1);
+         
         _myPositionX = 1;
         _myPositionY = 1;
         _exitNotFound = true;
@@ -298,7 +294,7 @@
                 if (i > 0 && i % 2 == 0 && i < n - 1 && j > 0 && j % 2 == 1 && j < n - 1 ||
                     i > 0 && i % 2 == 1 && i < n - 1 && j > 0 && j % 2 == 0 && j < n - 1)
                 {
-                    lab[i, j] = rnd.Next(0, density);
+                    lab[i, j] = Random.Shared.Next(0, density);
                 }
             }
 
@@ -321,9 +317,8 @@
 
         for (int i = 1; i < _labSize; i++)
         {
-            _sand[rnd.Next(1, n / 2 + 1) * 2 - 1, rnd.Next(1, n / 2 + 1) * 2 - 1] = 0;
-        }
-
+            _sand[Random.Shared.Next(1, n / 2 + 1) * 2 - 1, Random.Shared.Next(1, n / 2 + 1) * 2 - 1] = 0;
+        } 
         _isInit = true;
     }
 
