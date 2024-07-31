@@ -98,16 +98,18 @@
             <div style="position: absolute; right: 20px; width: 250px;">
                 <MudStack Spacing="3">
                     <MudText Typo="Typo.h6">Очки: @_score</MudText>
-                        <MudDivider Class="my-2" Style="height:2px" DividerType="DividerType.FullWidth" />
-                        <MudText Typo="Typo.h5">Параметры:</MudText>
-                        <MudStack>
-                            <MudNumericField Label="Размер" Min="@MinSize" Max="@MaxSize" DebounceInterval="300" Value="@_originalSize" HelperText="Попробуй тут шифт + колесо мыши" />
-                            <MudSlider @bind-Value="_originalSize" Min="@MinSize" Max="@MaxSize" Color="Color.Info" Size="Size.Medium" />
+                    <MudDivider Class="my-2" Style="height:2px" DividerType="DividerType.FullWidth" />
+                    <MudText Typo="Typo.h5">Параметры:</MudText>
+                    <MudStack>
+                        <MudNumericField Label="Размер" Min="@MinSize" Max="@MaxSize" DebounceInterval="300" Value="@_originalSize" HelperText="Попробуй тут шифт + колесо мыши" />
+                        <MudSlider @bind-Value="_originalSize" Min="@MinSize" Max="@MaxSize" Color="Color.Info" Size="Size.Medium" />
                         </MudStack>
-                        <MudButton OnClick="Generate" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Генерировать</MudButton>
-                 <MudButton OnClick="FocusField" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Играть</MudButton>
-             </MudStack>
-         </div>
+                        <MudText Typo="Typo.h6">Молоток: @_molot</MudText>
+                        <MudText Typo="Typo.h6">Бомба: @_bomba</MudText>
+                    <MudButton OnClick="Generate" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Генерировать</MudButton>
+                     <MudButton OnClick="FocusField" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Играть</MudButton>
+                 </MudStack>
+            </div>
         }
     </div>
 </MudStack>
@@ -116,6 +118,9 @@
     const string MoveDownKey = "ArrowDown";
     const string MoveLeftKey = "ArrowLeft";
     const string MoveRightKey = "ArrowRight";
+
+    const string MolotKeyCode = "KeyA";
+    const string BombaKeyCode = "KeyB";
 
     const int MinSize = 1;
     const int MaxSize = 100;
@@ -142,6 +147,10 @@
     private int _exitBoxPostionY;
     private int _score = 0;
 
+    private bool _ataka;
+    private int _bomba;
+    private int _molot;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -156,59 +165,55 @@
     {
         if (_exitNotFound)
         {
-            // if (e.KeyCode == Keys.A && Global.molot > 0)
-            // {
-            //     Global.ataka = true;
-            //     Global.molot--;
-            //     textmolot.Text = Convert.ToString(Global.molot);
-            // }
-            // Graphics g = this.CreateGraphics();
-            // Pen p = new Pen(BackColor, Global.step / 5);
-            // if (e.KeyCode == Keys.B && Global.bomba > 0)
-            // {
-            //     if (_myPositionX != Global.size * 2 - 1)
-            //     {
-            //         Global.lab[_myPositionX + 1, _myPositionY] = 1;
-            //     }
-            //     if (_myPositionX != 1)
-            //     {
-            //         Global.lab[_myPositionX - 1, _myPositionY] = 1;
-            //     }
-            //     if (_myPositionY != 1)
-            //     {
-            //         Global.lab[_myPositionX, _myPositionY - 1] = 1;
-            //     }
-            //     if (_myPositionY != Global.size * 2 - 1)
-            //     {
-            //         Global.lab[_myPositionX, _myPositionY + 1] = 1;
-            //     }
-            //     clear();
-            //     Global.bomba--;
-            //     textbomb.Text = Convert.ToString(Global.bomba);
-            //     Global.ataka = false;
-            // }
-            // if (Global.ataka && e.KeyCode != Keys.A)
-            // {
-            //     if (e.KeyCode == Keys.Down && _myPositionX != Global.size * 2 - 1)
-            //     {
-            //         Global.lab[_myPositionX + 1, _myPositionY] = 1;
-            //     }
-            //     if (e.KeyCode == Keys.Up && _myPositionX != 1)
-            //     {
-            //         Global.lab[_myPositionX - 1, _myPositionY] = 1;
-            //     }
-            //     if (e.KeyCode == Keys.Left && _myPositionY != 1)
-            //     {
-            //         Global.lab[_myPositionX, _myPositionY - 1] = 1;
-            //     }
-            //     if (e.KeyCode == Keys.Right && _myPositionY != Global.size * 2 - 1)
-            //     {
-            //         Global.lab[_myPositionX, _myPositionY + 1] = 1;
-            //     }
-            //     clear();
-            //     Global.ataka = false;
-            // }
-            if (true) //!Global.ataka)
+            if (e.Code == MolotKeyCode && _molot > 0)
+            {
+                _ataka = true;
+                _molot--;
+                //textmolot.Text = Convert.ToString(_molot);
+            }
+            if (e.Code == BombaKeyCode && _bomba > 0)
+            {
+                if (_myPositionX != _originalSize * 2 - 1)
+                {
+                    lab[_myPositionY, _myPositionX + 1] = 1;
+                }
+                if (_myPositionX != 1)
+                {
+                    lab[_myPositionY, _myPositionX - 1] = 1;
+                }
+                if (_myPositionY != 1)
+                {
+                    lab[_myPositionY - 1, _myPositionX] = 1;
+                }
+                if (_myPositionY != _originalSize * 2 - 1)
+                {
+                    lab[_myPositionY + 1, _myPositionX] = 1;
+                }
+                _bomba--;
+                //textbomb.Text = Convert.ToString(_bomba);
+                _ataka = false;
+            }
+            if (_ataka && e.Code != MolotKeyCode)
+            {
+                if (e.Key == MoveRightKey && _myPositionX != _originalSize * 2 - 1)
+                {
+                    lab[_myPositionY, _myPositionX + 1] = 1;
+                }
+                if (e.Key == MoveLeftKey && _myPositionX != 1)
+                {
+                    lab[_myPositionY, _myPositionX - 1] = 1;
+                }
+                if (e.Key == MoveUpKey && _myPositionY != 1)
+                {
+                    lab[_myPositionY - 1, _myPositionX] = 1;
+                }
+                if (e.Key == MoveDownKey && _myPositionY != _originalSize * 2 - 1)
+                {
+                    lab[_myPositionY + 1, _myPositionX] = 1;
+                }
+                _ataka = false;
+            }
+            if (!_ataka)
             {
                 switch (e.Key)
                 {
@@ -274,6 +279,9 @@
         int n = _originalSize * 2 + 1;
         lab = new int[n, n];
         _labSize = n;
+        _molot = 3;
+        _bomba = 1;
+        _score = 0;
 
         for (int i = 0; i < n; i++)
         {
