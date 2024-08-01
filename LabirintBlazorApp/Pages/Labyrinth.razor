@@ -1,5 +1,5 @@
 ﻿@page "/labirint"
-
+@inject SoundService _soundService
 <PageTitle>Лабиринт</PageTitle>
 <MudStack Spacing="3">
     <MudText Typo="Typo.h4">Лабиринт!</MudText>
@@ -7,9 +7,9 @@
         @if (_isInit == false)
         {
             <MudStack AlignItems="AlignItems.Center" Row>
-             <MudProgressCircular Indeterminate />
-                 <MudText Typo="Typo.body1">Загрузка..</MudText>
-             </MudStack>
+                <MudProgressCircular Indeterminate />
+                <MudText Typo="Typo.body1">Загрузка..</MudText>
+            </MudStack>
         }
         else
         {
@@ -68,13 +68,13 @@
                                 int left = (j - 1) * boxSize + wallWidth;
                                 int top = (i - 1) * boxSize + wallWidth;
                                 <div style="position:absolute;
-                                            display: flex;
-                                            justify-content: center;
-                                            align-items: flex-end;
-                                            left: @(left)px;
-                                            top: @(top)px;
-                                            width: @(entityBoxSize)px;
-                                            height: @(entityBoxSize)px;">
+                                                    display: flex;
+                                                    justify-content: center;
+                                                    align-items: flex-end;
+                                                    left: @(left)px;
+                                                    top: @(top)px;
+                                                    width: @(entityBoxSize)px;
+                                                    height: @(entityBoxSize)px;">
                                     <img src="/images/sand.png" style="width: @(boxSize)px; height: @(boxSize)px;" />
                                 </div>
                             }
@@ -83,13 +83,13 @@
                     int myLeft = (_myPositionX - 1) * boxSize + wallWidth;
                     int myTop = (_myPositionY - 1) * boxSize + wallWidth;
                     <div style="position:absolute;
-                                display: flex;
-                                justify-content: center;
-                                align-items: center;
-                                left: @(myLeft)px;
-                                top: @(myTop)px;
-                                width: @(entityBoxSize)px;
-                                height: @(entityBoxSize)px;">
+                                        display: flex;
+                                        justify-content: center;
+                                        align-items: center;
+                                        left: @(myLeft)px;
+                                        top: @(myTop)px;
+                                        width: @(entityBoxSize)px;
+                                        height: @(entityBoxSize)px;">
                         <img src="/images/runner.png" style="width: @(boxSize)px; height: @(boxSize)px;" />
                     </div>
                 }
@@ -103,12 +103,18 @@
                     <MudStack>
                         <MudNumericField Label="Размер" Min="@MinSize" Max="@MaxSize" DebounceInterval="300" Value="@_originalSize" HelperText="Попробуй тут шифт + колесо мыши" />
                         <MudSlider @bind-Value="_originalSize" Min="@MinSize" Max="@MaxSize" Color="Color.Info" Size="Size.Medium" />
-                        </MudStack>
-                        <MudText Typo="Typo.h6">Молоток: @_molot</MudText>
-                        <MudText Typo="Typo.h6">Бомба: @_bomba</MudText>
+                    </MudStack>
+                    <MudStack Row>
+                        <MudIcon Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.Hammer" Size="Size.Large" />
+                        <MudText Color="Color.Warning" Typo="Typo.h6">@_molot</MudText>
+                    </MudStack>
+                    <MudStack Row>
+                        <MudIcon Color="Color.Error" Icon="@MaterialDesignIcons.Normal.Bomb" Size="Size.Large" />
+                        <MudText Color="Color.Error" Typo="Typo.h6"> @_bomba</MudText>
+                    </MudStack>
                     <MudButton OnClick="Generate" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Генерировать</MudButton>
-                     <MudButton OnClick="FocusField" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Играть</MudButton>
-                 </MudStack>
+                    <MudButton OnClick="FocusField" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Играть</MudButton>
+                </MudStack>
             </div>
         }
     </div>
@@ -161,7 +167,8 @@
             StateHasChanged();
         }
     }
-    private void OnKeyDown(KeyboardEventArgs e)
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
     {
         if (_exitNotFound)
         {
@@ -169,6 +176,7 @@
             {
                 _ataka = true;
                 _molot--;
+                await _soundService.PlayAsync(SoundType.Molot);
                 //textmolot.Text = Convert.ToString(_molot);
             }
             if (e.Code == BombaKeyCode && _bomba > 0)
@@ -191,6 +199,7 @@
                 }
                 _bomba--;
                 //textbomb.Text = Convert.ToString(_bomba);
+                await _soundService.PlayAsync(SoundType.Bomb);
                 _ataka = false;
             }
             if (_ataka && e.Code != MolotKeyCode)
@@ -218,33 +227,33 @@
                 switch (e.Key)
                 {
                     case MoveUpKey:
-                        Move(0, -1);
+                        await Move(0, -1);
                         break;
 
                     case MoveDownKey:
-                        Move(0, 1);
+                        await Move(0, 1);
                         break;
 
                     case MoveLeftKey:
-                        Move(-1, 0);
+                        await Move(-1, 0);
                         break;
 
                     case MoveRightKey:
-                        Move(1, 0);
+                        await Move(1, 0);
                         break;
                 }
             }
         }
     }
 
-    private void Move(int xOffset, int yOffset)
+    private async Task Move(int xOffset, int yOffset)
     {
         if (lab[_myPositionY + yOffset, _myPositionX + xOffset] == 0)
             return;
 
         _myPositionX += xOffset * 2;
         _myPositionY += yOffset * 2;
-
+        await _soundService.PlayAsync(SoundType.Step);
         if (_myPositionX == _exitBoxPostionX && _myPositionY == _exitBoxPostionY)
         {
             _exitNotFound = false;
@@ -255,6 +264,7 @@
             {
                 _sand[_myPositionY, _myPositionX] = 1;
                 _score += 100;
+                await _soundService.PlayAsync(SoundType.Score);
             }
         }
     }
@@ -364,5 +374,4 @@
 
         return size;
     }
-
 }
