@@ -1,5 +1,5 @@
-﻿@page "/labirint"
-
+@page "/labirint"
+@inject SoundService _soundService
 <PageTitle>Лабиринт</PageTitle>
 <MudStack Spacing="3">
     <MudText Typo="Typo.h4">Лабиринт!</MudText>
@@ -104,8 +104,14 @@
                         <MudNumericField Label="Размер" Min="@MinSize" Max="@MaxSize" DebounceInterval="300" Value="@_originalSize" HelperText="Попробуй тут шифт + колесо мыши" />
                         <MudSlider @bind-Value="_originalSize" Min="@MinSize" Max="@MaxSize" Color="Color.Info" Size="Size.Medium" />
                     </MudStack>
-                    <MudText Typo="Typo.h6">Молоток: @_molotCount/@MaxMolotCount</MudText>
-                    <MudText Typo="Typo.h6">Бомба: @_bombaCount/@MaxBombaCount</MudText>
+                    <MudStack Row>
+                        <MudIcon Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.Hammer" Size="Size.Large" />
+                        <MudText Color="Color.Warning" Typo="Typo.h6">@_molotCount/@MaxMolotCount</MudText>
+                    </MudStack>
+                    <MudStack Row>
+                        <MudIcon Color="Color.Error" Icon="@MaterialDesignIcons.Normal.Bomb" Size="Size.Large" />
+                        <MudText Color="Color.Error" Typo="Typo.h6"> @_bombaCount/@MaxBombaCount</MudText>
+                    </MudStack>
                     <MudButton OnClick="GenerateAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Генерировать</MudButton>
                     <MudButton OnClick="FocusFieldAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Играть</MudButton>
                 </MudStack>
@@ -162,21 +168,22 @@
         }
     }
 
-    private void OnKeyDown(KeyboardEventArgs e)
+    private async Task OnKeyDown(KeyboardEventArgs e)
     {
         if (_exitNotFound == false)
             return;
 
-        HandleAttack(e.Key);
-        HandleMovement(e.Key);
+        await HandleAttack(e.Key);
+        await HandleMovement(e.Key);
     }
 
-    private void HandleAttack(string key)
+    private async Task HandleAttack(string key)
     {
         if (key == BombaKey && _bombaCount > 0)
         {
             DetonateBomb();
             _bombaCount--;
+            await _soundService.PlayAsync(SoundType.Bomb);
             _isAtaka = false;
             return;
         }
@@ -190,11 +197,12 @@
         if (key != MolotKey && _isAtaka)
         {
             Attack(key);
+            await _soundService.PlayAsync(SoundType.Molot);
             _isAtaka = false;
         }
     }
 
-    private void HandleMovement(string key)
+    private async Task HandleMovement(string key)
     {
         if (_isAtaka)
             return;
@@ -202,19 +210,19 @@
         switch (key)
         {
             case MoveUpKey:
-                Move(0, -1);
+                await Move(0, -1);
                 break;
 
             case MoveDownKey:
-                Move(0, 1);
+                await Move(0, 1);
                 break;
 
             case MoveLeftKey:
-                Move(-1, 0);
+                await Move(-1, 0);
                 break;
 
             case MoveRightKey:
-                Move(1, 0);
+                await Move(1, 0);
                 break;
         }
     }
@@ -257,7 +265,7 @@
         }
     }
 
-    private void Move(int xOffset, int yOffset)
+    private async Task Move(int xOffset, int yOffset)
     {
         if (lab[_myPositionY + yOffset, _myPositionX + xOffset] == 0)
             return;
@@ -265,6 +273,7 @@
         _myPositionX += xOffset * 2;
         _myPositionY += yOffset * 2;
 
+        await _soundService.PlayAsync(SoundType.Step);
         if (_myPositionX == _exitBoxPositionX && _myPositionY == _exitBoxPositionY)
         {
             _exitNotFound = false;
@@ -276,6 +285,7 @@
 
         _sand[_myPositionY, _myPositionX] = 1;
         _score += 100;
+        await _soundService.PlayAsync(SoundType.Score);
     }
 
     private async Task GenerateAsync()

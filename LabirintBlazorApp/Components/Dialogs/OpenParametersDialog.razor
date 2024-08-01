@@ -9,10 +9,13 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudText>Цвет лабиринта</MudText>
-        <MudStack>
-            <MudColorPicker Rounded="true" ShowToolbar="true" ShowAlpha="true" ShowColorField="true" ShowPreview="true" ShowSliders="true" ShowInputs="true" ShowModeSwitch="true"
-                            ColorPickerMode="ColorPickerMode.HEX" PickerVariant="PickerVariant.Static" @bind-Text="@Parameters.Labyrinth.Color" />
+        <MudStack Spacing="2">
+            <MudSwitch @bind-Value="@Parameters.Labyrinth.IsSoundOn" Color="Color.Success" UncheckedColor="Color.Error" Label="Звук" />
+            <MudStack>
+                <MudText>Цвет лабиринта</MudText>
+                <MudColorPicker Rounded="true" ShowToolbar="true" ShowAlpha="true" ShowColorField="true" ShowPreview="true" ShowSliders="true" ShowInputs="true" ShowModeSwitch="true"
+                                ColorPickerMode="ColorPickerMode.HEX" PickerVariant="PickerVariant.Static" @bind-Text="@Parameters.Labyrinth.Color" />
+            </MudStack>
         </MudStack>
     </DialogContent>
     <DialogActions>
@@ -31,7 +34,7 @@
     </DialogActions>
 </MudDialog>
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } 
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     private bool _processing { get; set; } = false;
 
     private async Task Update()
@@ -40,7 +43,7 @@
         try
         {
             await _localStorage.SetItemAsync<LabyrinthParametersDto>("LabyrinthParameters", Parameters.Labyrinth);
-            _snackbarService.Add("Сохранено! Применится с следующей генерации", Severity.Success); 
+            _snackbarService.Add("Сохранено! Применится с следующей генерации", Severity.Success);
             MudDialog.Close();
         }
         catch
