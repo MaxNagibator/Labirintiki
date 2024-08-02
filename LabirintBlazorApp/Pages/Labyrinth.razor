@@ -1,9 +1,11 @@
-@page "/labirint"
-@inject SoundService _soundService
+﻿@page "/labirint"
+@using LabirintBlazorApp.Common
+@inject SoundService SoundService
+
 <PageTitle>Лабиринт</PageTitle>
 <MudStack Spacing="3">
     <MudText Typo="Typo.h4">Лабиринт!</MudText>
-    <div class="key-interceptor" @onkeydown="OnKeyDown" @ref="_keyInterceptorRef" tabindex="0">
+    <KeyInterceptor OnMoveKeyDown="OnMoveKeyDown" OnAttackKeyDown="OnAttackKeyDown" @ref="_keyInterceptor">
         @if (_isInit == false)
         {
             <MudStack AlignItems="AlignItems.Center" Row>
@@ -114,21 +116,15 @@
                     </MudStack>
                     <MudButton OnClick="GenerateAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Генерировать</MudButton>
                     <MudButton OnClick="FocusFieldAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Играть</MudButton>
+
+                    <ControlSchemeSwitcher></ControlSchemeSwitcher>
                 </MudStack>
             </div>
         }
-    </div>
+    </KeyInterceptor>
 </MudStack>
 
 @code {
-    const string MoveUpKey = "ArrowUp";
-    const string MoveDownKey = "ArrowDown";
-    const string MoveLeftKey = "ArrowLeft";
-    const string MoveRightKey = "ArrowRight";
-
-    const string MolotKey = "a";
-    const string BombaKey = "b";
-
     const int MinSize = 1;
     const int MaxSize = 100;
 
@@ -138,7 +134,7 @@
     private int _myPositionX;
     private int _myPositionY;
 
-    private ElementReference _keyInterceptorRef;
+    private KeyInterceptor _keyInterceptor;
     private bool _isInit;
 
     private int _originalSize;
@@ -168,83 +164,41 @@
         }
     }
 
-    private async Task OnKeyDown(KeyboardEventArgs e)
+    private async Task OnMoveKeyDown(MoveEventArgs moveEventArgs)
     {
         if (_exitNotFound == false)
             return;
 
-        await HandleAttack(e.Key);
-        await HandleMovement(e.Key);
-    }
-
-    private async Task HandleAttack(string key)
-    {
-        if (key == BombaKey && _bombaCount > 0)
-        {
-            DetonateBomb();
-            _bombaCount--;
-            await _soundService.PlayAsync(SoundType.Bomb);
-            _isAtaka = false;
-            return;
-        }
-
-        if (key == MolotKey && _molotCount > 0)
-        {
-            _isAtaka = true;
-            _molotCount--;
-        }
-
-        if (key != MolotKey && _isAtaka)
-        {
-            Attack(key);
-            await _soundService.PlayAsync(SoundType.Molot);
-            _isAtaka = false;
-        }
-    }
-
-    private async Task HandleMovement(string key)
-    {
         if (_isAtaka)
-            return;
-
-        switch (key)
         {
-            case MoveUpKey:
-                await Move(0, -1);
-                break;
-
-            case MoveDownKey:
-                await Move(0, 1);
-                break;
-
-            case MoveLeftKey:
-                await Move(-1, 0);
-                break;
-
-            case MoveRightKey:
-                await Move(1, 0);
-                break;
+            Attack(moveEventArgs.DeltaX, moveEventArgs.DeltaY);
+            await SoundService.PlayAsync(SoundType.Molot);
+            _isAtaka = false;
         }
+
+        await Move(moveEventArgs.DeltaX, moveEventArgs.DeltaY);
+        StateHasChanged();
     }
 
-    private void Attack(string key)
+    private void Attack(int deltaX, int deltaY)
     {
-        switch (key)
+        BreakWall(_myPositionX + deltaX, _myPositionY + deltaY);
+    }
+
+    private async void OnAttackKeyDown(AttackEventArgs attackEventArgs)
+    {
+        switch (attackEventArgs.Type)
         {
-            case MoveRightKey:
-                BreakWall(_myPositionX + 1, _myPositionY);
-                break;
+            case AttackType.Bomba when _bombaCount > 0:
+                DetonateBomb();
+                _bombaCount--;
+                await SoundService.PlayAsync(SoundType.Bomb);
+                _isAtaka = false;
+                return;
 
-            case MoveLeftKey:
-                BreakWall(_myPositionX - 1, _myPositionY);
-                break;
-
-            case MoveUpKey:
-                BreakWall(_myPositionX, _myPositionY - 1);
-                break;
-
-            case MoveDownKey:
-                BreakWall(_myPositionX, _myPositionY + 1);
+            case AttackType.Molot when _molotCount > 0:
+                _isAtaka = true;
+                _molotCount--;
                 break;
         }
     }
@@ -273,7 +227,8 @@
         _myPositionX += xOffset * 2;
         _myPositionY += yOffset * 2;
 
-        await _soundService.PlayAsync(SoundType.Step);
+        await SoundService.PlayAsync(SoundType.Step);
+
         if (_myPositionX == _exitBoxPositionX && _myPositionY == _exitBoxPositionY)
         {
             _exitNotFound = false;
@@ -285,7 +240,8 @@
 
         _sand[_myPositionY, _myPositionX] = 1;
         _score += 100;
-        await _soundService.PlayAsync(SoundType.Score);
+
+        await SoundService.PlayAsync(SoundType.Score);
     }
 
     private async Task GenerateAsync()
@@ -367,10 +323,7 @@
 
     private async Task FocusFieldAsync()
     {
-        if (_keyInterceptorRef is { Id: not null, Context: not null })
-        {
-            await _keyInterceptorRef.FocusAsync();
-        }
+        await _keyInterceptor.FocusAsync();
     }
 
     private int ClampSize(int size)
