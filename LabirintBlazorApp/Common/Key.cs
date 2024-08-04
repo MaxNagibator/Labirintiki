@@ -1,6 +1,6 @@
 ﻿namespace LabirintBlazorApp.Common;
 
-public class Key : ValueObject
+public record Key
 {
     public static readonly Key ArrowUp = new(nameof(ArrowUp));
     public static readonly Key ArrowDown = new(nameof(ArrowDown));
@@ -43,11 +43,6 @@ public class Key : ValueObject
         return All.Any(key => key.KeyCode.Equals(keyCode, StringComparison.CurrentCulture))
             ? new Key(keyCode)
             : new Key(Undefined.KeyCode);
-    }
-
-    protected override IEnumerable<object> GetEqualityComponents()
-    {
-        yield return KeyCode;
     }
 
     public static implicit operator string(Key key)

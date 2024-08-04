@@ -4,5 +4,5 @@ namespace LabirintBlazorApp;
 
 public static class Parameters
 {
-    public static LabyrinthParametersDto Labyrinth = new();
+    public static LabyrinthParameters Labyrinth { get; set; } = new();
 }

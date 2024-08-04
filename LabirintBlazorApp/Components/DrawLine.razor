@@ -7,6 +7,7 @@
 </div>
 
 @code {
+
     [Parameter]
     [EditorRequired]
     public int X1 { get; set; }
@@ -29,5 +30,6 @@
 
     [Parameter]
     [EditorRequired]
-    public string Color { get; set; }
+    public required string Color { get; set; }
+
 }
