@@ -3,10 +3,24 @@
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
-    <NotFound>
-        <PageTitle>Not found</PageTitle>
+
+    <Navigating>
         <LayoutView Layout="@typeof(MainLayout)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
+            <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+        </LayoutView>
+    </Navigating>
+
+    <NotFound>
+        <PageTitle>Нот фоунд</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <MudAlert Severity="Severity.Warning" ContentAlignment="HorizontalAlignment.Center">Братан, видать адресочком ошибся</MudAlert>
+            <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-8">
+                <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">Ну, бывает такое</MudText>
+                <MudText Typo="Typo.body1" Align="Align.Center" Class="mb-6">Не расстраивайся, давай попробуем найти то, что ты искал?</MudText>
+                <MudText Typo="Typo.body2" Align="Align.Center" Class="mb-6">
+                    <MudLink Href="/">Вернуться на главную</MudLink>
+                </MudText>
+            </MudContainer>
         </LayoutView>
     </NotFound>
 </Router>

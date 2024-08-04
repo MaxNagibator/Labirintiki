@@ -9,9 +9,9 @@ namespace LabirintBlazorApp.Components;
 
 public partial class KeyInterceptor : IDisposable
 {
-    private Dictionary<string, (int DeltaX, int DeltaY)> _moveDirections;
+    private Dictionary<string, (int DeltaX, int DeltaY)> _moveDirections = new();
     private ElementReference _keyInterceptorRef;
-    private HashSet<string> _attackKeys;
+    private HashSet<string> _attackKeys = [];
 
     [Inject]
     public required IControlSchemeService SchemeService { get; set; }

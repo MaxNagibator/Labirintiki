@@ -2,16 +2,15 @@
 
 namespace LabirintBlazorApp.Services;
 
-public class SoundService
+public class SoundService(IJSRuntime jsRuntime)
 {
-    private readonly IJSRuntime _jsRuntime;
-    public SoundService(IJSRuntime jsRuntime)
+    public ValueTask PlayAsync(string soundType)
     {
-        _jsRuntime = jsRuntime;
-    }
-    public async Task PlayAsync(string soundType)
-    {
-        if (Parameters.Labyrinth.IsSoundOn)
-            await _jsRuntime.InvokeVoidAsync("playSound", soundType);
+        if (Parameters.Labyrinth.IsSoundOn == false)
+        {
+            return ValueTask.CompletedTask;
+        }
+
+        return jsRuntime.InvokeVoidAsync("playSound", soundType);
     }
 }
