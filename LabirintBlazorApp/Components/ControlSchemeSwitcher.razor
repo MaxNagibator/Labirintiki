@@ -3,10 +3,16 @@
 
 <MudText Typo="Typo.h5">Схемы управления:</MudText>
 <MudStack>
-    <MudText>@ControlSchemeService.CurrentScheme.Name</MudText>
     @foreach (IControlScheme scheme in ControlSchemeService.AvailableSchemes)
     {
-        <MudButton OnClick="() => SwitchScheme(scheme)" Variant="Variant.Outlined" Color="Color.Info" FullWidth>@scheme.Name</MudButton>
+        if (scheme == ControlSchemeService.CurrentScheme)
+        {
+            <MudButton Variant="Variant.Filled" Color="Color.Inherit" FullWidth>@scheme.Name</MudButton>
+        }
+        else
+        {
+            <MudButton OnClick="() => SwitchScheme(scheme)" Variant="Variant.Outlined" Color="Color.Info" FullWidth>@scheme.Name</MudButton>
+        }
     }
 </MudStack>
 
