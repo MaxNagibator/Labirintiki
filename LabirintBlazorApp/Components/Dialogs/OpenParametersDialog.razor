@@ -10,7 +10,10 @@
     </TitleContent>
     <DialogContent>
         <MudStack Spacing="2">
+            <ControlSchemeSwitcher />
+
             <MudSwitch @bind-Value="@Parameters.Labyrinth.IsSoundOn" Color="Color.Success" Label="Звук" UncheckedColor="Color.Error" />
+
             <MudStack>
                 <MudText>Цвет лабиринта</MudText>
                 <MudColorPicker @bind-Text="@Parameters.Labyrinth.Color"
