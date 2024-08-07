@@ -14,9 +14,9 @@
         <MudIconButton Icon="@Icons.Material.Rounded.Notes" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle" />
         <MudSpacer />
         <MudStack Row AlignItems="AlignItems.Center">
-            @if (NavigationManager.ToBaseRelativePath(NavigationManager.Uri) != "labirint")
+            @if (NavigationManager.ToBaseRelativePath(NavigationManager.Uri) != "maze")
             {
-                <MudFab OnClick="@(() => NavigationManager.NavigateTo("labirint"))"
+                <MudFab OnClick="@(() => NavigationManager.NavigateTo("maze"))"
                         DropShadow Size="Size.Small"
                         Color="Color.Info"
                         StartIcon="@Icons.Material.Rounded.Games"
