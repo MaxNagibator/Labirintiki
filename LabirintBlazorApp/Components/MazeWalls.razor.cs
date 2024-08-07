@@ -31,10 +31,12 @@ public partial class MazeWalls : CanvasComponent
         int halfWallOffset = WallWidth / 2;
 
         await Context.ClearRectAsync(0, 0, CanvasWidth, CanvasHeight);
-        await Context.SetStrokeStyleAsync(Parameters.Labyrinth.Color);
-        await Context.SetLineWidthAsync(WallWidth);
 
-        List<DrawCommand> drawCommands = [];
+        List<DrawCommand> drawCommands =
+        [
+            new DrawCommand(DrawCommandType.StrokeStyle, Parameters.Labyrinth.Color),
+            new DrawCommand(DrawCommandType.LineWidth, (double)WallWidth)
+        ];
 
         for (int y = 1; y < MazeHeight - 1; y += 2)
         {

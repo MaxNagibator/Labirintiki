@@ -45,8 +45,8 @@
 
                 if (!_exitNotFound && _way != null)
                 {
-                    int x = _myPositionX;
-                    int y = _myPositionY;
+                    int x = _myPositionY;
+                    int y = _myPositionX;
                     road? t = _way;
 
                     while (t != null)
@@ -106,11 +106,13 @@
 
         <div style="position: absolute; right: 20px; width: 250px;">
             <MudStack Spacing="3">
-                <MudText Typo="Typo.h6">Очки: @_score</MudText>
-
                 <MudStack Row>
-                    <MudIcon Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.Hammer" Size="Size.Large" />
-                    <MudText Color="Color.Warning" Typo="Typo.h6">@_molotCount/@MaxMolotCount</MudText>
+                    <MudIcon Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.Bitcoin" Size="Size.Large" />
+                    <MudText Color="Color.Warning" Typo="Typo.h6">@_score/@_maxScore</MudText>
+                </MudStack>
+                <MudStack Row>
+                    <MudIcon Color="Color.Inherit" Icon="@MaterialDesignIcons.Normal.Hammer" Size="Size.Large" />
+                    <MudText Color="Color.Inherit" Typo="Typo.h6">@_molotCount/@MaxMolotCount</MudText>
                 </MudStack>
                 <MudStack Row>
                     <MudIcon Color="Color.Error" Icon="@MaterialDesignIcons.Normal.Bomb" Size="Size.Large" />
@@ -119,6 +121,7 @@
                 <MudDivider Class="my-2" Style="height:2px" DividerType="DividerType.FullWidth" />
 
                 <MudText Typo="Typo.h5">Параметры:</MudText>
+                <MudTextField @bind-Value="_seed" Label="Зерно генерации" DebounceInterval="300" />
                 <MudStack>
                     <MudNumericField Label="Размер" Min="@MinSize" Max="@MaxSize" DebounceInterval="300" Value="_originalSize" />
                     <MudSlider @bind-Value="_originalSize" Min="@MinSize" Max="@MaxSize" Color="Color.Info" Size="Size.Medium" />
@@ -135,8 +138,6 @@
                 <MudButton OnClick="GenerateAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Генерировать</MudButton>
                 <MudButton OnClick="FocusFieldAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Играть</MudButton>
                 <MudButton OnClick="FindExitAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Найти выход</MudButton>
-
-                <ControlSchemeSwitcher />
             </MudStack>
         </div>
     }

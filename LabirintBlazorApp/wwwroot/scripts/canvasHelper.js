@@ -3,7 +3,9 @@ const commandTypes = {
     1: 'moveTo',
     2: 'lineTo',
     3: 'stroke',
-    4: 'drawImage'
+    4: 'drawImage',
+    5: 'strokeStyle',
+    6: 'lineWidth'
 };
 
 window.canvasHelper = {
@@ -27,6 +29,10 @@ window.canvasHelper = {
                     contextRef.lineTo(command.x, command.y);
                 } else if (commandTypes[command.type] === "stroke") {
                     contextRef.stroke();
+                } else if (commandTypes[command.type] === "strokeStyle") {
+                    contextRef.strokeStyle = command.color;
+                } else if (commandTypes[command.type] === "lineWidth") {
+                    contextRef.lineWidth = command.size;
                 } else if (commandTypes[command.type] === "drawImage") {
                     const img = new Image();
                     img.src = command.source;

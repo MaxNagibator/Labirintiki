@@ -1,4 +1,6 @@
-﻿using LabirintBlazorApp.Common;
+﻿using System.Security.Cryptography;
+using System.Text;
+using LabirintBlazorApp.Common;
 using LabirintBlazorApp.Components;
 using LabirintBlazorApp.Constants;
 using LabirintBlazorApp.Dto;
@@ -12,29 +14,30 @@ public partial class Maze
 
     private const int MaxMolotCount = 6;
     private const int MaxBombaCount = 2;
-    private readonly Random _random = new();
 
     private bool _exitNotFound;
     private bool _isAtaka;
     private bool _isInit;
-
     private int _bombaCount;
-
     private int _density;
 
     private int _exitBoxPositionX;
     private int _exitBoxPositionY;
     private int _labSize;
+
+    private int _maxScore;
     private int _molotCount;
 
     private int _myPositionX;
-
     private int _myPositionXDisplay;
+
     private int _myPositionY;
     private int _myPositionYDisplay;
+
     private int _originalSize;
     private int _originalSizeDisplay;
 
+    private int _sandCost;
     private int _score;
     private int _speed;
 
@@ -46,13 +49,18 @@ public partial class Maze
     private KeyInterceptor? _keyInterceptor;
     private MazeSands? _mazeSands;
     private MazeWalls? _mazeWalls;
+
+    private Random _random = new();
     private road? _way;
+
+    private string? _seed;
 
     protected override void OnInitialized()
     {
         _originalSize = 16;
         _speed = 3;
         _density = 3;
+        _sandCost = 100;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -156,7 +164,7 @@ public partial class Maze
 
         _sand[_myPositionY, _myPositionX] = 1;
         _mazeSands?.UpdateAsync(_myPositionX, _myPositionY);
-        _score += 100;
+        _score += _sandCost;
 
         await SoundService.PlayAsync(SoundType.Score);
     }
@@ -170,6 +178,10 @@ public partial class Maze
         StateHasChanged();
         await Task.Delay(1);
 
+        _random = string.IsNullOrWhiteSpace(_seed) == false 
+            ? new Random(GetSeed(_seed)) 
+            : new Random();
+
         _myPositionX = 1;
         _myPositionY = 1;
         _myPositionXDisplay = _myPositionX;
@@ -180,6 +192,7 @@ public partial class Maze
         n = _originalSize * 2 + 1;
         lab = new int[n, n];
         _labSize = n;
+        _maxScore = 0;
         _molotCount = MaxMolotCount;
         _bombaCount = MaxBombaCount;
         _score = 0;
@@ -229,8 +242,19 @@ public partial class Maze
 
         for (int i = 1; i < _labSize; i++)
         {
-            _sand[_random.Next(1, n / 2 + 1) * 2 - 1, _random.Next(1, n / 2 + 1) * 2 - 1] = 0;
+            int x = _random.Next(1, n / 2 + 1) * 2 - 1;
+            int y = _random.Next(1, n / 2 + 1) * 2 - 1;
+
+            if (_sand[x, y] == 0)
+            {
+                continue;
+            }
+
+            _sand[x, y] = 0;
+            _maxScore++;
         }
+
+        _maxScore *= _sandCost;
 
         StateHasChanged();
 
@@ -248,6 +272,13 @@ public partial class Maze
         StateHasChanged();
 
         await FocusFieldAsync();
+    }
+
+    private static int GetSeed(string input)
+    {
+        byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));
+        int result = BitConverter.ToInt32(hashBytes, 0);
+        return Math.Abs(result);
     }
 
     private async Task FocusFieldAsync()
@@ -284,7 +315,6 @@ public partial class Maze
         int y = _myPositionX;
         int back;
         road way = new();
-        //pictureBox1.Location = new System.Drawing.Point((y - 1) * Global.step + Global.step / 2, (x - 1) * Global.step + Global.step / 2);
         _exitNotFound = true;
 
         while (_exitNotFound)
@@ -312,7 +342,6 @@ public partial class Maze
 
                     _myPositionXDisplay = y;
                     _myPositionYDisplay = x;
-                    //pictureBox1.Location = new System.Drawing.Point((y - 1) * Global.step + Global.step / 2, (x - 1) * Global.step + Global.step / 2);
                 }
                 else if (lab[x, y + 1] != 0 && lab2[x, y + 1] != 0) //right
                 {
@@ -322,7 +351,6 @@ public partial class Maze
 
                     _myPositionXDisplay = y;
                     _myPositionYDisplay = x;
-                    //pictureBox1.Location = new System.Drawing.Point((y - 1) * Global.step + Global.step / 2, (x - 1) * Global.step + Global.step / 2);
                 }
                 else if (lab[x, y - 1] != 0 && lab2[x, y - 1] != 0) //left
                 {
@@ -332,7 +360,6 @@ public partial class Maze
 
                     _myPositionXDisplay = y;
                     _myPositionYDisplay = x;
-                    //pictureBox1.Location = new System.Drawing.Point((y - 1) * Global.step + Global.step / 2, (x - 1) * Global.step + Global.step / 2);
                 }
                 else if (lab[x - 1, y] != 0 && lab2[x - 1, y] != 0) //up
                 {
@@ -342,7 +369,6 @@ public partial class Maze
 
                     _myPositionXDisplay = y;
                     _myPositionYDisplay = x;
-                    //pictureBox1.Location = new System.Drawing.Point((y - 1) * Global.step + Global.step / 2, (x - 1) * Global.step + Global.step / 2);
                 } //1-r 2-l 3-d 4-u
                 else
                 {
@@ -360,7 +386,6 @@ public partial class Maze
                     }
                     else
                     {
-                        //textresult.Text = "exit: false";
                         _exitNotFound = false;
                         _way = null;
                     }
