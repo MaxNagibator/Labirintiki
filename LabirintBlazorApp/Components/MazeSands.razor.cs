@@ -40,9 +40,7 @@ public partial class MazeSands : MazeComponent
                 drawSequence.DrawImage("/images/sand.png", left, top, HalfBoxSize, HalfBoxSize);
             }
         }
-
-        Logger.LogInformation("Количество команд на отрисовку (sand): {Count}", drawSequence.Count);
-
+        
         await Context.DrawSequenceAsync(drawSequence);
     }
 }

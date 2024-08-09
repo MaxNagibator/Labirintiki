@@ -73,9 +73,7 @@ public partial class MazeWalls : MazeComponent
                 drawSequence.Stroke();
             }
         }
-
-        Logger.LogInformation("Количество команд на отрисовку (walls): {Count}", drawSequence.Count);
-
+        
         await Context.DrawSequenceAsync(drawSequence);
     }
 }

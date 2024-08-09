@@ -47,14 +47,10 @@ public abstract class MazeComponent : ComponentBase
     public async Task ForceRender()
     {
         _isShouldRender = true;
-
-        DateTime startTime = DateTime.Now;
-
+        
         await DrawAsync();
         StateHasChanged();
-
-        Logger.LogInformation("Отрисовка {Name} завершена: {Time} мс", CanvasId, (DateTime.Now - startTime).Milliseconds);
-
+        
         _isShouldRender = false;
     }
 
