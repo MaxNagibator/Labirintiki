@@ -16,21 +16,24 @@
     }
     else
     {
-        <div class="field">
+        <div class="field" style="max-width:500px; max-height:500px; overflow-x: hidden; overflow-y: hidden;">
 
             @{
                 int size = 370;
-                int halfBoxSize = size / _originalSizeDisplay;
+                int halfBoxSize = 23;// size / _originalSizeDisplay;
                 int wallWidth = Math.Max(1, halfBoxSize / 10 * 2);
             }
 
-            <MazeWalls @ref="_mazeWalls" Maze="lab" HalfBoxSize="halfBoxSize" WallWidth="wallWidth" />
-            <MazeSands @ref="_mazeSands" Sand="_sand" HalfBoxSize="halfBoxSize" WallWidth="wallWidth" />
+            <MazeWalls @ref="_mazeWalls" Maze="lab" HalfBoxSize="halfBoxSize" WallWidth="wallWidth" Vision="_vision"/>
+            <MazeSands @ref="_mazeSands" Sand="_sand" HalfBoxSize="halfBoxSize" WallWidth="wallWidth" Vision="_vision" />
 
             @{
+                var drawY = _vision.GetDrawY(_myPositionYDisplay);
+                var drawX = _vision.GetDrawX(_myPositionXDisplay);
+
                 int entityBoxSize = halfBoxSize * 2 - wallWidth;
-                int myLeft = (_myPositionXDisplay - 1) * halfBoxSize + wallWidth;
-                int myTop = (_myPositionYDisplay - 1) * halfBoxSize + wallWidth;
+                int myLeft = (drawX - 1) * halfBoxSize + wallWidth;
+                int myTop = (drawY - 1) * halfBoxSize + wallWidth;
                 <div style="position:absolute;
                             display: flex;
                             justify-content: center;

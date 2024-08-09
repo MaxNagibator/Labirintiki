@@ -1,4 +1,5 @@
 ﻿using LabirintBlazorApp.Common;
+using LabirintBlazorApp.Dto;
 using Microsoft.AspNetCore.Components;
 
 namespace LabirintBlazorApp.Components;
@@ -16,6 +17,10 @@ public partial class MazeSands : CanvasComponent
     [Parameter]
     [EditorRequired]
     public required int WallWidth { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public required Vision Vision { get; set; }
 
     private int MazeWidth => Sand.GetLength(0);
     private int MazeHeight => Sand.GetLength(1);
@@ -36,17 +41,20 @@ public partial class MazeSands : CanvasComponent
         int entityBoxSize = HalfBoxSize * 2 - WallWidth;
         int offset = HalfBoxSize - entityBoxSize;
 
-        for (int y = 1; y < MazeHeight - 1; y += 2)
+        for (int y = Vision.StartY; y < Vision.FinishY; y += 2)
         {
-            for (int x = 1; x < MazeWidth - 1; x += 2)
+            for (int x = Vision.StartX; x < Vision.FinishX; x += 2)
             {
                 if (Sand[y, x] != 0)
                 {
                     continue;
                 }
 
-                int left = (x - 1) * HalfBoxSize + WallWidth - offset / 2;
-                int top = (y - 1) * HalfBoxSize + WallWidth - offset;
+                var drawY = Vision.GetDrawY(y);
+                var drawX = Vision.GetDrawX(x);
+
+                int left = (drawX - 1) * HalfBoxSize + WallWidth - offset / 2;
+                int top = (drawY - 1) * HalfBoxSize + WallWidth - offset;
 
                 drawCommands.Add(new DrawCommand(DrawCommandType.DrawImage, "/images/sand.png", left, top, HalfBoxSize));
             }

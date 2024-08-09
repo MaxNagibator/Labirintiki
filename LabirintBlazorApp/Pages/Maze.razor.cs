@@ -39,6 +39,7 @@ public partial class Maze
 
     private int _sandCost;
     private int _score;
+    private Vision _vision;
     private int _speed;
 
     private int n;
@@ -146,8 +147,19 @@ public partial class Maze
 
         _myPositionX += xOffset * 2;
         _myPositionY += yOffset * 2;
+        _vision.SetPosition(_myPositionX, _myPositionY);
         _myPositionXDisplay = _myPositionX;
         _myPositionYDisplay = _myPositionY;
+
+        if (_mazeWalls != null)
+        {
+            await _mazeWalls.ForceRender();
+        }
+
+        if (_mazeSands != null)
+        {
+            await _mazeSands.ForceRender();
+        }
 
         await SoundService.PlayAsync(SoundType.Step);
 
@@ -166,7 +178,13 @@ public partial class Maze
         _mazeSands?.UpdateAsync(_myPositionX, _myPositionY);
         _score += _sandCost;
 
+        if (_mazeSands != null)
+        {
+            await _mazeSands.ForceRender();
+        }
+
         await SoundService.PlayAsync(SoundType.Score);
+        StateHasChanged();
     }
 
     private async Task GenerateAsync()
@@ -190,6 +208,8 @@ public partial class Maze
         _originalSize = ClampSize(_originalSize);
         _originalSizeDisplay = _originalSize;
         n = _originalSize * 2 + 1;
+        var mazeWidth = n;
+        var mazeHeight = n;
         lab = new int[n, n];
         _labSize = n;
         _maxScore = 0;
@@ -197,6 +217,9 @@ public partial class Maze
         _bombaCount = MaxBombaCount;
         _score = 0;
 
+
+        _vision = new Vision(mazeWidth, mazeHeight);
+        _vision.SetPosition(_myPositionX, _myPositionY);
         for (int i = 0; i < n; i++)
         {
             for (int j = 0; j < n; j++)
@@ -240,6 +263,8 @@ public partial class Maze
 
         _sand = lab2;
 
+        _sand[3, 3] = 0;
+        _sand[5, 5] = 0;
         for (int i = 1; i < _labSize; i++)
         {
             int x = _random.Next(1, n / 2 + 1) * 2 - 1;

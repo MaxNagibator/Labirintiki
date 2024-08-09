@@ -1,4 +1,5 @@
 ﻿using LabirintBlazorApp.Common;
+using LabirintBlazorApp.Dto;
 using Microsoft.AspNetCore.Components;
 
 namespace LabirintBlazorApp.Components;
@@ -16,6 +17,10 @@ public partial class MazeWalls : CanvasComponent
     [Parameter]
     [EditorRequired]
     public required int WallWidth { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public required Vision Vision { get; set; }
 
     private int MazeWidth => Maze.GetLength(0);
     private int MazeHeight => Maze.GetLength(1);
@@ -38,15 +43,18 @@ public partial class MazeWalls : CanvasComponent
             new DrawCommand(DrawCommandType.LineWidth, (double)WallWidth)
         ];
 
-        for (int y = 1; y < MazeHeight - 1; y += 2)
+        for (int y = Vision.StartY; y < Vision.FinishY; y += 2)
         {
-            for (int x = 1; x < MazeWidth - 1; x += 2)
+            for (int x = Vision.StartX; x < Vision.FinishX; x += 2)
             {
-                int topLeftY = y * HalfBoxSize - HalfBoxSize;
-                int topLeftX = x * HalfBoxSize - HalfBoxSize;
+                var drawY = Vision.GetDrawY(y);
+                var drawX = Vision.GetDrawX(x);
 
-                int bottomRightY = y * HalfBoxSize + HalfBoxSize;
-                int bottomRightX = x * HalfBoxSize + HalfBoxSize;
+                int topLeftY = drawY * HalfBoxSize - HalfBoxSize;
+                int topLeftX = drawX * HalfBoxSize - HalfBoxSize;
+
+                int bottomRightY = drawY * HalfBoxSize + HalfBoxSize;
+                int bottomRightX = drawX * HalfBoxSize + HalfBoxSize;
 
                 drawCommands.Add(new DrawCommand(DrawCommandType.BeginPath));
 
