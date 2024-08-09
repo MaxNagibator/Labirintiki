@@ -38,7 +38,6 @@ public partial class Maze
     private int[,] lab;
     private int[,] lab2;
 
-    private KeyInterceptor? _keyInterceptor;
     private MazeSands? _mazeSands;
     private MazeWalls? _mazeWalls;
 
@@ -68,7 +67,6 @@ public partial class Maze
     {
         if (firstRender)
         {
-            await FocusFieldAsync();
             await GenerateAsync();
         }
     }
@@ -278,8 +276,6 @@ public partial class Maze
 
         _isInit = true;
         StateHasChanged();
-
-        await FocusFieldAsync();
     }
 
     private Task ForceRenderSands()
@@ -297,14 +293,6 @@ public partial class Maze
         byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));
         int result = BitConverter.ToInt32(hashBytes, 0);
         return Math.Abs(result);
-    }
-
-    private async Task FocusFieldAsync()
-    {
-        if (_keyInterceptor != null)
-        {
-            await _keyInterceptor.FocusAsync();
-        }
     }
 
     private int ClampSize(int size)

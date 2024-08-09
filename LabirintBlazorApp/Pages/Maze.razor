@@ -2,8 +2,6 @@
 @inject SoundService SoundService
 
 <PageTitle>Maze</PageTitle>
-<KeyInterceptor OnMoveKeyDown="OnMoveKeyDown" OnAttackKeyDown="OnAttackKeyDown" @ref="_keyInterceptor">
-</KeyInterceptor>
 <MudStack Spacing="3">
     <MudText Typo="Typo.h4">Maze!</MudText>
 
@@ -137,7 +135,7 @@
                 </MudStack>
 
                 <MudButton OnClick="GenerateAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Генерировать</MudButton>
-                <MudButton OnClick="FocusFieldAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Играть</MudButton>
+                <KeyInterceptor OnMoveKeyDown="OnMoveKeyDown" OnAttackKeyDown="OnAttackKeyDown" />
                 <MudButton OnClick="FindExitAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Найти выход</MudButton>
             </MudStack>
         </div>
