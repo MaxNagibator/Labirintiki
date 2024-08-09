@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using LabirintBlazorApp.Dto;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace LabirintBlazorApp.Common;
 
-public abstract class CanvasComponent : ComponentBase
+public abstract class MazeComponent : ComponentBase
 {
     private bool _isShouldRender;
-    protected bool IsDebug = false;
 
     protected Canvas2DContext Context = null!;
     protected ElementReference CanvasRef;
@@ -15,10 +15,19 @@ public abstract class CanvasComponent : ComponentBase
     public required IJSRuntime JSRuntime { get; set; }
 
     [Inject]
-    public required ILogger<CanvasComponent> Logger { get; set; }
+    public required ILogger<MazeComponent> Logger { get; set; }
 
-    protected abstract int CanvasWidth { get; }
-    protected abstract int CanvasHeight { get; }
+    [Parameter]
+    [EditorRequired]
+    public required int HalfBoxSize { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public required Vision Vision { get; set; }
+
+    protected int CanvasWidth => Vision.Range * 2 * HalfBoxSize;
+    protected int CanvasHeight => Vision.Range * 2 * HalfBoxSize;
+
     protected abstract string CanvasId { get; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

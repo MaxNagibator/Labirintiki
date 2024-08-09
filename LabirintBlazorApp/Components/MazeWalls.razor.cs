@@ -1,10 +1,9 @@
 ﻿using LabirintBlazorApp.Common;
-using LabirintBlazorApp.Dto;
 using Microsoft.AspNetCore.Components;
 
 namespace LabirintBlazorApp.Components;
 
-public partial class MazeWalls : CanvasComponent
+public partial class MazeWalls : MazeComponent
 {
     [Parameter]
     [EditorRequired]
@@ -12,21 +11,10 @@ public partial class MazeWalls : CanvasComponent
 
     [Parameter]
     [EditorRequired]
-    public required int HalfBoxSize { get; set; }
-
-    [Parameter]
-    [EditorRequired]
     public required int WallWidth { get; set; }
-
-    [Parameter]
-    [EditorRequired]
-    public required Vision Vision { get; set; }
 
     private int MazeWidth => Maze.GetLength(0);
     private int MazeHeight => Maze.GetLength(1);
-
-    protected override int CanvasWidth => Maze.GetLength(0) * HalfBoxSize;
-    protected override int CanvasHeight => Maze.GetLength(1) * HalfBoxSize;
 
     protected override string CanvasId => "mazeWallsCanvas";
 
@@ -35,20 +23,17 @@ public partial class MazeWalls : CanvasComponent
         int fullWallOffset = WallWidth;
         int halfWallOffset = WallWidth / 2;
 
-        await Context.ClearRectAsync(0, 0, CanvasWidth, CanvasHeight);
+        DrawSequence drawSequence = new();
 
-        List<DrawCommand> drawCommands =
-        [
-            new DrawCommand(DrawCommandType.StrokeStyle, Parameters.Labyrinth.Color),
-            new DrawCommand(DrawCommandType.LineWidth, (double)WallWidth)
-        ];
+        drawSequence.ClearRect(0, 0, CanvasWidth, CanvasHeight);
+        drawSequence.StrokeStyle(Parameters.Labyrinth.Color);
+        drawSequence.LineWidth(WallWidth);
 
-        for (int y = Vision.StartY; y < Vision.FinishY; y += 2)
+        for (int y = Vision.Start.Y; y < Vision.Finish.Y; y += 2)
         {
-            for (int x = Vision.StartX; x < Vision.FinishX; x += 2)
+            for (int x = Vision.Start.X; x < Vision.Finish.X; x += 2)
             {
-                var drawY = Vision.GetDrawY(y);
-                var drawX = Vision.GetDrawX(x);
+                (int drawX, int drawY) = Vision.GetDraw(x, y);
 
                 int topLeftY = drawY * HalfBoxSize - HalfBoxSize;
                 int topLeftX = drawX * HalfBoxSize - HalfBoxSize;
@@ -56,61 +41,41 @@ public partial class MazeWalls : CanvasComponent
                 int bottomRightY = drawY * HalfBoxSize + HalfBoxSize;
                 int bottomRightX = drawX * HalfBoxSize + HalfBoxSize;
 
-                drawCommands.Add(new DrawCommand(DrawCommandType.BeginPath));
+                drawSequence.BeginPath();
 
                 if (Maze[y, x - 1] == 0) // Left wall
                 {
-                    drawCommands.Add(new DrawCommand(DrawCommandType.MoveTo, topLeftX + halfWallOffset, topLeftY));
-                    drawCommands.Add(new DrawCommand(DrawCommandType.LineTo, topLeftX + halfWallOffset, bottomRightY + fullWallOffset));
+                    drawSequence.MoveTo(topLeftX + halfWallOffset, topLeftY);
+                    drawSequence.LineTo(topLeftX + halfWallOffset, bottomRightY + fullWallOffset);
                 }
 
                 if (Maze[y - 1, x] == 0) // Top wall
                 {
-                    drawCommands.Add(new DrawCommand(DrawCommandType.MoveTo, topLeftX, topLeftY + halfWallOffset));
-                    drawCommands.Add(new DrawCommand(DrawCommandType.LineTo, bottomRightX + fullWallOffset, topLeftY + halfWallOffset));
+                    drawSequence.MoveTo(topLeftX, topLeftY + halfWallOffset);
+                    drawSequence.LineTo(bottomRightX + fullWallOffset, topLeftY + halfWallOffset);
                 }
 
                 if (y == MazeHeight - 2 || x == MazeWidth - 2)
                 {
                     if (Maze[y, x + 1] == 0) // Right wall
                     {
-                        drawCommands.Add(new DrawCommand(DrawCommandType.MoveTo, bottomRightX + halfWallOffset, topLeftY));
-                        drawCommands.Add(new DrawCommand(DrawCommandType.LineTo, bottomRightX + halfWallOffset, bottomRightY + fullWallOffset));
+                        drawSequence.MoveTo(bottomRightX + halfWallOffset, topLeftY);
+                        drawSequence.LineTo(bottomRightX + halfWallOffset, bottomRightY + fullWallOffset);
                     }
 
                     if (Maze[y + 1, x] == 0) // Bottom wall
                     {
-                        drawCommands.Add(new DrawCommand(DrawCommandType.MoveTo, topLeftX, bottomRightY + halfWallOffset));
-                        drawCommands.Add(new DrawCommand(DrawCommandType.LineTo, bottomRightX + fullWallOffset, bottomRightY + halfWallOffset));
+                        drawSequence.MoveTo(topLeftX, bottomRightY + halfWallOffset);
+                        drawSequence.LineTo(bottomRightX + fullWallOffset, bottomRightY + halfWallOffset);
                     }
                 }
 
-                drawCommands.Add(new DrawCommand(DrawCommandType.Stroke));
+                drawSequence.Stroke();
             }
         }
 
-        Logger.LogInformation("Количество команд на отрисовку (walls): {Count}", drawCommands.Count);
+        Logger.LogInformation("Количество команд на отрисовку (walls): {Count}", drawSequence.Count);
 
-        await Context.DrawCommandsAsync(drawCommands);
-    }
-
-    public async Task UpdateAsync(List<(int, int)> updatedCells)
-    {
-        int entityBoxSize = HalfBoxSize * 2 - WallWidth;
-
-        foreach ((int x, int y) in updatedCells)
-        {
-            int left = (x - 1) * HalfBoxSize + WallWidth;
-            int top = (y - 1) * HalfBoxSize + WallWidth;
-
-            if (IsDebug)
-            {
-                await Context.FillRectAsync(left, top, entityBoxSize, entityBoxSize);
-            }
-            else
-            {
-                await Context.ClearRectAsync(left, top, entityBoxSize, entityBoxSize);
-            }
-        }
+        await Context.DrawSequenceAsync(drawSequence);
     }
 }

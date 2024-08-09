@@ -14,32 +14,23 @@ public partial class Maze
 
     private const int MaxMolotCount = 6;
     private const int MaxBombaCount = 2;
-
     private bool _exitNotFound;
+
     private bool _isAtaka;
     private bool _isInit;
     private int _bombaCount;
     private int _density;
 
-    private int _exitBoxPositionX;
-    private int _exitBoxPositionY;
     private int _labSize;
 
     private int _maxScore;
+
     private int _molotCount;
-
-    private int _myPositionX;
-    private int _myPositionXDisplay;
-
-    private int _myPositionY;
-    private int _myPositionYDisplay;
 
     private int _originalSize;
     private int _originalSizeDisplay;
-
     private int _sandCost;
     private int _score;
-    private Vision _vision;
     private int _speed;
 
     private int n;
@@ -51,10 +42,16 @@ public partial class Maze
     private MazeSands? _mazeSands;
     private MazeWalls? _mazeWalls;
 
+    private Position _exitBox;
+    private Position _player;
+    private Position _playerDisplay;
     private Random _random = new();
+
     private road? _way;
 
     private string? _seed;
+
+    private Vision? _vision;
 
     protected override void OnInitialized()
     {
@@ -62,6 +59,9 @@ public partial class Maze
         _speed = 3;
         _density = 3;
         _sandCost = 100;
+        _player = (0, 0);
+        _playerDisplay = (0, 0);
+        _exitBox = (0, 0);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -70,7 +70,6 @@ public partial class Maze
         {
             await FocusFieldAsync();
             await GenerateAsync();
-            StateHasChanged();
         }
     }
 
@@ -83,28 +82,28 @@ public partial class Maze
 
         if (_isAtaka)
         {
-            Attack(moveEventArgs.DeltaX, moveEventArgs.DeltaY);
-            await SoundService.PlayAsync(SoundType.Molot);
+            await Attack(moveEventArgs.DeltaX, moveEventArgs.DeltaY);
             _isAtaka = false;
         }
 
         await Move(moveEventArgs.DeltaX, moveEventArgs.DeltaY);
-        StateHasChanged();
     }
 
-    private void Attack(int deltaX, int deltaY)
+    private async Task Attack(int deltaX, int deltaY)
     {
-        BreakWall(_myPositionX + deltaX, _myPositionY + deltaY);
+        BreakWall(_player.X + deltaX, _player.Y + deltaY);
+
+        await SoundService.PlayAsync(SoundType.Molot);
+        await ForceRenderWalls();
     }
 
-    private async void OnAttackKeyDown(AttackEventArgs attackEventArgs)
+    private async Task OnAttackKeyDown(AttackEventArgs attackEventArgs)
     {
         switch (attackEventArgs.Type)
         {
             case AttackType.Bomba when _bombaCount > 0:
-                DetonateBomb();
+                await DetonateBomb();
                 _bombaCount--;
-                await SoundService.PlayAsync(SoundType.Bomb);
                 _isAtaka = false;
                 return;
 
@@ -119,12 +118,15 @@ public partial class Maze
         }
     }
 
-    private void DetonateBomb()
+    private async Task DetonateBomb()
     {
-        BreakWall(_myPositionX + 1, _myPositionY);
-        BreakWall(_myPositionX - 1, _myPositionY);
-        BreakWall(_myPositionX, _myPositionY - 1);
-        BreakWall(_myPositionX, _myPositionY + 1);
+        BreakWall(_player.X + 1, _player.Y);
+        BreakWall(_player.X - 1, _player.Y);
+        BreakWall(_player.X, _player.Y - 1);
+        BreakWall(_player.X, _player.Y + 1);
+
+        await SoundService.PlayAsync(SoundType.Bomb);
+        await ForceRenderWalls();
     }
 
     private void BreakWall(int x, int y)
@@ -135,56 +137,38 @@ public partial class Maze
         }
 
         lab[y, x] = 1;
-        _mazeWalls?.UpdateAsync([(x, y)]);
     }
 
     private async Task Move(int xOffset, int yOffset)
     {
-        if (lab[_myPositionY + yOffset, _myPositionX + xOffset] == 0)
+        if (lab[_player.Y + yOffset, _player.X + xOffset] == 0)
         {
             return;
         }
 
-        _myPositionX += xOffset * 2;
-        _myPositionY += yOffset * 2;
-        _vision.SetPosition(_myPositionX, _myPositionY);
-        _myPositionXDisplay = _myPositionX;
-        _myPositionYDisplay = _myPositionY;
-
-        if (_mazeWalls != null)
-        {
-            await _mazeWalls.ForceRender();
-        }
-
-        if (_mazeSands != null)
-        {
-            await _mazeSands.ForceRender();
-        }
+        _player.X += xOffset * 2;
+        _player.Y += yOffset * 2;
+        _vision?.SetPosition(_player.X, _player.Y);
+        _playerDisplay = _player;
 
         await SoundService.PlayAsync(SoundType.Step);
 
-        if (_myPositionX == _exitBoxPositionX && _myPositionY == _exitBoxPositionY)
+        if (_player != _exitBox)
+        {
+            if (_sand[_player.Y, _player.X] == 0)
+            {
+                _sand[_player.Y, _player.X] = 1;
+                _score += _sandCost;
+
+                await SoundService.PlayAsync(SoundType.Score);
+            }
+        }
+        else
         {
             _exitNotFound = false;
-            return;
         }
 
-        if (_sand[_myPositionY, _myPositionX] != 0)
-        {
-            return;
-        }
-
-        _sand[_myPositionY, _myPositionX] = 1;
-        _mazeSands?.UpdateAsync(_myPositionX, _myPositionY);
-        _score += _sandCost;
-
-        if (_mazeSands != null)
-        {
-            await _mazeSands.ForceRender();
-        }
-
-        await SoundService.PlayAsync(SoundType.Score);
-        StateHasChanged();
+        await Task.WhenAll(ForceRenderWalls(), ForceRenderSands());
     }
 
     private async Task GenerateAsync()
@@ -196,30 +180,35 @@ public partial class Maze
         StateHasChanged();
         await Task.Delay(1);
 
-        _random = string.IsNullOrWhiteSpace(_seed) == false 
-            ? new Random(GetSeed(_seed)) 
+        _random = string.IsNullOrWhiteSpace(_seed) == false
+            ? new Random(GetSeed(_seed))
             : new Random();
 
-        _myPositionX = 1;
-        _myPositionY = 1;
-        _myPositionXDisplay = _myPositionX;
-        _myPositionYDisplay = _myPositionY;
+        _player = (1, 1);
+        _playerDisplay = _player;
+
         _exitNotFound = true;
+
         _originalSize = ClampSize(_originalSize);
         _originalSizeDisplay = _originalSize;
+
         n = _originalSize * 2 + 1;
-        var mazeWidth = n;
-        var mazeHeight = n;
+
+        int mazeWidth = n;
+        int mazeHeight = n;
         lab = new int[n, n];
+
         _labSize = n;
+
+        _score = 0;
         _maxScore = 0;
+
         _molotCount = MaxMolotCount;
         _bombaCount = MaxBombaCount;
-        _score = 0;
-
 
         _vision = new Vision(mazeWidth, mazeHeight);
-        _vision.SetPosition(_myPositionX, _myPositionY);
+        _vision.SetPosition(_player.X, _player.Y);
+
         for (int i = 0; i < n; i++)
         {
             for (int j = 0; j < n; j++)
@@ -246,9 +235,8 @@ public partial class Maze
                 }
             }
 
-            _exitBoxPositionX = n / 2 - (_originalSize % 2 == 0 ? 1 : 0);
-            _exitBoxPositionY = n;
-            lab[_exitBoxPositionY - 1, _exitBoxPositionX] = 1;
+            _exitBox = (n / 2 - (_originalSize % 2 == 0 ? 1 : 0), n);
+            lab[_exitBox.Y - 1, _exitBox.X] = 1;
         }
 
         lab2 = new int[n, n];
@@ -265,38 +253,43 @@ public partial class Maze
 
         _sand[3, 3] = 0;
         _sand[5, 5] = 0;
+
         for (int i = 1; i < _labSize; i++)
         {
             int x = _random.Next(1, n / 2 + 1) * 2 - 1;
             int y = _random.Next(1, n / 2 + 1) * 2 - 1;
 
-            if (_sand[x, y] == 0)
+            if (_sand[x, y] != 0)
             {
-                continue;
+                _sand[x, y] = 0;
+                _maxScore++;
             }
-
-            _sand[x, y] = 0;
-            _maxScore++;
+            else
+            {
+                i--;
+            }
         }
 
         _maxScore *= _sandCost;
 
         StateHasChanged();
 
-        if (_mazeWalls != null)
-        {
-            await _mazeWalls.ForceRender();
-        }
-
-        if (_mazeSands != null)
-        {
-            await _mazeSands.ForceRender();
-        }
+        await Task.WhenAll(ForceRenderWalls(), ForceRenderSands());
 
         _isInit = true;
         StateHasChanged();
 
         await FocusFieldAsync();
+    }
+
+    private Task ForceRenderSands()
+    {
+        return _mazeSands?.ForceRender() ?? Task.CompletedTask;
+    }
+
+    private Task ForceRenderWalls()
+    {
+        return _mazeWalls?.ForceRender() ?? Task.CompletedTask;
     }
 
     private static int GetSeed(string input)
@@ -336,8 +329,8 @@ public partial class Maze
             }
         }
 
-        int x = _myPositionY;
-        int y = _myPositionX;
+        (int y, int x) = _player;
+
         int back;
         road way = new();
         _exitNotFound = true;
@@ -346,7 +339,6 @@ public partial class Maze
         {
             if (x == n && y == n / 2 || x == n && y == n / 2 - 1)
             {
-                //textresult.Text = "exit: true";
                 _exitNotFound = false;
                 _way = way.head;
             }
@@ -365,8 +357,7 @@ public partial class Maze
                     way.add(3);
                     x += 2;
 
-                    _myPositionXDisplay = y;
-                    _myPositionYDisplay = x;
+                    _playerDisplay = (y, x);
                 }
                 else if (lab[x, y + 1] != 0 && lab2[x, y + 1] != 0) //right
                 {
@@ -374,8 +365,7 @@ public partial class Maze
                     way.add(1);
                     y += 2;
 
-                    _myPositionXDisplay = y;
-                    _myPositionYDisplay = x;
+                    _playerDisplay = (y, x);
                 }
                 else if (lab[x, y - 1] != 0 && lab2[x, y - 1] != 0) //left
                 {
@@ -383,8 +373,7 @@ public partial class Maze
                     way.add(2);
                     y -= 2;
 
-                    _myPositionXDisplay = y;
-                    _myPositionYDisplay = x;
+                    _playerDisplay = (y, x);
                 }
                 else if (lab[x - 1, y] != 0 && lab2[x - 1, y] != 0) //up
                 {
@@ -392,8 +381,7 @@ public partial class Maze
                     way.add(4);
                     x -= 2;
 
-                    _myPositionXDisplay = y;
-                    _myPositionYDisplay = x;
+                    _playerDisplay = (y, x);
                 } //1-r 2-l 3-d 4-u
                 else
                 {
@@ -401,13 +389,25 @@ public partial class Maze
                     {
                         back = way.deq();
 
-                        if (back == 1) { y -= 2; }
+                        if (back == 1)
+                        {
+                            y -= 2;
+                        }
 
-                        if (back == 2) { y += 2; }
+                        if (back == 2)
+                        {
+                            y += 2;
+                        }
 
-                        if (back == 3) { x -= 2; }
+                        if (back == 3)
+                        {
+                            x -= 2;
+                        }
 
-                        if (back == 4) { x += 2; }
+                        if (back == 4)
+                        {
+                            x += 2;
+                        }
                     }
                     else
                     {

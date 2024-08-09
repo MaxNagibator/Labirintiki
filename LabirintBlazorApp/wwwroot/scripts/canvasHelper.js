@@ -5,42 +5,72 @@ const commandTypes = {
     3: 'stroke',
     4: 'drawImage',
     5: 'strokeStyle',
-    6: 'lineWidth'
+    6: 'lineWidth',
+    7: 'clearRect',
+};
+
+const commandHandlers = {
+    beginPath: (context) => {
+        context.beginPath();
+    },
+    moveTo: (context, command) => {
+        context.moveTo(command.x, command.y);
+    },
+    lineTo: (context, command) => {
+        context.lineTo(command.x, command.y);
+    },
+    stroke: (context) => {
+        context.stroke();
+    },
+    strokeStyle: (context, command) => {
+        context.strokeStyle = command.color;
+    },
+    lineWidth: (context, command) => {
+        context.lineWidth = command.width;
+    },
+    clearRect: (context, command) => {
+        context.clearRect(command.x, command.y, command.width, command.height);
+    },
+    drawImage: async (context, command) => {
+        const img = await loadImage(command.source);
+        context.drawImage(img, command.x, command.y, command.width, command.height);
+    }
+};
+
+const loadImage = (source) => {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.src = source;
+        img.onload = () => resolve(img);
+    });
 };
 
 window.canvasHelper = {
     getContext2D(canvas) {
         return canvas.getContext('2d');
     },
-    setLineWidth(context, width) {
-        context.lineWidth = width;
-    },
-    setStrokeStyle(context, color) {
-        context.strokeStyle = color;
-    },
-    drawCommands(contextRef, drawCommands) {
-        function draw() {
+    drawCommands(context, drawCommands) {
+        const offScreenCanvas = document.createElement('canvas');
+        offScreenCanvas.width = context.canvas.width;
+        offScreenCanvas.height = context.canvas.height;
+        const offScreenContext = offScreenCanvas.getContext('2d');
+
+        async function draw() {
             for (const command of drawCommands) {
-                if (commandTypes[command.type] === "beginPath") {
-                    contextRef.beginPath();
-                } else if (commandTypes[command.type] === "moveTo") {
-                    contextRef.moveTo(command.x, command.y);
-                } else if (commandTypes[command.type] === "lineTo") {
-                    contextRef.lineTo(command.x, command.y);
-                } else if (commandTypes[command.type] === "stroke") {
-                    contextRef.stroke();
-                } else if (commandTypes[command.type] === "strokeStyle") {
-                    contextRef.strokeStyle = command.color;
-                } else if (commandTypes[command.type] === "lineWidth") {
-                    contextRef.lineWidth = command.size;
-                } else if (commandTypes[command.type] === "drawImage") {
-                    const img = new Image();
-                    img.src = command.source;
-                    img.onload = () => contextRef.drawImage(img, command.x, command.y, command.size, command.size);
+                const handler = commandHandlers[commandTypes[command.type]];
+                if (handler) {
+                    await handler(offScreenContext, command);
+                } else {
+                    console.warn(`Неизвестный тип команды: ${command.type}`);
                 }
             }
+
+            context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+            context.drawImage(offScreenCanvas, 0, 0);
         }
 
         requestAnimationFrame(draw);
     }
 };
+
+

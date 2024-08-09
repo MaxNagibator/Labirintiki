@@ -1,40 +1,29 @@
-﻿using MudBlazor;
+﻿namespace LabirintBlazorApp.Dto;
 
-namespace LabirintBlazorApp.Dto
+public class Vision(int mazeWidth, int mazeHeight, int visionRangeBase = 3)
 {
-    public class Vision(int mazeWidth, int mazeHeight)
+    public int Range { get; } = visionRangeBase * 2;
+
+    public Position Player { get; private set; }
+    public Position Start { get; private set; }
+    public Position Finish { get; private set; }
+
+    public void SetPosition(int x, int y)
     {
-        private int _mazeWidth = mazeWidth;
-        private int _mazeHeight = mazeHeight;
+        Player = (x, y);
 
-        public int MyPositionX { get; private set; }
-        public int MyPositionY { get; private set; }
-        public int StartX { get; private set; }
-        public int StartY { get; private set; }
-        public int FinishX { get; private set; }
-        public int FinishY { get; private set; }
+        int startX = Math.Max(1, x - Range);
+        int finishX = Math.Min(mazeHeight - 1, x + Range + 2);
 
-        public void SetPosition(int x, int y)
-        {
-            var visionRangeBase = 3;
-            var visionRange = (visionRangeBase) * 2;
+        int startY = Math.Max(1, y - Range);
+        int finishY = Math.Min(mazeWidth - 1, y + Range + 2);
 
-            MyPositionX = x;
-            MyPositionY = y;
-            StartX = Math.Max(1, MyPositionX - visionRange);
-            FinishX = Math.Min(_mazeHeight - 1, MyPositionX + visionRange + 2);
-            StartY = Math.Max(1, MyPositionY - visionRange);
-            FinishY = Math.Min(_mazeWidth - 1, MyPositionY + visionRange + 2);
-        }
+        Start = (startX, startY);
+        Finish = (finishX, finishY);
+    }
 
-        public int GetDrawX(int x)
-        {
-            return x - StartX + 1;
-        }
-
-        public int GetDrawY(int y)
-        {
-            return y - StartY + 1;
-        }
+    public Position GetDraw(int x, int y)
+    {
+        return (x - Start.X + 1, y - Start.Y + 1);
     }
 }
