@@ -1,6 +1,19 @@
-﻿<div class="key-interceptor" @onkeydown="OnKeyDown" @ref="_keyInterceptorRef" tabindex="0">
-    @if (ChildContent != null)
-    {
-        @ChildContent
-    }
-</div>
+﻿<MudButton OnClick="() => _isPause = !_isPause"
+           Variant=" Variant.Outlined"
+           Color="@(_isPause ? Color.Success : Color.Warning)"
+           FullWidth>
+    @(_isPause ? "Играть" : "Остановить")
+</MudButton>
+
+<script>
+
+    let keyDownHandler;
+
+    window.initializeKeyInterceptor = dotNetHelper => {
+        keyDownHandler = e => dotNetHelper.invokeMethodAsync('OnKeyDown', e.code);       
+        document.addEventListener("keydown", keyDownHandler);
+    };
+
+    window.finalizeKeyInterceptor = () => document.removeEventListener("keydown", keyDownHandler)
+
+</script>

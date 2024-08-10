@@ -3,21 +3,23 @@ using LabirintBlazorApp.Common.Schemes;
 using LabirintBlazorApp.Dto;
 using LabirintBlazorApp.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 
 namespace LabirintBlazorApp.Components;
 
-public partial class KeyInterceptor : IDisposable
+public partial class KeyInterceptor : IAsyncDisposable
 {
+    private bool _isPause = false;
+    
     private Dictionary<string, (int DeltaX, int DeltaY)> _moveDirections = new();
-    private ElementReference _keyInterceptorRef;
+    private DotNetObjectReference<KeyInterceptor>? _reference;
     private HashSet<string> _attackKeys = [];
 
     [Inject]
     public required IControlSchemeService SchemeService { get; set; }
 
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
+    [Inject]
+    public required IJSRuntime JSRuntime { get; set; }
 
     [Parameter]
     public EventCallback<MoveEventArgs> OnMoveKeyDown { get; set; }
@@ -27,16 +29,29 @@ public partial class KeyInterceptor : IDisposable
 
     private IControlScheme ControlScheme => SchemeService.CurrentScheme;
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
+        await JSRuntime.InvokeVoidAsync("finalizeKeyInterceptor");
+        _reference?.Dispose();
+        
         SchemeService.ControlSchemeChanged -= OnSchemeChanged;
         GC.SuppressFinalize(this);
     }
 
     protected override void OnInitialized()
     {
+        _reference = DotNetObjectReference.Create(this);
+
         Initialize();
         SchemeService.ControlSchemeChanged += OnSchemeChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("initializeKeyInterceptor", _reference);
+        }
     }
 
     private void OnSchemeChanged(object? sender, IControlScheme scheme)
@@ -62,33 +77,31 @@ public partial class KeyInterceptor : IDisposable
         ];
     }
 
-    public async Task FocusAsync()
+    [JSInvokable]
+    public async Task OnKeyDown(string code)
     {
-        if (_keyInterceptorRef is { Id: not null, Context: not null })
+        if (_isPause)
         {
-            await _keyInterceptorRef.FocusAsync();
+            return;
         }
-    }
 
-    private async Task OnKeyDown(KeyboardEventArgs e)
-    {
-        if (_attackKeys.Contains(e.Code))
+        if (_attackKeys.Contains(code))
         {
             AttackEventArgs attackEventArgs = new()
             {
-                KeyCode = Key.Create(e.Code),
-                Type = ControlScheme.GetAttackType(e.Code)
+                KeyCode = Key.Create(code),
+                Type = ControlScheme.GetAttackType(code)
             };
 
             await OnAttackKeyDown.InvokeAsync(attackEventArgs);
         }
 
-        if (_moveDirections.TryGetValue(e.Code, out (int DeltaX, int DeltaY) direction))
+        if (_moveDirections.TryGetValue(code, out (int DeltaX, int DeltaY) direction))
         {
             MoveEventArgs moveEventArgs = new()
             {
                 Direction = direction,
-                KeyCode = Key.Create(e.Code)
+                KeyCode = Key.Create(code)
             };
 
             await OnMoveKeyDown.InvokeAsync(moveEventArgs);

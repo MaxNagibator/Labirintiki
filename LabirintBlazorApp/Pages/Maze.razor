@@ -1,11 +1,9 @@
 @page "/maze"
 @inject SoundService SoundService
 
-<PageTitle>Labirint != Maze</PageTitle>
-<KeyInterceptor OnMoveKeyDown="OnMoveKeyDown" OnAttackKeyDown="OnAttackKeyDown" @ref="_keyInterceptor">
-</KeyInterceptor>
+<PageTitle>Maze</PageTitle>
 <MudStack Spacing="3">
-    <MudText Typo="Typo.h4">Labirint != Maze!</MudText>
+    <MudText Typo="Typo.h4">Maze!</MudText>
 
     @if (_isInit == false)
     {
@@ -16,20 +14,19 @@
     }
     else
     {
-        <div class="field" style="max-width:500px; max-height:500px; overflow-x: hidden; overflow-y: hidden;">
+        <div class="field">
 
             @{
                 int size = 370;
-                int halfBoxSize = 23;// size / _originalSizeDisplay;
+                int halfBoxSize = 23; // size / _originalSizeDisplay;
                 int wallWidth = Math.Max(1, halfBoxSize / 10 * 2);
             }
 
-            <MazeWalls @ref="_mazeWalls" Maze="lab" HalfBoxSize="halfBoxSize" WallWidth="wallWidth" Vision="_vision"/>
+            <MazeWalls @ref="_mazeWalls" Maze="lab" HalfBoxSize="halfBoxSize" WallWidth="wallWidth" Vision="_vision" />
             <MazeSands @ref="_mazeSands" Sand="_sand" HalfBoxSize="halfBoxSize" WallWidth="wallWidth" Vision="_vision" />
 
             @{
-                var drawY = _vision.GetDrawY(_myPositionYDisplay);
-                var drawX = _vision.GetDrawX(_myPositionXDisplay);
+                (int drawX, int drawY) = _vision.GetDraw(_playerDisplay.X, _playerDisplay.Y);
 
                 int entityBoxSize = halfBoxSize * 2 - wallWidth;
                 int myLeft = (drawX - 1) * halfBoxSize + wallWidth;
@@ -48,8 +45,7 @@
 
                 if (!_exitNotFound && _way != null)
                 {
-                    int x = _myPositionY;
-                    int y = _myPositionX;
+                    (int y, int x) = _player;
                     road? t = _way;
 
                     while (t != null)
@@ -126,20 +122,20 @@
                 <MudText Typo="Typo.h5">Параметры:</MudText>
                 <MudTextField @bind-Value="_seed" Label="Зерно генерации" DebounceInterval="300" />
                 <MudStack>
-                    <MudNumericField Label="Размер" Min="@MinSize" Max="@MaxSize" DebounceInterval="300" Value="_originalSize" />
+                    <MudNumericField Label="Размер" Min="@MinSize" Max="@MaxSize" DebounceInterval="300" @bind-Value="_originalSize" />
                     <MudSlider @bind-Value="_originalSize" Min="@MinSize" Max="@MaxSize" Color="Color.Info" Size="Size.Medium" />
                 </MudStack>
                 <MudStack>
-                    <MudNumericField Label="Плотность" Min="0" Max="100" DebounceInterval="300" Value="_density" />
+                    <MudNumericField Label="Плотность" Min="0" Max="100" DebounceInterval="300" @bind-Value="_density" />
                     <MudSlider @bind-Value="_density" Min="0" Max="100" Color="Color.Info" Size="Size.Medium" />
                 </MudStack>
                 <MudStack>
-                    <MudNumericField Label="Скорость" Min="1" Max="100" DebounceInterval="300" Value="_speed" />
+                    <MudNumericField Label="Скорость" Min="1" Max="100" DebounceInterval="300" @bind-Value="_speed" />
                     <MudSlider @bind-Value="_speed" Min="1" Max="100" Color="Color.Info" Size="Size.Medium" />
                 </MudStack>
 
                 <MudButton OnClick="GenerateAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Генерировать</MudButton>
-                <MudButton OnClick="FocusFieldAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Играть</MudButton>
+                <KeyInterceptor OnMoveKeyDown="OnMoveKeyDown" OnAttackKeyDown="OnAttackKeyDown" />
                 <MudButton OnClick="FindExitAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Найти выход</MudButton>
             </MudStack>
         </div>
