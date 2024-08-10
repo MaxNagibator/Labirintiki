@@ -14,71 +14,73 @@
     }
     else
     {
-        <div class="field">
-
-            @{
-                int size = 370;
-                int halfBoxSize = 23;
-                int wallWidth = Math.Max(1, halfBoxSize / 10 * 2);
-            }
-
-            <MazeWalls @ref="_mazeWalls" Maze="lab" HalfBoxSize="halfBoxSize" WallWidth="wallWidth" Vision="_vision" />
-            <MazeSands @ref="_mazeSands" Sand="_sand" HalfBoxSize="halfBoxSize" WallWidth="wallWidth" Vision="_vision" />
-
-            @{
-                (int drawX, int drawY) = _vision.GetDraw(_player);
-
-                int entityBoxSize = halfBoxSize * 2 - wallWidth;
-                int myLeft = (drawX - 1) * halfBoxSize + wallWidth;
-                int myTop = (drawY - 1) * halfBoxSize + wallWidth;
-                <div style="position:absolute;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            z-index: 100;
-                            left: @(myLeft)px;
-                            top: @(myTop)px;
-                            width: @(entityBoxSize)px;
-                            height: @(entityBoxSize)px;">
-                    <img src="/images/runner.png" style="width: @(halfBoxSize)px; height: @(halfBoxSize)px;" alt="Бегун" />
-                </div>
-            }
-        </div>
-
-        <div style="position: absolute; right: 20px; width: 250px;">
-            <MudStack Spacing="3">
-                <MudStack Row>
-                    <MudIcon Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.Bitcoin" Size="Size.Large" />
-                    <MudText Color="Color.Warning" Typo="Typo.h6">@_score/@_maxScore</MudText>
+        <div class="workspace">
+            <div class="info-panel">
+                <MudStack Row Spacing="3">
+                    <MudStack Row>
+                        <MudIcon Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.Bitcoin" Size="Size.Large" />
+                        <MudText Color="Color.Warning" Typo="Typo.h6">@_score/@_maxScore</MudText>
+                    </MudStack>
+                    <MudStack Row>
+                        <MudIcon Color="Color.Inherit" Icon="@MaterialDesignIcons.Normal.Hammer" Size="Size.Large" />
+                        <MudText Color="Color.Inherit" Typo="Typo.h6">@_molotCount/@MaxMolotCount</MudText>
+                    </MudStack>
+                    <MudStack Row>
+                        <MudIcon Color="Color.Error" Icon="@MaterialDesignIcons.Normal.Bomb" Size="Size.Large" />
+                        <MudText Color="Color.Error" Typo="Typo.h6"> @_bombaCount/@MaxBombaCount</MudText>
+                    </MudStack>
                 </MudStack>
-                <MudStack Row>
-                    <MudIcon Color="Color.Inherit" Icon="@MaterialDesignIcons.Normal.Hammer" Size="Size.Large" />
-                    <MudText Color="Color.Inherit" Typo="Typo.h6">@_molotCount/@MaxMolotCount</MudText>
-                </MudStack>
-                <MudStack Row>
-                    <MudIcon Color="Color.Error" Icon="@MaterialDesignIcons.Normal.Bomb" Size="Size.Large" />
-                    <MudText Color="Color.Error" Typo="Typo.h6"> @_bombaCount/@MaxBombaCount</MudText>
-                </MudStack>
-                <MudDivider Class="my-2" Style="height:2px" DividerType="DividerType.FullWidth" />
+            </div>
 
-                <MudText Typo="Typo.h5">Параметры:</MudText>
-                <MudTextField @bind-Value="_seed" Label="Зерно генерации" DebounceInterval="300" />
-                <MudStack>
-                    <MudNumericField Label="Размер" Min="@MinSize" Max="@MaxSize" DebounceInterval="300" @bind-Value="_originalSize" />
-                    <MudSlider @bind-Value="_originalSize" Min="@MinSize" Max="@MaxSize" Color="Color.Info" Size="Size.Medium" />
-                </MudStack>
-                <MudStack>
-                    <MudNumericField Label="Плотность" Min="0" Max="100" DebounceInterval="300" @bind-Value="_density" />
-                    <MudSlider @bind-Value="_density" Min="0" Max="100" Color="Color.Info" Size="Size.Medium" />
-                </MudStack>
-                <MudStack>
-                    <MudNumericField Label="Скорость" Min="1" Max="100" DebounceInterval="300" @bind-Value="_speed" />
-                    <MudSlider @bind-Value="_speed" Min="1" Max="100" Color="Color.Info" Size="Size.Medium" />
-                </MudStack>
+            <div class="field">
+                @{
+                    int halfBoxSize = 23;
+                    int wallWidth = Math.Max(1, halfBoxSize / 10 * 2);
+                }
 
-                <MudButton OnClick="GenerateAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Генерировать</MudButton>
-                <KeyInterceptor OnMoveKeyDown="OnMoveKeyDown" OnAttackKeyDown="OnAttackKeyDown" />
-            </MudStack>
+                <MazeWalls @ref="_mazeWalls" Maze="lab" HalfBoxSize="halfBoxSize" WallWidth="wallWidth" Vision="_vision" />
+                <MazeSands @ref="_mazeSands" Sand="_sand" HalfBoxSize="halfBoxSize" WallWidth="wallWidth" Vision="_vision" />
+
+                @{
+                    int entityBoxSize = halfBoxSize * 2 - wallWidth;
+
+                    (int drawX, int drawY) = (_vision.GetDraw(_player) - 1) * halfBoxSize + wallWidth;
+
+                    <div style="position:absolute;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        z-index: 100;
+                        left: @(drawX)px;
+                        top: @(drawY)px;
+                        width: @(entityBoxSize)px;
+                        height: @(entityBoxSize)px;">
+                        <img src="/images/runner.png" style="width: @(halfBoxSize)px; height: @(halfBoxSize)px;" alt="Бегун" />
+                    </div>
+                }
+            </div>
+
+            <div class="control-panel">
+                <MudStack Spacing="3">
+                    <MudText Typo="Typo.h5">Параметры:</MudText>
+                    <MudTextField @bind-Value="_seed" Label="Зерно генерации" DebounceInterval="300" />
+                    <MudStack>
+                        <MudNumericField Label="Размер" Min="@MinSize" Max="@MaxSize" DebounceInterval="300" @bind-Value="_originalSize" />
+                        <MudSlider @bind-Value="_originalSize" Min="@MinSize" Max="@MaxSize" Color="Color.Info" Size="Size.Medium" />
+                    </MudStack>
+                    <MudStack>
+                        <MudNumericField Label="Плотность" Min="0" Max="100" DebounceInterval="300" @bind-Value="_density" />
+                        <MudSlider @bind-Value="_density" Min="0" Max="100" Color="Color.Info" Size="Size.Medium" />
+                    </MudStack>
+                    <MudStack>
+                        <MudNumericField Label="Скорость" Min="1" Max="100" DebounceInterval="300" @bind-Value="_speed" />
+                        <MudSlider @bind-Value="_speed" Min="1" Max="100" Color="Color.Info" Size="Size.Medium" />
+                    </MudStack>
+
+                    <MudButton OnClick="GenerateAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Генерировать</MudButton>
+                    <KeyInterceptor OnMoveKeyDown="OnMoveKeyDown" OnAttackKeyDown="OnAttackKeyDown" />
+                </MudStack>
+            </div>
         </div>
     }
 

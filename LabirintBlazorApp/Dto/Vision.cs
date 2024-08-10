@@ -1,8 +1,8 @@
 ﻿namespace LabirintBlazorApp.Dto;
 
-public class Vision(int mazeWidth, int mazeHeight, int visionRangeBase = 3)
+public class Vision(int mazeWidth, int mazeHeight, int visionRange = 3)
 {
-    public int Range { get; } = visionRangeBase * 2;
+    public int Range { get; } = visionRange * 2;
 
     public Position Player { get; private set; }
     public Position Start { get; private set; }
@@ -24,6 +24,6 @@ public class Vision(int mazeWidth, int mazeHeight, int visionRangeBase = 3)
 
     public Position GetDraw(Position position)
     {
-        return (position.X - Start.X + 1, position.Y - Start.Y + 1);
+        return position - Start + 1;
     }
 }

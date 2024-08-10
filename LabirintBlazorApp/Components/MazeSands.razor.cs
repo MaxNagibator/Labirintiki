@@ -9,10 +9,6 @@ public partial class MazeSands : MazeComponent
     [EditorRequired]
     public required int[,] Sand { get; set; }
 
-    [Parameter]
-    [EditorRequired]
-    public required int WallWidth { get; set; }
-
     protected override string CanvasId => "mazeSandsCanvas";
 
     protected override async Task DrawAsync()
@@ -32,15 +28,15 @@ public partial class MazeSands : MazeComponent
                     continue;
                 }
 
-                (int drawX, int drawY) = Vision.GetDraw((x, y));
+                (int drawX, int drawY) = (Vision.GetDraw((x, y)) - 1) * HalfBoxSize + WallWidth;
 
-                int left = (drawX - 1) * HalfBoxSize + WallWidth - offset / 2;
-                int top = (drawY - 1) * HalfBoxSize + WallWidth - offset;
+                int left = drawX - offset / 2;
+                int top = drawY - offset;
 
                 drawSequence.DrawImage("/images/sand.png", left, top, HalfBoxSize, HalfBoxSize);
             }
         }
-        
+
         await Context.DrawSequenceAsync(drawSequence);
     }
 }

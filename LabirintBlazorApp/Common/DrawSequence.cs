@@ -52,6 +52,12 @@ public class DrawSequence
         _commands.Add(new Command(Command.Stroke));
     }
 
+    public void DrawLine(double topLeftX, double topLeftY, double bottomRightX, double bottomRightY)
+    {
+        MoveTo(topLeftX, topLeftY);
+        LineTo(bottomRightX, bottomRightY);
+    }
+
     public void DrawImage(string source, double left, double top, double width, double height)
     {
         _commands.Add(new Command(Command.DrawImage)
