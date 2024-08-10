@@ -32,7 +32,7 @@ public partial class MazeSands : MazeComponent
                     continue;
                 }
 
-                (int drawX, int drawY) = Vision.GetDraw(x, y);
+                (int drawX, int drawY) = Vision.GetDraw((x, y));
 
                 int left = (drawX - 1) * HalfBoxSize + WallWidth - offset / 2;
                 int top = (drawY - 1) * HalfBoxSize + WallWidth - offset;

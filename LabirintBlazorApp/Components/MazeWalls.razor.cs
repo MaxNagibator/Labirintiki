@@ -33,7 +33,7 @@ public partial class MazeWalls : MazeComponent
         {
             for (int x = Vision.Start.X; x < Vision.Finish.X; x += 2)
             {
-                (int drawX, int drawY) = Vision.GetDraw(x, y);
+                (int drawX, int drawY) = Vision.GetDraw((x, y));
 
                 int topLeftY = drawY * HalfBoxSize - HalfBoxSize;
                 int topLeftX = drawX * HalfBoxSize - HalfBoxSize;

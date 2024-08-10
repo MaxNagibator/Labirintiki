@@ -10,7 +10,7 @@ namespace LabirintBlazorApp.Pages;
 public partial class Maze
 {
     private const int MinSize = 1;
-    private const int MaxSize = 100;
+    private const int MaxSize = 500;
 
     private const int MaxMolotCount = 6;
     private const int MaxBombaCount = 2;
@@ -28,7 +28,6 @@ public partial class Maze
     private int _molotCount;
 
     private int _originalSize;
-    private int _originalSizeDisplay;
     private int _sandCost;
     private int _score;
     private int _speed;
@@ -36,17 +35,13 @@ public partial class Maze
     private int n;
     private int[,] _sand;
     private int[,] lab;
-    private int[,] lab2;
 
     private MazeSands? _mazeSands;
     private MazeWalls? _mazeWalls;
 
     private Position _exitBox;
     private Position _player;
-    private Position _playerDisplay;
     private Random _random = new();
-
-    private road? _way;
 
     private string? _seed;
 
@@ -59,7 +54,6 @@ public partial class Maze
         _density = 3;
         _sandCost = 100;
         _player = (0, 0);
-        _playerDisplay = (0, 0);
         _exitBox = (0, 0);
     }
 
@@ -146,8 +140,7 @@ public partial class Maze
 
         _player.X += xOffset * 2;
         _player.Y += yOffset * 2;
-        _vision?.SetPosition(_player.X, _player.Y);
-        _playerDisplay = _player;
+        _vision?.SetPosition(_player);
 
         await SoundService.PlayAsync(SoundType.Step);
 
@@ -183,12 +176,10 @@ public partial class Maze
             : new Random();
 
         _player = (1, 1);
-        _playerDisplay = _player;
 
         _exitNotFound = true;
 
         _originalSize = ClampSize(_originalSize);
-        _originalSizeDisplay = _originalSize;
 
         n = _originalSize * 2 + 1;
 
@@ -205,7 +196,7 @@ public partial class Maze
         _bombaCount = MaxBombaCount;
 
         _vision = new Vision(mazeWidth, mazeHeight);
-        _vision.SetPosition(_player.X, _player.Y);
+        _vision.SetPosition(_player);
 
         for (int i = 0; i < n; i++)
         {
@@ -237,20 +228,14 @@ public partial class Maze
             lab[_exitBox.Y - 1, _exitBox.X] = 1;
         }
 
-        lab2 = new int[n, n];
-
+        _sand = new int[n, n];
         for (int i = 0; i < n; i++)
         {
             for (int j = 0; j < n; j++)
             {
-                lab2[i, j] = 1;
+                _sand[i, j] = 1;
             }
         }
-
-        _sand = lab2;
-
-        _sand[3, 3] = 0;
-        _sand[5, 5] = 0;
 
         for (int i = 1; i < _labSize; i++)
         {
@@ -305,105 +290,5 @@ public partial class Maze
         };
 
         return size;
-    }
-
-    private async Task FindExitAsync()
-    {
-        for (int i = 0; i < n; i++)
-        {
-            for (int j = 0; j < n; j++)
-            {
-                lab2[i, j] = 1;
-            }
-        }
-
-        (int y, int x) = _player;
-
-        int back;
-        road way = new();
-        _exitNotFound = true;
-
-        while (_exitNotFound)
-        {
-            if (x == n && y == n / 2 || x == n && y == n / 2 - 1)
-            {
-                _exitNotFound = false;
-                _way = way.head;
-            }
-            else
-            {
-                StateHasChanged();
-
-                if (_speed is > 0 and < 100)
-                {
-                    await Task.Delay(100 / _speed);
-                }
-
-                if (lab[x + 1, y] != 0 && lab2[x + 1, y] != 0) //down
-                {
-                    lab2[x + 1, y] = 0;
-                    way.add(3);
-                    x += 2;
-
-                    _playerDisplay = (y, x);
-                }
-                else if (lab[x, y + 1] != 0 && lab2[x, y + 1] != 0) //right
-                {
-                    lab2[x, y + 1] = 0;
-                    way.add(1);
-                    y += 2;
-
-                    _playerDisplay = (y, x);
-                }
-                else if (lab[x, y - 1] != 0 && lab2[x, y - 1] != 0) //left
-                {
-                    lab2[x, y - 1] = 0;
-                    way.add(2);
-                    y -= 2;
-
-                    _playerDisplay = (y, x);
-                }
-                else if (lab[x - 1, y] != 0 && lab2[x - 1, y] != 0) //up
-                {
-                    lab2[x - 1, y] = 0;
-                    way.add(4);
-                    x -= 2;
-
-                    _playerDisplay = (y, x);
-                } //1-r 2-l 3-d 4-u
-                else
-                {
-                    if (way.size() != 0)
-                    {
-                        back = way.deq();
-
-                        if (back == 1)
-                        {
-                            y -= 2;
-                        }
-
-                        if (back == 2)
-                        {
-                            y += 2;
-                        }
-
-                        if (back == 3)
-                        {
-                            x -= 2;
-                        }
-
-                        if (back == 4)
-                        {
-                            x += 2;
-                        }
-                    }
-                    else
-                    {
-                        _exitNotFound = false;
-                        _way = null;
-                    }
-                }
-            }
-        }
     }
 }

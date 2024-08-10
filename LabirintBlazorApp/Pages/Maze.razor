@@ -18,7 +18,7 @@
 
             @{
                 int size = 370;
-                int halfBoxSize = 23; // size / _originalSizeDisplay;
+                int halfBoxSize = 23;
                 int wallWidth = Math.Max(1, halfBoxSize / 10 * 2);
             }
 
@@ -26,7 +26,7 @@
             <MazeSands @ref="_mazeSands" Sand="_sand" HalfBoxSize="halfBoxSize" WallWidth="wallWidth" Vision="_vision" />
 
             @{
-                (int drawX, int drawY) = _vision.GetDraw(_playerDisplay.X, _playerDisplay.Y);
+                (int drawX, int drawY) = _vision.GetDraw(_player);
 
                 int entityBoxSize = halfBoxSize * 2 - wallWidth;
                 int myLeft = (drawX - 1) * halfBoxSize + wallWidth;
@@ -42,64 +42,6 @@
                             height: @(entityBoxSize)px;">
                     <img src="/images/runner.png" style="width: @(halfBoxSize)px; height: @(halfBoxSize)px;" alt="Бегун" />
                 </div>
-
-                if (!_exitNotFound && _way != null)
-                {
-                    (int y, int x) = _player;
-                    road? t = _way;
-
-                    while (t != null)
-                    {
-                        switch (t.cur)
-                        {
-                            case 1:
-                                <DrawLine Color="@("darkred")"
-                                          Width="@(wallWidth)"
-                                          X1="@(y * halfBoxSize)"
-                                          Y1="@(x * halfBoxSize)"
-                                          X2="@((y + 2) * halfBoxSize)"
-                                          Y2="@(x * halfBoxSize)" />
-
-                                y += 2;
-                                break;
-
-                            case 2:
-                                <DrawLine Color="@("darkred")"
-                                          Width="@(wallWidth)"
-                                          X1="@(y * halfBoxSize)"
-                                          Y1="@(x * halfBoxSize)"
-                                          X2="@((y - 2) * halfBoxSize)"
-                                          Y2="@(x * halfBoxSize)" />
-
-                                y -= 2;
-                                break;
-
-                            case 3:
-                                <DrawLine Color="@("darkred")"
-                                          Width="@(wallWidth)"
-                                          X1="@(y * halfBoxSize)"
-                                          Y1="@(x * halfBoxSize)"
-                                          X2="@(y * halfBoxSize)"
-                                          Y2="@((x + 2) * halfBoxSize)" />
-
-                                x += 2;
-                                break;
-
-                            case 4:
-                                <DrawLine Color="@("darkred")"
-                                          Width="@(wallWidth)"
-                                          X1="@(y * halfBoxSize)"
-                                          Y1="@(x * halfBoxSize)"
-                                          X2="@(y * halfBoxSize)"
-                                          Y2="@((x - 2) * halfBoxSize)" />
-
-                                x -= 2;
-                                break;
-                        }
-
-                        t = t.next;
-                    }
-                }
             }
         </div>
 
@@ -136,7 +78,6 @@
 
                 <MudButton OnClick="GenerateAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Генерировать</MudButton>
                 <KeyInterceptor OnMoveKeyDown="OnMoveKeyDown" OnAttackKeyDown="OnAttackKeyDown" />
-                <MudButton OnClick="FindExitAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Найти выход</MudButton>
             </MudStack>
         </div>
     }

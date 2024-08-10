@@ -6,4 +6,7 @@
     position: relative;
     overflow-x: hidden;
     overflow-y: hidden;
+    left: 300px;
+    width: 500px;
+    height: 500px;
 }
