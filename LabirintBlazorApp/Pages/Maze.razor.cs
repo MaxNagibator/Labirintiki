@@ -1,9 +1,8 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using LabirintBlazorApp.Common;
+﻿using LabirintBlazorApp.Common;
 using LabirintBlazorApp.Components;
 using LabirintBlazorApp.Constants;
 using LabirintBlazorApp.Dto;
+using Microsoft.AspNetCore.Components;
 
 namespace LabirintBlazorApp.Pages;
 
@@ -30,19 +29,20 @@ public partial class Maze
     private int _originalSize;
     private int _sandCost;
     private int _score;
-    private int[,] lab;
+    private int[,] _lab;
     private int[,] _sand;
 
     private MazeSands? _mazeSands;
+    private MazeSeed _seeder = null!;
     private MazeWalls? _mazeWalls;
 
     private Position _exitBox;
     private Position _player;
-    private Random _random = new();
 
     private Vision _vision = null!;
 
-    private Vision? _vision;
+    [Parameter]
+    public string? Seed { get; set; }
 
     protected override void OnInitialized()
     {
@@ -124,12 +124,12 @@ public partial class Maze
             return;
         }
 
-        lab[y, x] = 1;
+        _lab[y, x] = 1;
     }
 
     private async Task Move(int xOffset, int yOffset)
     {
-        if (lab[_player.Y + yOffset, _player.X + xOffset] == 0)
+        if (_lab[_player.Y + yOffset, _player.X + xOffset] == 0)
         {
             return;
         }
@@ -163,71 +163,60 @@ public partial class Maze
         // todo Костыль чтоб цвет обновлялся, надо больше времени подумать.
         // (Не перерисовывает если стена осталась на прежнем месте)
         // Но в принципе то работает))))))
-        _labSize = 0;
         StateHasChanged();
         await Task.Delay(1);
-
-        _random = string.IsNullOrWhiteSpace(_seed) == false
-            ? new Random(GetSeed(_seed))
-            : new Random();
-
-        _player = (1, 1);
-
-        _exitNotFound = true;
-
-        _originalSize = ClampSize(_originalSize);
-
-        n = _originalSize * 2 + 1;
-
-        int mazeWidth = n;
-        int mazeHeight = n;
-        lab = new int[n, n];
-
-        _labSize = n;
-
+        
         _score = 0;
         _maxScore = 0;
 
         _molotCount = MaxMolotCount;
         _bombaCount = MaxBombaCount;
 
-        _vision = new Vision(mazeWidth, mazeHeight);
+        _player = (1, 1);
+        _exitNotFound = true;
+
+        _originalSize = Math.Max(MinSize, Math.Min(MaxSize, _originalSize));
+        _labSize = _originalSize * 2 + 1;
+        _lab = new int[_labSize, _labSize];
+
+        _vision = new Vision(_labSize, _labSize);
         _vision.SetPosition(_player);
 
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < _labSize; i++)
         {
-            for (int j = 0; j < n; j++)
+            for (int j = 0; j < _labSize; j++)
             {
-                if (i == 0 || i == n - 1)
+                if (i == 0 || i == _labSize - 1)
                 {
-                    lab[i, j] = 0;
+                    _lab[i, j] = 0;
                 }
 
-                if (j == 0 || j == n - 1)
+                if (j == 0 || j == _labSize - 1)
                 {
-                    lab[i, j] = 0;
+                    _lab[i, j] = 0;
                 }
 
                 if (i % 2 == 1 && j % 2 == 1)
                 {
-                    lab[i, j] = 2;
+                    _lab[i, j] = 2;
                 }
 
-                if ((i > 0 && i % 2 == 0 && i < n - 1 && j > 0 && j % 2 == 1 && j < n - 1) || 
-                    (i > 0 && i % 2 == 1 && i < n - 1 && j > 0 && j % 2 == 0 && j < n - 1))
+                if ((i > 0 && i % 2 == 0 && i < _labSize - 1 && j > 0 && j % 2 == 1 && j < _labSize - 1) || 
+                    (i > 0 && i % 2 == 1 && i < _labSize - 1 && j > 0 && j % 2 == 0 && j < _labSize - 1))
                 {
-                    lab[i, j] = _random.Next(0, _density);
+                    _lab[i, j] = _seeder.Random.Next(0, _density);
                 }
             }
 
-            _exitBox = (n / 2 - (_originalSize % 2 == 0 ? 1 : 0), n);
-            lab[_exitBox.Y - 1, _exitBox.X] = 1;
+            _exitBox = (_labSize / 2 - (_originalSize % 2 == 0 ? 1 : 0), _labSize);
+            _lab[_exitBox.Y - 1, _exitBox.X] = 1;
         }
 
-        _sand = new int[n, n];
-        for (int i = 0; i < n; i++)
+        _sand = new int[_labSize, _labSize];
+
+        for (int i = 0; i < _labSize; i++)
         {
-            for (int j = 0; j < n; j++)
+            for (int j = 0; j < _labSize; j++)
             {
                 _sand[i, j] = 1;
             }
@@ -235,8 +224,8 @@ public partial class Maze
 
         for (int i = 1; i < _labSize; i++)
         {
-            int x = _random.Next(1, n / 2 + 1) * 2 - 1;
-            int y = _random.Next(1, n / 2 + 1) * 2 - 1;
+            int x = _seeder.Random.Next(1, _labSize / 2 + 1) * 2 - 1;
+            int y = _seeder.Random.Next(1, _labSize / 2 + 1) * 2 - 1;
 
             if (_sand[x, y] != 0)
             {
@@ -267,24 +256,5 @@ public partial class Maze
     private Task ForceRenderWalls()
     {
         return _mazeWalls?.ForceRender() ?? Task.CompletedTask;
-    }
-
-    private static int GetSeed(string input)
-    {
-        byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));
-        int result = BitConverter.ToInt32(hashBytes, 0);
-        return Math.Abs(result);
-    }
-
-    private int ClampSize(int size)
-    {
-        size = size switch
-        {
-            < MinSize => MinSize,
-            > MaxSize => MaxSize,
-            var _ => size
-        };
-
-        return size;
     }
 }
