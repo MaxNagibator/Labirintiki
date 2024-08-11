@@ -1,12 +1,30 @@
-﻿.key-interceptor:focus {
-    outline: none !important;
+﻿.workspace {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+@media (max-width: 600px) {
+    .workspace {
+        flex-direction: column;
+    }
+}
+
+.info-panel {
+    width: 100%;
 }
 
 .field {
     position: relative;
-    overflow-x: hidden;
-    overflow-y: hidden;
-    left: 300px;
-    width: 500px;
-    height: 500px;
+    margin: auto;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3), inset 0 0 10px 0 rgba(0, 0, 0, 0.3);
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.field:hover {
+    box-shadow: 0 0 30px 15px rgba(0, 0, 0, 0.5);
+}
+
+.control-panel {
 }

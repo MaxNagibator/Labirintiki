@@ -23,10 +23,14 @@ public abstract class MazeComponent : ComponentBase
 
     [Parameter]
     [EditorRequired]
+    public required int WallWidth { get; set; }
+
+    [Parameter]
+    [EditorRequired]
     public required Vision Vision { get; set; }
 
-    protected int CanvasWidth => Vision.Range * 2 * HalfBoxSize;
-    protected int CanvasHeight => Vision.Range * 2 * HalfBoxSize;
+    protected int CanvasWidth => Vision.Range * 2 * HalfBoxSize + WallWidth;
+    protected int CanvasHeight => Vision.Range * 2 * HalfBoxSize + WallWidth;
 
     protected abstract string CanvasId { get; }
 
@@ -47,10 +51,10 @@ public abstract class MazeComponent : ComponentBase
     public async Task ForceRender()
     {
         _isShouldRender = true;
-        
+
         await DrawAsync();
         StateHasChanged();
-        
+
         _isShouldRender = false;
     }
 

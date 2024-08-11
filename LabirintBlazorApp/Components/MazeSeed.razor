@@ -1,0 +1,18 @@
+﻿<MudStack Row>
+    <MudTextField @bind-Value="_userSeed" OnBlur="Reset" Label="Зерно генерации" DebounceInterval="300" HelperText="@_seed.ToString()" />
+    <MudIconButton Icon="@Icons.Material.TwoTone.Share" OnClick="ShowMessageBox" Color="Color.Info" />
+</MudStack>
+
+<MudMessageBox @ref="_messageBox">
+    <TitleContent>
+        <MudText Typo="Typo.h6">Поделиться ссылкой</MudText>
+    </TitleContent>
+    <MessageContent>
+        <MudText Typo="Typo.body1">Если вы хотите поделиться с другом лабиринтом, отправьте ему эту ссылку:</MudText>
+        <MudTextField Value="Link" ReadOnly="true" Margin="Margin.Dense" />
+        <MudButton OnClick="CopyLink" Color="Color.Primary" Margin="Margin.Dense">Скопировать ссылку</MudButton>
+    </MessageContent>
+    <YesButton>
+        <MudButton Color="Color.Secondary">Закрыть</MudButton>
+    </YesButton>
+</MudMessageBox>

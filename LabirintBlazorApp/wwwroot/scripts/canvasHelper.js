@@ -10,40 +10,29 @@ const commandTypes = {
 };
 
 const commandHandlers = {
-    beginPath: (context) => {
-        context.beginPath();
-    },
-    moveTo: (context, command) => {
-        context.moveTo(command.x, command.y);
-    },
-    lineTo: (context, command) => {
-        context.lineTo(command.x, command.y);
-    },
-    stroke: (context) => {
-        context.stroke();
-    },
+    beginPath: context => context.beginPath(),
+    moveTo: (context, command) => context.moveTo(command.x, command.y),
+    lineTo: (context, command) => context.lineTo(command.x, command.y),
+    stroke: context => context.stroke(),
     strokeStyle: (context, command) => {
         context.strokeStyle = command.color;
     },
     lineWidth: (context, command) => {
         context.lineWidth = command.width;
     },
-    clearRect: (context, command) => {
-        context.clearRect(command.x, command.y, command.width, command.height);
-    },
+    clearRect: (context, command) => context.clearRect(command.x, command.y, command.width, command.height),
     drawImage: async (context, command) => {
         const img = await loadImage(command.source);
         context.drawImage(img, command.x, command.y, command.width, command.height);
     }
 };
 
-const loadImage = (source) => {
-    return new Promise((resolve) => {
-        const img = new Image();
-        img.src = source;
-        img.onload = () => resolve(img);
+const loadImage = source =>
+    new Promise(resolve => {
+        const image = new Image();
+        image.src = source;
+        image.onload = () => resolve(image);
     });
-};
 
 window.canvasHelper = {
     getContext2D(canvas) {

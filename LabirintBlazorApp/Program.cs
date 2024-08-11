@@ -15,6 +15,7 @@ builder.Services.AddMudServices();
 
 builder.Services.AddSingleton<SoundService>();
 builder.Services.AddSingleton<IControlSchemeService, ControlSchemeService>();
+builder.Services.AddScoped<IClipboardService, ClipboardService>();
 
 builder.Services.AddScoped(_ => new HttpClient
 {
