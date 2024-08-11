@@ -27,6 +27,10 @@ public abstract class MazeComponent : ComponentBase
 
     [Parameter]
     [EditorRequired]
+    public required Labyrinth Maze { get; set; }
+
+    [Parameter]
+    [EditorRequired]
     public required Vision Vision { get; set; }
 
     protected int CanvasWidth => Vision.Range * 2 * HalfBoxSize + WallWidth;

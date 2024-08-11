@@ -2,7 +2,7 @@
 
 public class Vision(int mazeWidth, int mazeHeight, int visionRange = 3)
 {
-    public int Range { get; } = visionRange * 2;
+    public int Range { get; } = visionRange;
 
     public Position Player { get; private set; }
     public Position Start { get; private set; }
@@ -12,11 +12,11 @@ public class Vision(int mazeWidth, int mazeHeight, int visionRange = 3)
     {
         Player = position;
 
-        int startX = Math.Max(1, position.X - Range);
-        int finishX = Math.Min(mazeHeight - 1, position.X + Range + 2);
+        int startX = Math.Max(0, position.X - Range);
+        int finishX = Math.Min(mazeWidth - 1, position.X + Range);
 
-        int startY = Math.Max(1, position.Y - Range);
-        int finishY = Math.Min(mazeWidth - 1, position.Y + Range + 2);
+        int startY = Math.Max(0, position.Y - Range);
+        int finishY = Math.Min(mazeHeight - 1, position.Y + Range);
 
         Start = (startX, startY);
         Finish = (finishX, finishY);
@@ -24,6 +24,6 @@ public class Vision(int mazeWidth, int mazeHeight, int visionRange = 3)
 
     public Position GetDraw(Position position)
     {
-        return position - Start + 1;
+        return position - Start + 1; // +1 ?????
     }
 }

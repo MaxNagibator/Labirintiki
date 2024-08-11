@@ -42,12 +42,12 @@
                     int wallWidth = Math.Max(1, halfBoxSize / 10 * 2);
                 }
 
-                <MazeWalls @ref="_mazeWalls" Maze="_lab" HalfBoxSize="halfBoxSize" WallWidth="wallWidth" Vision="_vision" />
-                <MazeSands @ref="_mazeSands" Sand="_sand" HalfBoxSize="halfBoxSize" WallWidth="wallWidth" Vision="_vision" />
+                <MazeWalls @ref="_mazeWalls" Maze="_labyrinth" HalfBoxSize="halfBoxSize" WallWidth="wallWidth" Vision="_vision" />
+                <MazeSands @ref="_mazeSands" Maze="_labyrinth" HalfBoxSize="halfBoxSize" WallWidth="wallWidth" Vision="_vision" />
 
                 @{
                     int entityBoxSize = halfBoxSize * 2 - wallWidth;
-                    (int drawX, int drawY) = (_vision.GetDraw(_player) - 1) * halfBoxSize + wallWidth;
+                    (int drawX, int drawY) = (_vision.GetDraw(_labyrinth.Player) - 1) * halfBoxSize + wallWidth;
                 }
                 <div style="position:absolute;
                         display: flex;

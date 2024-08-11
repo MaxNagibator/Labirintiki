@@ -11,7 +11,7 @@ public partial class KeyInterceptor : IAsyncDisposable
 {
     private bool _isPause = false;
     
-    private Dictionary<string, (int DeltaX, int DeltaY)> _moveDirections = new();
+    private Dictionary<string, Direction> _moveDirections = new();
     private DotNetObjectReference<KeyInterceptor>? _reference;
     private HashSet<string> _attackKeys = [];
 
@@ -62,12 +62,12 @@ public partial class KeyInterceptor : IAsyncDisposable
 
     private void Initialize()
     {
-        _moveDirections = new Dictionary<string, (int, int)>
+        _moveDirections = new Dictionary<string, Direction>
         {
-            { ControlScheme.MoveUp, (0, -1) },
-            { ControlScheme.MoveDown, (0, 1) },
-            { ControlScheme.MoveLeft, (-1, 0) },
-            { ControlScheme.MoveRight, (1, 0) }
+            { ControlScheme.MoveLeft, Direction.Left },
+            { ControlScheme.MoveUp, Direction.Top },
+            { ControlScheme.MoveRight, Direction.Right },
+            { ControlScheme.MoveDown, Direction.Bottom },
         };
 
         _attackKeys =
@@ -96,7 +96,7 @@ public partial class KeyInterceptor : IAsyncDisposable
             await OnAttackKeyDown.InvokeAsync(attackEventArgs);
         }
 
-        if (_moveDirections.TryGetValue(code, out (int DeltaX, int DeltaY) direction))
+        if (_moveDirections.TryGetValue(code, out Direction direction))
         {
             MoveEventArgs moveEventArgs = new()
             {

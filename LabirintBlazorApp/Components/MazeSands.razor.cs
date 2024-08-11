@@ -1,14 +1,9 @@
 ﻿using LabirintBlazorApp.Common;
-using Microsoft.AspNetCore.Components;
 
 namespace LabirintBlazorApp.Components;
 
 public partial class MazeSands : MazeComponent
 {
-    [Parameter]
-    [EditorRequired]
-    public required int[,] Sand { get; set; }
-
     protected override string CanvasId => "mazeSandsCanvas";
 
     protected override async Task DrawAsync()
@@ -19,11 +14,11 @@ public partial class MazeSands : MazeComponent
         int entityBoxSize = HalfBoxSize * 2 - WallWidth;
         int offset = HalfBoxSize - entityBoxSize;
 
-        for (int y = Vision.Start.Y; y < Vision.Finish.Y; y += 2)
+        for (int x = Vision.Start.X; x < Vision.Finish.X; x++)
         {
-            for (int x = Vision.Start.X; x < Vision.Finish.X; x += 2)
+            for (int y = Vision.Start.Y; y < Vision.Finish.Y; y++)
             {
-                if (Sand[y, x] != 0)
+                if (Maze.Tiles[x, y].HasSand == false)
                 {
                     continue;
                 }
