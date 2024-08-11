@@ -30,11 +30,8 @@ public partial class Maze
     private int _originalSize;
     private int _sandCost;
     private int _score;
-    private int _speed;
-
-    private int n;
-    private int[,] _sand;
     private int[,] lab;
+    private int[,] _sand;
 
     private MazeSands? _mazeSands;
     private MazeWalls? _mazeWalls;
@@ -43,14 +40,13 @@ public partial class Maze
     private Position _player;
     private Random _random = new();
 
-    private string? _seed;
+    private Vision _vision = null!;
 
     private Vision? _vision;
 
     protected override void OnInitialized()
     {
         _originalSize = 16;
-        _speed = 3;
         _density = 3;
         _sandCost = 100;
         _player = (0, 0);
@@ -140,7 +136,7 @@ public partial class Maze
 
         _player.X += xOffset * 2;
         _player.Y += yOffset * 2;
-        _vision?.SetPosition(_player);
+        _vision.SetPosition(_player);
 
         await SoundService.PlayAsync(SoundType.Step);
 

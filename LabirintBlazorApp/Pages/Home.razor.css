@@ -1,9 +1,9 @@
 ﻿.content-section {
-    background-color: #f9f9f9;
+    margin-top: 20px;
     padding: 20px;
     border-radius: 10px;
+    background-color: #f9f9f9;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
 }
 
 .content-section h2 {
@@ -11,41 +11,41 @@
 }
 
 .content-section ul {
-    list-style-type: none;
     padding: 0;
+    list-style-type: none;
 }
 
 .content-section ul li {
-    background-color: #e8f0fe;
+    display: flex;
+    align-items: center;
     margin: 10px 0;
     padding: 10px;
     border-radius: 5px;
-    display: flex;
-    align-items: center;
+    background-color: #e8f0fe;
 }
 
 .content-section ul li::before {
-    content: "\f00c";
     font-family: "Font Awesome 5 Free", serif;
     font-weight: 900;
     margin-right: 10px;
+    content: "\f00c";
     color: #3498db;
 }
 
 .content-section p.joke {
-    background-color: #fff3cd;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin: 10px 0;
     display: flex;
     align-items: center;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #fff3cd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .content-section p.joke::before {
-    content: "\f118";
     font-family: "Font Awesome 5 Free", serif;
     font-weight: 900;
     margin-right: 10px;
+    content: "\f118";
     color: #ffc107;
 }
