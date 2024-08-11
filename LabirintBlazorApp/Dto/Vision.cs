@@ -24,6 +24,6 @@ public class Vision(int mazeWidth, int mazeHeight, int visionRange = 3)
 
     public Position GetDraw(Position position)
     {
-        return position - Start + 1; // +1 ?????
+        return position - Start;
     }
 }

@@ -5,62 +5,63 @@ namespace LabirintBlazorApp.Components;
 
 public partial class MazeWalls : MazeComponent
 {
+    private int _height;
+    private int _width;
+
     protected override string CanvasId => "mazeWallsCanvas";
+
+    protected override void OnParametersSetInner()
+    {
+        _width = WallWidth;
+        _height = BoxSize + WallWidth;
+    }
 
     protected override async Task DrawAsync()
     {
-        int fullWallOffset = WallWidth / 2;
-        int halfWallOffset = WallWidth / 4;
+        // При рисовании на canvas, ширина линии симметрична центру,
+        // то есть при рисовании из (0,0) в (0,10) получится линии в половину ширины,
+        // в итоге линия - это будет прямоугольник (0,0) в (ширина/2, 10),
+        // поэтому нужны были смешение в половину ширины линии.
+        // Теперь для упрощения понимания рисуются не линии, а просто прямоугольники.
 
         DrawSequence drawSequence = new();
 
         drawSequence.ClearRect(0, 0, CanvasWidth, CanvasHeight);
         drawSequence.StrokeStyle(Parameters.Labyrinth.Color);
-        drawSequence.LineWidth(WallWidth);
 
         for (int x = Vision.Start.X; x <= Vision.Finish.X; x++)
         {
             for (int y = Vision.Start.Y; y <= Vision.Finish.Y; y++)
             {
-                (int drawX, int drawY) = Vision.GetDraw((x, y)) * HalfBoxSize;
+                Position topLeft = Vision.GetDraw((x, y)) * BoxSize;
+                Position bottomRight = topLeft + BoxSize;
 
-                int topLeftX = drawX - HalfBoxSize;
-                int topLeftY = drawY - HalfBoxSize;
-
-                int bottomRightX = drawX + HalfBoxSize;
-                int bottomRightY = drawY + HalfBoxSize;
-
-                drawSequence.BeginPath();
-
-
-                if (Maze.Tiles[x, y].ContainsWall(Direction.Left))
+                if (Maze[x, y].ContainsWall(Direction.Left))
                 {
-                    drawSequence.DrawLine(topLeftX + halfWallOffset, topLeftY, topLeftX + halfWallOffset, bottomRightY + fullWallOffset);
+                    drawSequence.DrawRect(topLeft.X, topLeft.Y, _width, _height);
                 }
 
-                if (Maze.Tiles[x, y].ContainsWall(Direction.Top))
+                if (Maze[x, y].ContainsWall(Direction.Top))
                 {
-                    drawSequence.DrawLine(topLeftX, topLeftY + halfWallOffset, bottomRightX + fullWallOffset, topLeftY + halfWallOffset);
+                    drawSequence.DrawRect(topLeft.X, topLeft.Y, _height, _width);
                 }
 
                 // нет смысла рисовать одну и ту же стенку дважды.
                 if (x == Maze.Width - 1)
                 {
-                    if (Maze.Tiles[x, y].ContainsWall(Direction.Right))
+                    if (Maze[x, y].ContainsWall(Direction.Right))
                     {
-                        drawSequence.DrawLine(bottomRightX + halfWallOffset, topLeftY, bottomRightX + halfWallOffset, bottomRightY + fullWallOffset);
+                        drawSequence.DrawRect(bottomRight.X, topLeft.Y, _width, _height);
                     }
                 }
 
                 if (y == Maze.Height - 1)
                 {
-                    if (Maze.Tiles[x, y].ContainsWall(Direction.Bottom))
+                    if (Maze[x, y].ContainsWall(Direction.Bottom))
                     {
-                        drawSequence.DrawLine(topLeftX, bottomRightY + halfWallOffset, bottomRightX + fullWallOffset, bottomRightY + halfWallOffset);
+                        drawSequence.DrawRect(topLeft.X, bottomRight.Y, _height, _width);
                     }
                 }
-
-                drawSequence.Stroke();
             }
         }
 

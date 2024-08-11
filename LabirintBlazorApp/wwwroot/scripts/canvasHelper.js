@@ -7,6 +7,7 @@ const commandTypes = {
     5: 'strokeStyle',
     6: 'lineWidth',
     7: 'clearRect',
+    8: 'strokeRect',
 };
 
 const commandHandlers = {
@@ -16,11 +17,13 @@ const commandHandlers = {
     stroke: context => context.stroke(),
     strokeStyle: (context, command) => {
         context.strokeStyle = command.color;
+        context.fillStyle = command.color;
     },
     lineWidth: (context, command) => {
         context.lineWidth = command.width;
     },
     clearRect: (context, command) => context.clearRect(command.x, command.y, command.width, command.height),
+    strokeRect: (context, command) => context.fillRect(command.x, command.y, command.width, command.height),
     drawImage: async (context, command) => {
         const img = await loadImage(command.source);
         context.drawImage(img, command.x, command.y, command.width, command.height);

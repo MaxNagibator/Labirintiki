@@ -13,7 +13,10 @@ public class Labyrinth()
     /// <summary>
     /// Клеточки.
     /// </summary>
-    public Tile[,] Tiles { get; set; }
+    private Tile[,] Tiles { get; set; }
+
+    public Tile this[int x, int y] => Tiles[x, y];
+    public Tile this[Position position] => Tiles[position.X, position.Y];
 
     public int Width { get; private set; }
 

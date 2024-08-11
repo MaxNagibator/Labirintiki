@@ -19,7 +19,7 @@ public abstract class MazeComponent : ComponentBase
 
     [Parameter]
     [EditorRequired]
-    public required int HalfBoxSize { get; set; }
+    public required int BoxSize { get; set; }
 
     [Parameter]
     [EditorRequired]
@@ -33,10 +33,29 @@ public abstract class MazeComponent : ComponentBase
     [EditorRequired]
     public required Vision Vision { get; set; }
 
-    protected int CanvasWidth => Vision.Range * 2 * HalfBoxSize + WallWidth;
-    protected int CanvasHeight => Vision.Range * 2 * HalfBoxSize + WallWidth;
+    protected int CanvasWidth { get; private set; }
+    protected int CanvasHeight { get; private set; }
 
     protected abstract string CanvasId { get; }
+
+    protected sealed override void OnParametersSet()
+    {
+        // По факту рисуется Vision.Range * 2 * BoxSize + BoxSize + WallWidth,
+        // но чтобы было (возможно) красивее оставлена только верхнюю часть ячейки (картинки были в предыдущем PR).
+        // Из-за этого игрок размещается не в центре радиуса видимости.
+        // Если данное поведение не устраивает, нужно заменить стоку 49 на закомментированную ниже.
+        // int renderRange = Vision.Range * 2 * BoxSize + BoxSize + WallWidth;
+
+        int renderRange = Vision.Range * 2 * BoxSize + WallWidth;
+        CanvasWidth = renderRange;
+        CanvasHeight = renderRange;
+
+        OnParametersSetInner();
+    }
+
+    protected virtual void OnParametersSetInner()
+    {
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
