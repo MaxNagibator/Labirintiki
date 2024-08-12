@@ -58,7 +58,15 @@ public class Labyrinth(MazeSeed seeder)
 
         // Делаем коррекцию кол-ва песочков, чтобы оно было числом размещенных песочков на поле
         int requiredSandCount = (width + height) / 2;
-        SandCount = PlaceSand(requiredSandCount, width, height);
+        int requiredHammerCount = (width + height) * density / 400;
+        int requiredBombCount = requiredHammerCount / 2;
+        var items = new Dictionary<ItemType, int>
+        {
+            { ItemType.Sand, requiredSandCount },
+            { ItemType.Hammer, requiredHammerCount },
+            {  ItemType.Bomb, requiredBombCount }
+        };
+        SandCount = PlaceSand(items, width, height);
     }
 
     public void Move(Direction direction)
@@ -114,10 +122,11 @@ public class Labyrinth(MazeSeed seeder)
         }
     }
 
-    private int PlaceSand(int sandCount, int width, int height)
+    private int PlaceSand(Dictionary<ItemType, int> items, int width, int height)
     {
         int length = width * height - 1;
-        int placingSandCount = sandCount > length ? length : sandCount;
+        var totalItemsCount = items.Sum(x => x.Value);
+        int placingSandCount = totalItemsCount > length ? length : totalItemsCount;
 
         // Исключаем клетку с игроком
         int[] indexes = Enumerable.Range(1, length).ToArray();
@@ -133,7 +142,20 @@ public class Labyrinth(MazeSeed seeder)
             int index = indexes[i];
             int x = index / width;
             int y = index % width;
-            this[x, y].HasSand = true;
+            var item = items.First();
+            if (item.Value > 0)
+            {
+                this[x, y].ItemType = item.Key;
+                var nextValue = item.Value - 1;
+                if (nextValue == 0)
+                {
+                    items.Remove(item.Key);
+                }
+                else
+                {
+                    items[item.Key] = nextValue;
+                }
+            }
         }
 
         return placingSandCount;

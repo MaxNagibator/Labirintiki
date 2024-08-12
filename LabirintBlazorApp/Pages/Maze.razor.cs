@@ -11,12 +11,12 @@ public partial class Maze
     private const int MinSize = 1;
     private const int MaxSize = 500;
 
-    private const int MaxMolotCount = 6;
-    private const int MaxBombaCount = 2;
+    private const int MaxHammerCount = 6;
+    private const int MaxBombCount = 2;
     private const int SandCost = 100;
 
-    private int _molotCount;
-    private int _bombaCount;
+    private int _hammerCount;
+    private int _bombCount;
     private bool _isAtaka;
 
     private bool _exitNotFound;
@@ -33,11 +33,11 @@ public partial class Maze
     private MazeWalls? _mazeWalls;
     private MazeEntities? _mazeSands;
     private MazeRenderParameter? _renderParameter;
-    
+
     private Labyrinth _labyrinth = null!;
     private MazeSeed _seeder = null!;
     private Vision _vision = null!;
-    
+
     [Parameter]
     public string? Seed { get; set; }
 
@@ -85,15 +85,15 @@ public partial class Maze
     {
         switch (attackEventArgs.Type)
         {
-            case AttackType.Bomba when _bombaCount > 0:
+            case AttackType.Bomba when _bombCount > 0:
                 await DetonateBomb();
-                _bombaCount--;
+                _bombCount--;
                 _isAtaka = false;
                 return;
 
-            case AttackType.Molot when _molotCount > 0:
+            case AttackType.Molot when _hammerCount > 0:
                 _isAtaka = true;
-                _molotCount--;
+                _hammerCount--;
                 break;
 
             case AttackType.None:
@@ -127,12 +127,34 @@ public partial class Maze
 
         if (!_labyrinth[_labyrinth.Player].IsExit)
         {
-            if (_labyrinth[_labyrinth.Player].HasSand)
+            if (_labyrinth[_labyrinth.Player].ItemType != null)
             {
-                _labyrinth[_labyrinth.Player].HasSand = false;
-                _score += SandCost;
-
-                await SoundService.PlayAsync(SoundType.Score);
+                if (_labyrinth[_labyrinth.Player].ItemType == ItemType.Sand)
+                {
+                    _score += SandCost;
+                    _labyrinth[_labyrinth.Player].ItemType = null;
+                    await SoundService.PlayAsync(SoundType.Score);
+                }
+                else
+                if (_labyrinth[_labyrinth.Player].ItemType == ItemType.Hammer)
+                {
+                    if (_hammerCount < MaxHammerCount)
+                    {
+                        _hammerCount++;
+                        _labyrinth[_labyrinth.Player].ItemType = null;
+                        await SoundService.PlayAsync(SoundType.Score);
+                    }
+                }
+                else
+                if (_labyrinth[_labyrinth.Player].ItemType == ItemType.Bomb)
+                {
+                    if (_bombCount < MaxBombCount)
+                    {
+                        _bombCount++;
+                        _labyrinth[_labyrinth.Player].ItemType = null;
+                        await SoundService.PlayAsync(SoundType.Score);
+                    }
+                }
             }
         }
         else
@@ -154,8 +176,8 @@ public partial class Maze
         _score = 0;
         _maxScore = 0;
 
-        _molotCount = MaxMolotCount;
-        _bombaCount = MaxBombaCount;
+        _hammerCount = MaxHammerCount;
+        _bombCount = MaxBombCount;
 
         _exitNotFound = true;
 

@@ -6,9 +6,9 @@
 public class Tile
 {
     /// <summary>
-    ///     Содержит песочек.
+    ///     Тип предмета в клетке.
     /// </summary>
-    public bool HasSand { get; set; }
+    public ItemType? ItemType { get; set; }
 
     /// <summary>
     ///     Направления стенок клетки.
@@ -50,6 +50,6 @@ public class Tile
 
     public override string ToString()
     {
-        return $"{nameof(Walls)}: {Walls}, {nameof(HasSand)}: {HasSand}, {nameof(IsExit)}: {IsExit}";
+        return $"{nameof(Walls)}: {Walls}, {nameof(ItemType)}: {ItemType}, {nameof(IsExit)}: {IsExit}";
     }
 }
