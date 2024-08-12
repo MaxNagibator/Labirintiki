@@ -5,7 +5,7 @@
 <MudStack Spacing="3">
     <MudText Typo="Typo.h4">Labirint!</MudText>
 
-    @if (_isInit == false)
+    @if (IsInit == false)
     {
         <MudStack AlignItems="AlignItems.Center" Row>
             <MudProgressCircular Indeterminate />
@@ -13,53 +13,51 @@
         </MudStack>
     }
 
-    <div class="workspace" hidden="@(!_isInit)">
-        <div class="info-panel">
-            <MudStack Row Spacing="3">
-                <MudStack Row>
-                    <MudIcon Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.Bitcoin" Size="Size.Large" />
-                    <MudText Color="Color.Warning" Typo="Typo.h6">@_score/@_maxScore</MudText>
-                </MudStack>
-                <MudStack Row>
-                    <MudIcon Color="Color.Inherit" Icon="@MaterialDesignIcons.Normal.Hammer" Size="Size.Large" />
-                    <MudText Color="Color.Inherit" Typo="Typo.h6">@_molotCount/@MaxMolotCount</MudText>
-                </MudStack>
-                <MudStack Row>
-                    <MudIcon Color="Color.Error" Icon="@MaterialDesignIcons.Normal.Bomb" Size="Size.Large" />
-                    <MudText Color="Color.Error" Typo="Typo.h6"> @_bombaCount/@MaxBombaCount</MudText>
-                </MudStack>
-            </MudStack>
-        </div>
-
-        @if (_isInit)
+    <div class="workspace" hidden="@(!IsInit)">
+        @if (IsInit)
         {
+            int entityBoxSize = _boxSize - _wallWidth;
+            int playerSize = entityBoxSize / 2;
+
+            Position draw = _vision.GetDraw(_labyrinth.Player) * _boxSize + _wallWidth;
+            (int left, int top) = AlignmentHelper.CalculatePosition(Alignment.Center, draw, _boxSize, _wallWidth);
+
+            <div class="info-panel">
+                <MudStack Row Spacing="3">
+                    <MudStack Row>
+                        <MudIcon Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.Bitcoin" Size="Size.Large" />
+                        <MudText Color="Color.Warning" Typo="Typo.h6">@_score/@_maxScore</MudText>
+                    </MudStack>
+                    <MudStack Row>
+                        <MudIcon Color="Color.Inherit" Icon="@MaterialDesignIcons.Normal.Hammer" Size="Size.Large" />
+                        <MudText Color="Color.Inherit" Typo="Typo.h6">@_molotCount/@MaxMolotCount</MudText>
+                    </MudStack>
+                    <MudStack Row>
+                        <MudIcon Color="Color.Error" Icon="@MaterialDesignIcons.Normal.Bomb" Size="Size.Large" />
+                        <MudText Color="Color.Error" Typo="Typo.h6"> @_bombaCount/@MaxBombaCount</MudText>
+                    </MudStack>
+                    <MudStack Row>
+                        <MudText Typo="Typo.h6">X:@_labyrinth.Player.X (@left) Y:@_labyrinth.Player.Y (@top)</MudText>
+                    </MudStack>
+                </MudStack>
+            </div>
+
             <div class="field">
-                @{
-                    int halfBoxSize = 23;
-                }
 
-                @{
-                    int wallWidth = Math.Max(1, halfBoxSize / 10 * 2);
-                }
+                <CascadingValue Value="_renderParameter">
+                    <MazeWalls @ref="_mazeWalls" />
+                    <MazeEntities @ref="_mazeSands" />
+                </CascadingValue>
 
-                <MazeWalls @ref="_mazeWalls" Maze="_labyrinth" HalfBoxSize="halfBoxSize" WallWidth="wallWidth" Vision="_vision" />
-                <MazeSands @ref="_mazeSands" Maze="_labyrinth" HalfBoxSize="halfBoxSize" WallWidth="wallWidth" Vision="_vision" />
+                <img src="/images/runner.png"
+                     style="position:absolute;
+                            z-index: 100;
+                            left: @(left)px;
+                            top: @(top)px;
+                            width: @(playerSize)px;
+                            height: @(playerSize)px;"
+                     alt="Бегун" />
 
-                @{
-                    int entityBoxSize = halfBoxSize * 2 - wallWidth;
-                    (int drawX, int drawY) = (_vision.GetDraw(_labyrinth.Player) - 1) * halfBoxSize + wallWidth;
-                }
-                <div style="position:absolute;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        z-index: 100;
-                        left: @(drawX)px;
-                        top: @(drawY)px;
-                        width: @(entityBoxSize)px;
-                        height: @(entityBoxSize)px;">
-                    <img src="/images/runner.png" style="width: @(halfBoxSize)px; height: @(halfBoxSize)px;" alt="Бегун" />
-                </div>
             </div>
         }
 

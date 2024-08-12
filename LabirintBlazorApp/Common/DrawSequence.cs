@@ -58,6 +58,17 @@ public class DrawSequence
         LineTo(bottomRightX, bottomRightY);
     }
 
+    public void DrawRect(double x, double y, double width, double height)
+    {
+        _commands.Add(new Command(Command.StrokeRect)
+        {
+            X = x,
+            Y = y,
+            Width = width,
+            Height = height
+        });
+    }
+
     public void DrawImage(string source, double left, double top, double width, double height)
     {
         _commands.Add(new Command(Command.DrawImage)
@@ -97,6 +108,7 @@ public class DrawSequence
         public const int StrokeStyle = 5;
         public const int LineWidth = 6;
         public const int ClearRect = 7;
+        public const int StrokeRect = 8;
 
         public required int Type { get; init; } = type;
         public double X { get; init; }

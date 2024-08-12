@@ -1,19 +1,28 @@
-﻿
-using LabirintBlazorApp.Components;
-using LabirintBlazorApp.Pages;
-using MudBlazor;
+﻿using LabirintBlazorApp.Components;
 
 namespace LabirintBlazorApp.Dto;
 
 /// <summary>
-/// Лабиринта.
+///     Лабиринта.
 /// </summary>
-public class Labyrinth()
+public class Labyrinth(MazeSeed seeder)
 {
     /// <summary>
-    /// Клеточки.
+    ///     Клеточки.
     /// </summary>
-    public Tile[,] Tiles { get; set; }
+    private Tile[,] Tiles { get; set; }
+
+    public Tile this[int x, int y]
+    {
+        get => Tiles[x, y];
+        private set => Tiles[x, y] = value;
+    }
+
+    public Tile this[Position position]
+    {
+        get => Tiles[position.X, position.Y];
+        private set => Tiles[position.X, position.Y] = value;
+    }
 
     public int Width { get; private set; }
 
@@ -23,140 +32,146 @@ public class Labyrinth()
 
     public Position Player { get; private set; }
 
-    public void Init(int width, int height, int _density, MazeSeed seeder)
+    public void Init(int width, int height, int density)
     {
         Player = (0, 0);
         Width = width;
         Height = height;
 
         Tiles = new Tile[width, height];
+
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
-                var tile = new Tile();
-                Tiles[x, y] = tile;
-                if (x == 0)
-                {
-                    tile.Walls = tile.Walls | Direction.Top;
-                }
-                if (x == width - 1)
-                {
-                    tile.Walls = tile.Walls | Direction.Bottom;
-                }
-                if (y == 0)
-                {
-                    tile.Walls = tile.Walls | Direction.Left;
-                }
-                if (y == height - 1)
-                {
-                    tile.Walls = tile.Walls | Direction.Right;
-                }
+                Tile tile = AddTile((x, y));
 
-                CreateWall(Direction.Top);
-                CreateWall(Direction.Left);
+                AddBorderWalls(x, y, tile);
 
-                void CreateWall(Direction wallDirection)
-                {
-                    var a = seeder.Random.Next(0, 100);
-                    if (a < _density)
-                    {
-                        tile.Walls = tile.Walls | wallDirection;
-                        if (wallDirection == Direction.Top)
-                        {
-                            if (y > 0)
-                            {
-                                Tiles[x, y - 1].Walls |= Direction.Bottom;
-                            }
-                        }
-                        if (wallDirection == Direction.Left)
-                        {
-                            if (x > 0)
-                            {
-                                Tiles[x - 1, y].Walls |= Direction.Right;
-                            }
-                        }
-                    }
-                }
+                CreateWall((x, y), tile, Direction.Top, density);
+                CreateWall((x, y), tile, Direction.Left, density);
             }
         }
 
-        Tiles[width / 2, height - 1].IsExit = true;
-        Tiles[width / 2, height - 1].Walls &= ~Direction.Bottom;
+        this[width / 2, height - 1].IsExit = true;
+        this[width / 2, height - 1].RemoveWall(Direction.Bottom);
 
-        SandCount = (width + height) / 2;
-        for (int i = 1; i < SandCount; i++)
+        // Делаем коррекцию кол-ва песочков, чтобы оно было числом размещенных песочков на поле
+        int requiredSandCount = (width + height) / 2;
+        SandCount = PlaceSand(requiredSandCount, width, height);
+    }
+
+    public void Move(Direction direction)
+    {
+        if (this[Player].ContainsWall(direction))
         {
-            int x = seeder.Random.Next(0, width);
-            int y = seeder.Random.Next(0, height);
-
-            if (Tiles[x, y].HasSand == false)
-            {
-                Tiles[x, y].HasSand = true;
-            }
-            else
-            {
-                i--;
-            }
+            return;
         }
+
+        Player += direction.ToPosition();
     }
 
     public void BreakWall(Direction direction)
     {
-        if (direction == Direction.Left)
+        if (IsInBound(Player, direction) == false)
         {
-            if (Player.X > 0)
-            {
-                Tiles[Player.X, Player.Y].Walls &= ~Direction.Left;
-                Tiles[Player.X - 1, Player.Y].Walls &= ~Direction.Right;
-            }
+            return;
         }
 
-        if (direction == Direction.Top)
+        this[Player].RemoveWall(direction);
+
+        PerformActionForAdjacent(Player, direction, (adjacentTile, oppositeDirection) => adjacentTile.RemoveWall(oppositeDirection));
+    }
+
+    private Tile AddTile(Position position)
+    {
+        Tile tile = new();
+
+        this[position] = tile;
+        return tile;
+    }
+
+    private void AddBorderWalls(int x, int y, Tile tile)
+    {
+        if (x == 0)
         {
-            if (Player.Y > 0)
-            {
-                Tiles[Player.X, Player.Y].Walls &= ~Direction.Top;
-                Tiles[Player.X, Player.Y - 1].Walls &= ~Direction.Bottom;
-            }
+            tile.AddWall(Direction.Left);
         }
-        if (direction == Direction.Right)
+
+        if (x == Width - 1)
         {
-            if (Player.X < Width)
-            {
-                Tiles[Player.X, Player.Y].Walls &= ~Direction.Right;
-                Tiles[Player.X + 1, Player.Y].Walls &= ~Direction.Left;
-            }
+            tile.AddWall(Direction.Right);
         }
-        if (direction == Direction.Bottom)
+
+        if (y == 0)
         {
-            if (Player.Y < Height)
-            {
-                Tiles[Player.X, Player.Y].Walls &= ~Direction.Bottom;
-                Tiles[Player.X, Player.Y + 1].Walls &= ~Direction.Top;
-            }
+            tile.AddWall(Direction.Top);
+        }
+
+        if (y == Height - 1)
+        {
+            tile.AddWall(Direction.Bottom);
         }
     }
 
-    internal void Move(Direction direction)
+    private int PlaceSand(int sandCount, int width, int height)
     {
-        if (Tiles[Player.X, Player.Y].Walls.HasFlag(direction))
+        int length = width * height - 1;
+        int placingSandCount = sandCount > length ? length : sandCount;
+
+        // Исключаем клетку с игроком
+        int[] indexes = Enumerable.Range(1, length).ToArray();
+
+        for (int i = 0; i < placingSandCount; i++)
         {
-            switch (direction)
-            {
-                case Direction.Left:
-                    Player += (-1, 0);
-                    break;
-                case Direction.Top:
-                    Player += (0, -1);
-                    break;
-                case Direction.Right:
-                    Player += (1, 0);
-                    break;
-                case Direction.Bottom:
-                    Player += (0, 1);
-                    break;
-            }
+            int j = seeder.Random.Next(i + 1, length);
+            (indexes[i], indexes[j]) = (indexes[j], indexes[i]);
         }
+
+        for (int i = 0; i < placingSandCount; i++)
+        {
+            int index = indexes[i];
+            int x = index / width;
+            int y = index % width;
+            this[x, y].HasSand = true;
+        }
+
+        return placingSandCount;
+    }
+
+    private void CreateWall(Position position, Tile tile, Direction wallDirection, int density)
+    {
+        if (seeder.Random.Next(0, 100) >= density)
+        {
+            return;
+        }
+
+        tile.AddWall(wallDirection);
+
+        if (IsInBound(position, wallDirection) == false)
+        {
+            return;
+        }
+
+        PerformActionForAdjacent(position, wallDirection, (adjacentTile, oppositeDirection) => adjacentTile.AddWall(oppositeDirection));
+    }
+
+    private void PerformActionForAdjacent(Position position, Direction wallDirection, Action<Tile, Direction> action)
+    {
+        Position adjacentPosition = wallDirection.GetAdjacentPosition(position);
+        Direction oppositeDirection = wallDirection.GetOppositeDirection();
+        action.Invoke(this[adjacentPosition], oppositeDirection);
+    }
+
+    private bool IsInBound(Position position, Direction direction)
+    {
+        return direction switch
+        {
+            Direction.Left => position.X > 0,
+            Direction.Top => position.Y > 0,
+            Direction.Right => position.X < Width - 1,
+            Direction.Bottom => position.Y < Height - 1,
+            var _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
+        };
     }
 }
