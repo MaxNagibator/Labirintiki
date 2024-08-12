@@ -8,7 +8,7 @@ public abstract class MazeComponent : ComponentBase
 {
     private bool _isShouldRender;
 
-    protected Canvas2DContext Context = null!;
+    private Canvas2DContext _context = null!;
     protected ElementReference CanvasRef;
 
     [Inject]
@@ -17,21 +17,13 @@ public abstract class MazeComponent : ComponentBase
     [Inject]
     public required ILogger<MazeComponent> Logger { get; set; }
 
-    [Parameter]
-    [EditorRequired]
-    public required int BoxSize { get; set; }
+    [CascadingParameter]
+    public required MazeRenderParameter MazeRenderParameter { get; set; }
 
-    [Parameter]
-    [EditorRequired]
-    public required int WallWidth { get; set; }
-
-    [Parameter]
-    [EditorRequired]
-    public required Labyrinth Maze { get; set; }
-
-    [Parameter]
-    [EditorRequired]
-    public required Vision Vision { get; set; }
+    protected int BoxSize { get; private set; }
+    protected int WallWidth { get; private set; }
+    protected Labyrinth Maze { get; private set; } = null!;
+    protected Vision Vision { get; private set; } = null!;
 
     protected int CanvasWidth { get; private set; }
     protected int CanvasHeight { get; private set; }
@@ -40,12 +32,14 @@ public abstract class MazeComponent : ComponentBase
 
     protected sealed override void OnParametersSet()
     {
+        (Maze, BoxSize, WallWidth, Vision) = MazeRenderParameter;
+
         // Данное замечание актуально, если в MazeWalls оставлять условия с исключением повторного рисования стен
-        // и необходимо заменить перед прочтением 56 строку на данную: int renderRange = Vision.Range * 2 * BoxSize + WallWidth;
+        // и необходимо заменить перед прочтением 50 строку на данную: int renderRange = Vision.Range * 2 * BoxSize + WallWidth;
         // По факту рисуется Vision.Range * 2 * BoxSize + BoxSize + WallWidth,
         // но чтобы было (возможно) красивее оставлена только верхнюю часть ячейки (картинки были в предыдущем PR).
         // Из-за этого игрок размещается не в центре радиуса видимости.
-        // Если данное поведение не устраивает, нужно заменить стоку 56 на закомментированную ниже.
+        // Если данное поведение не устраивает, нужно заменить стоку 50 на закомментированную ниже.
         // int renderRange = Vision.Range * 2 * BoxSize + BoxSize + WallWidth;
 
         // Vision.Range * 2 -> область видимости во все стороны.
@@ -88,11 +82,28 @@ public abstract class MazeComponent : ComponentBase
         _isShouldRender = false;
     }
 
-    protected abstract Task DrawAsync();
+    protected abstract void DrawInner(int x, int y, DrawSequence sequence);
+
+    private async Task DrawAsync()
+    {
+        DrawSequence drawSequence = new();
+        drawSequence.ClearRect(0, 0, CanvasWidth, CanvasHeight);
+        drawSequence.StrokeStyle(Parameters.Labyrinth.Color);
+
+        for (int x = Vision.Start.X; x <= Vision.Finish.X; x++)
+        {
+            for (int y = Vision.Start.Y; y <= Vision.Finish.Y; y++)
+            {
+                DrawInner(x, y, drawSequence);
+            }
+        }
+
+        await _context.DrawSequenceAsync(drawSequence);
+    }
 
     private async Task InitAsync()
     {
         IJSObjectReference contextRef = await JSRuntime.InvokeAsync<IJSObjectReference>("canvasHelper.getContext2D", CanvasRef);
-        Context = new Canvas2DContext(contextRef, JSRuntime);
+        _context = new Canvas2DContext(contextRef, JSRuntime);
     }
 }

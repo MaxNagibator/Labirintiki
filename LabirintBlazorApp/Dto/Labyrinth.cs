@@ -56,8 +56,9 @@ public class Labyrinth(MazeSeed seeder)
         this[width / 2, height - 1].IsExit = true;
         this[width / 2, height - 1].RemoveWall(Direction.Bottom);
 
-        SandCount = (width + height) / 2;
-        PlaceSand(SandCount, width, height);
+        // Делаем коррекцию кол-ва песочков, чтобы оно было числом размещенных песочков на поле
+        int requiredSandCount = (width + height) / 2;
+        SandCount = PlaceSand(requiredSandCount, width, height);
     }
 
     public void Move(Direction direction)
@@ -113,22 +114,29 @@ public class Labyrinth(MazeSeed seeder)
         }
     }
 
-    private void PlaceSand(int sandCount, int width, int height)
+    private int PlaceSand(int sandCount, int width, int height)
     {
-        // TODO Переделать
-        for (int i = 0; i < sandCount; i++)
+        int length = width * height - 1;
+        int placingSandCount = sandCount > length ? length : sandCount;
+
+        // Исключаем клетку с игроком
+        int[] indexes = Enumerable.Range(1, length).ToArray();
+
+        for (int i = 0; i < placingSandCount; i++)
         {
-            int x = seeder.Random.Next(0, width);
-            int y = seeder.Random.Next(0, height);
+            int j = seeder.Random.Next(i + 1, length);
+            (indexes[i], indexes[j]) = (indexes[j], indexes[i]);
+        }
 
-            if (this[x, y].HasSand)
-            {
-                i--;
-                continue;
-            }
-
+        for (int i = 0; i < placingSandCount; i++)
+        {
+            int index = indexes[i];
+            int x = index / width;
+            int y = index % width;
             this[x, y].HasSand = true;
         }
+
+        return placingSandCount;
     }
 
     private void CreateWall(Position position, Tile tile, Direction wallDirection, int density)

@@ -14,29 +14,40 @@ public partial class Maze
     private const int MaxMolotCount = 6;
     private const int MaxBombaCount = 2;
     private const int SandCost = 100;
-    private bool _exitNotFound;
-
-    private bool _isAtaka;
-    private bool _isInit;
-    private int _bombaCount;
-    private int _density = 40;
-
-    private int _maxScore;
 
     private int _molotCount;
+    private int _bombaCount;
+    private bool _isAtaka;
+
+    private bool _exitNotFound;
+    private bool _isInit;
 
     private int _originalSize = 16;
+    private int _density = 40;
     private int _score;
+    private int _maxScore;
 
-    private Labyrinth _labyrinth = null!;
+    private int _boxSize;
+    private int _wallWidth;
 
-    private MazeSands? _mazeSands;
-    private MazeSeed _seeder = null!;
     private MazeWalls? _mazeWalls;
+    private MazeEntities? _mazeSands;
+    private MazeRenderParameter? _renderParameter;
+    
+    private Labyrinth _labyrinth = null!;
+    private MazeSeed _seeder = null!;
     private Vision _vision = null!;
-
+    
     [Parameter]
     public string? Seed { get; set; }
+
+    private bool IsInit => _isInit && _labyrinth != null && _seeder != null && _vision != null && _renderParameter != null;
+
+    protected override void OnInitialized()
+    {
+        _boxSize = 48;
+        _wallWidth = Math.Max(1, _boxSize / 10);
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -157,6 +168,8 @@ public partial class Maze
 
         _vision = new Vision(_originalSize, _originalSize);
         _vision.SetPosition(_labyrinth.Player);
+
+        _renderParameter = new MazeRenderParameter(_labyrinth, _boxSize, _wallWidth, _vision);
 
         StateHasChanged();
 

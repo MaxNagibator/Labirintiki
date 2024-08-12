@@ -5,7 +5,7 @@
 <MudStack Spacing="3">
     <MudText Typo="Typo.h4">Labirint!</MudText>
 
-    @if (_isInit == false)
+    @if (IsInit == false)
     {
         <MudStack AlignItems="AlignItems.Center" Row>
             <MudProgressCircular Indeterminate />
@@ -13,20 +13,14 @@
         </MudStack>
     }
 
-    <div class="workspace" hidden="@(!_isInit)">
-        @if (_isInit)
+    <div class="workspace" hidden="@(!IsInit)">
+        @if (IsInit)
         {
-            int boxSize = 48;
-            int wallWidth = Math.Max(1, boxSize / 10);
-
-            int entityBoxSize = boxSize - wallWidth;
+            int entityBoxSize = _boxSize - _wallWidth;
             int playerSize = entityBoxSize / 2;
-            int offset = playerSize - entityBoxSize;
 
-            (int drawX, int drawY) = _vision.GetDraw(_labyrinth.Player) * boxSize + wallWidth;
-
-            int left = drawX - offset / 2;
-            int top = drawY - offset / 2;
+            Position draw = _vision.GetDraw(_labyrinth.Player) * _boxSize + _wallWidth;
+            (int left, int top) = AlignmentHelper.CalculatePosition(Alignment.Center, draw, _boxSize, _wallWidth);
 
             <div class="info-panel">
                 <MudStack Row Spacing="3">
@@ -50,8 +44,10 @@
 
             <div class="field">
 
-                <MazeWalls @ref="_mazeWalls" Maze="_labyrinth" BoxSize="boxSize" WallWidth="wallWidth" Vision="_vision" />
-                <MazeSands @ref="_mazeSands" Maze="_labyrinth" BoxSize="boxSize" WallWidth="wallWidth" Vision="_vision" />
+                <CascadingValue Value="_renderParameter">
+                    <MazeWalls @ref="_mazeWalls" />
+                    <MazeEntities @ref="_mazeSands" />
+                </CascadingValue>
 
                 <img src="/images/runner.png"
                      style="position:absolute;

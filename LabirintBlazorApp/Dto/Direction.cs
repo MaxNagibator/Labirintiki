@@ -1,7 +1,7 @@
 ﻿namespace LabirintBlazorApp.Dto;
 
 [Flags]
-public enum Direction
+public enum Direction : byte
 {
     Left = 1 << 1,
     Top = 1 << 2,
