@@ -47,7 +47,8 @@ public partial class MazeWalls : MazeComponent
                 }
 
                 // нет смысла рисовать одну и ту же стенку дважды.
-                if (x == Maze.Width - 1)
+                // Без них улучшается внешний вид и нет необходимости в костыле с областью видимости в MazeComponent
+                // if (x == Maze.Width - 1)
                 {
                     if (Maze[x, y].ContainsWall(Direction.Right))
                     {
@@ -55,7 +56,7 @@ public partial class MazeWalls : MazeComponent
                     }
                 }
 
-                if (y == Maze.Height - 1)
+                // if (y == Maze.Height - 1)
                 {
                     if (Maze[x, y].ContainsWall(Direction.Bottom))
                     {

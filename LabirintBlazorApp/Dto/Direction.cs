@@ -1,0 +1,10 @@
+﻿namespace LabirintBlazorApp.Dto;
+
+[Flags]
+public enum Direction
+{
+    Left = 1 << 1,
+    Top = 1 << 2,
+    Right = 1 << 3,
+    Bottom = 1 << 4
+}

@@ -23,7 +23,7 @@
             int playerSize = entityBoxSize / 2;
             int offset = playerSize - entityBoxSize;
 
-            (int drawX, int drawY) = _vision.GetDraw(_labyrinth!.Player) * boxSize + wallWidth;
+            (int drawX, int drawY) = _vision.GetDraw(_labyrinth.Player) * boxSize + wallWidth;
 
             int left = drawX - offset / 2;
             int top = drawY - offset / 2;

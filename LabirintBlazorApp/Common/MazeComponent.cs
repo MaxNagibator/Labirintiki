@@ -40,13 +40,20 @@ public abstract class MazeComponent : ComponentBase
 
     protected sealed override void OnParametersSet()
     {
+        // Данное замечание актуально, если в MazeWalls оставлять условия с исключением повторного рисования стен
+        // и необходимо заменить перед прочтением 56 строку на данную: int renderRange = Vision.Range * 2 * BoxSize + WallWidth;
         // По факту рисуется Vision.Range * 2 * BoxSize + BoxSize + WallWidth,
         // но чтобы было (возможно) красивее оставлена только верхнюю часть ячейки (картинки были в предыдущем PR).
         // Из-за этого игрок размещается не в центре радиуса видимости.
-        // Если данное поведение не устраивает, нужно заменить стоку 49 на закомментированную ниже.
+        // Если данное поведение не устраивает, нужно заменить стоку 56 на закомментированную ниже.
         // int renderRange = Vision.Range * 2 * BoxSize + BoxSize + WallWidth;
 
-        int renderRange = Vision.Range * 2 * BoxSize + WallWidth;
+        // Vision.Range * 2 -> область видимости во все стороны.
+        // * BoxSize -> из относительного в абсолютное значение.
+        // + BoxSize -> клетка с игроком.
+        // + WallWidth -> для того, чтобы видеть стенки у клеток на границе обзора.
+
+        int renderRange = Vision.Range * 2 * BoxSize + BoxSize + WallWidth;
         CanvasWidth = renderRange;
         CanvasHeight = renderRange;
 

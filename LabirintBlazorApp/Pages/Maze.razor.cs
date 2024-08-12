@@ -13,37 +13,30 @@ public partial class Maze
 
     private const int MaxMolotCount = 6;
     private const int MaxBombaCount = 2;
+    private const int SandCost = 100;
     private bool _exitNotFound;
 
     private bool _isAtaka;
     private bool _isInit;
     private int _bombaCount;
-    private int _density;
+    private int _density = 40;
 
     private int _maxScore;
 
     private int _molotCount;
 
-    private int _originalSize;
-    private int _sandCost;
+    private int _originalSize = 16;
     private int _score;
+
+    private Labyrinth _labyrinth = null!;
 
     private MazeSands? _mazeSands;
     private MazeSeed _seeder = null!;
     private MazeWalls? _mazeWalls;
-
-    private Labyrinth _labyrinth = null!;
     private Vision _vision = null!;
 
     [Parameter]
     public string? Seed { get; set; }
-
-    protected override void OnInitialized()
-    {
-        _originalSize = 16;
-        _density = 40;
-        _sandCost = 100;
-    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -121,12 +114,12 @@ public partial class Maze
 
         await SoundService.PlayAsync(SoundType.Step);
 
-        if (!_labyrinth.Tiles[_labyrinth.Player.X, _labyrinth.Player.Y].IsExit)
+        if (!_labyrinth[_labyrinth.Player].IsExit)
         {
-            if (_labyrinth.Tiles[_labyrinth.Player.X, _labyrinth.Player.Y].HasSand)
+            if (_labyrinth[_labyrinth.Player].HasSand)
             {
-                _labyrinth.Tiles[_labyrinth.Player.X, _labyrinth.Player.Y].HasSand = false;
-                _score += _sandCost;
+                _labyrinth[_labyrinth.Player].HasSand = false;
+                _score += SandCost;
 
                 await SoundService.PlayAsync(SoundType.Score);
             }
@@ -156,9 +149,11 @@ public partial class Maze
         _exitNotFound = true;
 
         _originalSize = Math.Max(MinSize, Math.Min(MaxSize, _originalSize));
-        _labyrinth = new Labyrinth();
-        _labyrinth.Init(_originalSize, _originalSize, _density, _seeder);
-        _maxScore = _sandCost * _labyrinth.SandCount;
+
+        _labyrinth = new Labyrinth(_seeder);
+        _labyrinth.Init(_originalSize, _originalSize, _density);
+
+        _maxScore = SandCost * _labyrinth.SandCount;
 
         _vision = new Vision(_originalSize, _originalSize);
         _vision.SetPosition(_labyrinth.Player);
