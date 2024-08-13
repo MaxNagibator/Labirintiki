@@ -8,18 +8,28 @@ namespace LabirintBlazorApp.Components;
 
 public partial class MazeSeed
 {
-    private int _newSeed;
-    private int _seed;
+    public const string SizeQueryName = "s";
+    public const string DensityQueryName = "d";
+    private const string MazePageUrl = "labirint";
+
+    private bool _isShowMotivation;
+    private int _currentSeed;
 
     private MudMessageBox? _messageBox;
-
     private Random? _random;
     private string? _userSeed;
 
-    private string Link => $"{NavigationManager.BaseUri}labirint/{_seed}";
-
     [Parameter]
     public string? Seed { get; set; }
+
+    [Parameter]
+    public int Size { get; set; }
+
+    [Parameter]
+    public int Density { get; set; }
+
+    [Parameter]
+    public bool IsExitFound { get; set; }
 
     [Inject]
     private NavigationManager NavigationManager { get; set; } = null!;
@@ -35,45 +45,57 @@ public partial class MazeSeed
 
     public Random Random => _random ?? Random.Shared;
 
+    private bool IsGenerateRequired => _currentSeed < 0;
+
+    // TODO можно добавить кеширование, но это уже экономия на спичках
+    private string Link => GetShareLink();
+
     protected override void OnInitialized()
     {
-        if (string.IsNullOrWhiteSpace(Seed))
-        {
-            _seed = Random.Shared.Next();
-            _random = new Random(_seed);
-        }
-        else
+        if (string.IsNullOrWhiteSpace(Seed) == false)
         {
             _userSeed = Seed;
-            Reset();
         }
     }
 
-    private void Reset()
+    public void Reload()
     {
         if (string.IsNullOrWhiteSpace(_userSeed))
         {
+            ReloadWithRandomSeed();
             return;
         }
 
-        _newSeed = _userSeed.All(char.IsDigit)
+        _currentSeed = _userSeed.All(char.IsDigit)
             ? int.Parse(_userSeed)
             : GenerateSeed(_userSeed);
 
-        if (_seed == _newSeed)
-        {
-            return;
-        }
-
-        _random = new Random(_newSeed);
-        _seed = _newSeed;
+        _random = new Random(_currentSeed);
+        StateHasChanged();
     }
 
-    private static int GenerateSeed(string input)
+    private void ReloadWithRandomSeed()
     {
-        byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));
-        int result = BitConverter.ToInt32(hashBytes, 0);
-        return Math.Abs(result);
+        _currentSeed = Random.Shared.Next();
+        _random = new Random(_currentSeed);
+        StateHasChanged();
+    }
+
+    private void ResetSeed()
+    {
+        _currentSeed = -1;
+        StateHasChanged();
+    }
+
+    private string GetShareLink()
+    {
+        string linkWithSeed = $"{NavigationManager.BaseUri}{MazePageUrl}/{_currentSeed}";
+
+        return NavigationManager.GetUriWithQueryParameters(linkWithSeed, new Dictionary<string, object?>
+        {
+            [SizeQueryName] = Size,
+            [DensityQueryName] = Density
+        });
     }
 
     private void ShowMessageBox()
@@ -85,5 +107,20 @@ public partial class MazeSeed
     {
         await ClipboardService.CopyToClipboard(Link);
         SnackbarService.Add("Ссылка скопирована!", Severity.Success);
+    }
+
+    private void ToggleMotivation()
+    {
+        _isShowMotivation = !_isShowMotivation;
+
+        _messageBox?.Close();
+        _messageBox?.ShowAsync();
+    }
+
+    private static int GenerateSeed(string input)
+    {
+        byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));
+        int result = BitConverter.ToInt32(hashBytes, 0);
+        return Math.Abs(result);
     }
 }

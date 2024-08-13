@@ -22,8 +22,8 @@ public partial class Maze
     private bool _exitNotFound;
     private bool _isInit;
 
-    private int _originalSize = 16;
-    private int _density = 40;
+    private int _originalSize;
+    private int _density;
     private int _score;
     private int _maxScore;
 
@@ -41,12 +41,25 @@ public partial class Maze
     [Parameter]
     public string? Seed { get; set; }
 
+    [SupplyParameterFromQuery(Name = MazeSeed.SizeQueryName)]
+    public int? MazeSize { get; set; }
+
+    [SupplyParameterFromQuery(Name = MazeSeed.DensityQueryName)]
+    public int? MazeDensity { get; set; }
+
+    // Проверка на null и инициализацию (дополнительная проверка, если флаг выставили в true, а значение у не null полей не выставили)
     private bool IsInit => _isInit && _labyrinth != null && _seeder != null && _vision != null && _renderParameter != null;
 
     protected override void OnInitialized()
     {
         _boxSize = 48;
         _wallWidth = Math.Max(1, _boxSize / 10);
+    }
+
+    protected override void OnParametersSet()
+    {
+        _originalSize = MazeSize ?? 16;
+        _density = MazeDensity ?? 16;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -172,6 +185,8 @@ public partial class Maze
         // Но в принципе то работает))))))
         StateHasChanged();
         await Task.Delay(1);
+
+        _seeder.Reload();
 
         _score = 0;
         _maxScore = 0;

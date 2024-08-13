@@ -64,7 +64,7 @@
         <div class="control-panel">
             <MudStack Spacing="3">
                 <MudText Typo="Typo.h5">Параметры:</MudText>
-                <MazeSeed Seed="@Seed" @ref="_seeder" />
+                <MazeSeed @ref="_seeder" Seed="@Seed" Size="@_originalSize" Density="@_density" IsExitFound="@_isExitFound" />
                 <MudStack>
                     <MudNumericField Label="Размер" Min="@MinSize" Max="@MaxSize" DebounceInterval="300" @bind-Value="_originalSize" />
                     <MudSlider @bind-Value="_originalSize" Min="@MinSize" Max="@MaxSize" Color="Color.Info" Size="Size.Medium" />
