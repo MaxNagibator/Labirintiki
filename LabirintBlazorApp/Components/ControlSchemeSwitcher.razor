@@ -1,6 +1,4 @@
-﻿@using LabirintBlazorApp.Common.Schemes
-@inject IControlSchemeService ControlSchemeService
-
+﻿@using LabirintBlazorApp.Common.Control.Schemes
 <MudText Typo="Typo.h5">Схемы управления:</MudText>
 <MudStack>
     @foreach (IControlScheme scheme in ControlSchemeService.AvailableSchemes)

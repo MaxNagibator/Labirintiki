@@ -1,5 +1,6 @@
 ﻿namespace LabirintBlazorApp.Constants;
 
+// TODO переместить в предметы
 public static class SoundType
 {
     public const string Bomb = "bomb";

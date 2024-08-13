@@ -1,12 +1,13 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using LabirintBlazorApp.Services;
+using Labirint.Core.Interfaces;
+using LabirintBlazorApp.Services.Base;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
 namespace LabirintBlazorApp.Components;
 
-public partial class MazeSeed
+public partial class MazeSeed : IRandom
 {
     public const string SizeQueryName = "s";
     public const string DensityQueryName = "d";
@@ -43,12 +44,12 @@ public partial class MazeSeed
     [Inject]
     private ISnackbar SnackbarService { get; set; } = null!;
 
-    public Random Random => _random ?? Random.Shared;
-
     private bool IsGenerateRequired => _currentSeed < 0;
 
     // TODO можно добавить кеширование, но это уже экономия на спичках
     private string Link => GetShareLink();
+
+    public Random Random => _random ?? Random.Shared;
 
     protected override void OnInitialized()
     {

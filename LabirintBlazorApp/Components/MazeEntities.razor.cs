@@ -1,5 +1,5 @@
-﻿using LabirintBlazorApp.Common;
-using LabirintBlazorApp.Dto;
+﻿using LabirintBlazorApp.Common.Drawing;
+using LabirintBlazorApp.Components.Base;
 
 namespace LabirintBlazorApp.Components;
 
@@ -19,7 +19,9 @@ public partial class MazeEntities : MazeComponent
 
     protected override void DrawInner(int x, int y, DrawSequence sequence)
     {
-        if (Maze[x, y].ItemType == null)
+        Item? item = Maze[x, y].ItemType;
+
+        if (item == null)
         {
             return;
         }
@@ -27,6 +29,6 @@ public partial class MazeEntities : MazeComponent
         Position draw = Vision.GetDraw((x, y)) * BoxSize + WallWidth;
         (int left, int top) = AlignmentHelper.CalculatePosition(Alignment.BottomCenter, draw, _offset);
 
-        sequence.DrawImage($"/images/{Maze[x, y].ItemType}.png", left, top, _entitySize, _entitySize);
+        sequence.DrawImage($"/images/{item.Name}.png", left, top, _entitySize, _entitySize);
     }
 }

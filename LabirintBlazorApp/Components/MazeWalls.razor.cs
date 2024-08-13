@@ -1,5 +1,5 @@
-﻿using LabirintBlazorApp.Common;
-using LabirintBlazorApp.Dto;
+﻿using LabirintBlazorApp.Common.Drawing;
+using LabirintBlazorApp.Components.Base;
 
 namespace LabirintBlazorApp.Components;
 

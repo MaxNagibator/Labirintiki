@@ -1,4 +1,4 @@
-﻿using Microsoft.JSInterop;
+﻿using LabirintBlazorApp.Services.Base;
 
 namespace LabirintBlazorApp.Services;
 

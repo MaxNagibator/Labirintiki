@@ -1,4 +1,5 @@
 ﻿@using Blazored.LocalStorage
+@using LabirintBlazorApp.Parameters
 @inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
 @inject ILocalStorageService LocalStorage
@@ -106,7 +107,7 @@
         IsDarkMod = isDarkMod ?? true;
 
         LabyrinthParameters? labyrinthParameters = await LocalStorage.GetItemAsync<LabyrinthParameters>("LabyrinthParameters");
-        Parameters.Labyrinth = labyrinthParameters ?? new LabyrinthParameters();
+        GlobalParameters.Labyrinth = labyrinthParameters ?? new LabyrinthParameters();
     }
 
     private void OpenParameters()

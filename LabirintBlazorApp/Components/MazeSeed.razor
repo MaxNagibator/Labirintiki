@@ -3,7 +3,7 @@
                   HelperText="@(IsGenerateRequired ? "Необходима генерация" : _currentSeed.ToString())"
                   Label="Зерно генерации"
                   OnBlur="ResetSeed" />
-    <MudIconButton Color="Color.Info" Disabled="IsGenerateRequired" Icon="@Icons.Material.TwoTone.Share" OnClick="ShowMessageBox"  />
+    <MudIconButton Color="Color.Info" Disabled="IsGenerateRequired" Icon="@Icons.Material.TwoTone.Share" OnClick="ShowMessageBox" />
 </MudStack>
 
 <MudMessageBox @ref="_messageBox">
@@ -11,7 +11,7 @@
         <MudStack Row>
             <MudText Color="Color.Primary" Typo="Typo.h5">Поделиться лабиринтом</MudText>
             <MudSpacer />
-            <MudImage Alt="Мотивация" Height="40" @onclick="ToggleMotivation" Src="images/motivation.png"  />
+            <MudImage Alt="Мотивация" Height="40" @onclick="ToggleMotivation" Src="images/motivation.png" />
         </MudStack>
     </TitleContent>
     <MessageContent>
@@ -56,7 +56,7 @@
         }
 
         <MudStack Row Spacing="2">
-            <MudTextField Margin="Margin.Dense" ReadOnly="true" Value="Link"  />
+            <MudTextField Margin="Margin.Dense" ReadOnly="true" Value="Link" />
             <MudIconButton Color="Color.Primary" Icon="@Icons.Material.TwoTone.ContentCopy" OnClick="CopyLink"></MudIconButton>
         </MudStack>
         <MudText Typo="Typo.caption">

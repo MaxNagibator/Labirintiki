@@ -1,6 +1,6 @@
 using Blazored.LocalStorage;
 using LabirintBlazorApp;
-using LabirintBlazorApp.Services;
+using LabirintBlazorApp.Services.Base;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;

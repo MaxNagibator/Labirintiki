@@ -1,16 +1,14 @@
-﻿using LabirintBlazorApp.Common;
-using LabirintBlazorApp.Common.Schemes;
-using LabirintBlazorApp.Dto;
-using LabirintBlazorApp.Services;
+﻿using LabirintBlazorApp.Common.Control;
+using LabirintBlazorApp.Common.Control.Schemes;
+using LabirintBlazorApp.Services.Base;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 
 namespace LabirintBlazorApp.Components;
 
 public partial class KeyInterceptor : IAsyncDisposable
 {
     private bool _isPause = false;
-    
+
     private Dictionary<string, Direction> _moveDirections = new();
     private DotNetObjectReference<KeyInterceptor>? _reference;
     private HashSet<string> _attackKeys = [];
@@ -33,7 +31,7 @@ public partial class KeyInterceptor : IAsyncDisposable
     {
         await JSRuntime.InvokeVoidAsync("finalizeKeyInterceptor");
         _reference?.Dispose();
-        
+
         SchemeService.ControlSchemeChanged -= OnSchemeChanged;
         GC.SuppressFinalize(this);
     }
@@ -67,7 +65,7 @@ public partial class KeyInterceptor : IAsyncDisposable
             { ControlScheme.MoveLeft, Direction.Left },
             { ControlScheme.MoveUp, Direction.Top },
             { ControlScheme.MoveRight, Direction.Right },
-            { ControlScheme.MoveDown, Direction.Bottom },
+            { ControlScheme.MoveDown, Direction.Bottom }
         };
 
         _attackKeys =

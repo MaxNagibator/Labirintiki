@@ -1,7 +1,8 @@
-﻿using LabirintBlazorApp.Common;
+﻿using LabirintBlazorApp.Common.Control;
+using LabirintBlazorApp.Common.Drawing;
 using LabirintBlazorApp.Components;
 using LabirintBlazorApp.Constants;
-using LabirintBlazorApp.Dto;
+using LabirintBlazorApp.Parameters;
 using Microsoft.AspNetCore.Components;
 
 namespace LabirintBlazorApp.Pages;
@@ -11,21 +12,12 @@ public partial class Maze
     private const int MinSize = 1;
     private const int MaxSize = 500;
 
-    private const int MaxHammerCount = 6;
-    private const int MaxBombCount = 2;
-    private const int SandCost = 100;
-
-    private int _hammerCount;
-    private int _bombCount;
+    private bool _isExitFound;
     private bool _isAtaka;
-
-    private bool _exitNotFound;
     private bool _isInit;
 
     private int _originalSize;
     private int _density;
-    private int _score;
-    private int _maxScore;
 
     private int _boxSize;
     private int _wallWidth;
@@ -72,7 +64,7 @@ public partial class Maze
 
     private async Task OnMoveKeyDown(MoveEventArgs moveEventArgs)
     {
-        if (_exitNotFound == false)
+        if (_isExitFound)
         {
             return;
         }
@@ -86,33 +78,40 @@ public partial class Maze
         await Move(moveEventArgs.Direction);
     }
 
+    private async Task OnAttackKeyDown(AttackEventArgs attackEventArgs)
+    {
+        // TODO Вариант для проверки работоспособности
+        switch (attackEventArgs.Type)
+        {
+            case AttackType.Bomba:
+            {
+                if (_labyrinth.Items.First(x => x is Bomb).TryUse())
+                {
+                    await DetonateBomb();
+                    _isAtaka = false;
+                }
+
+                break;
+            }
+
+            case AttackType.Molot:
+            {
+                if (_labyrinth.Items.First(x => x is Hammer).TryUse())
+                {
+                    _isAtaka = true;
+                }
+
+                break;
+            }
+        }
+    }
+
     private async Task Attack(Direction direction)
     {
         BreakWall(direction);
 
         await SoundService.PlayAsync(SoundType.Molot);
         await ForceRenderWalls();
-    }
-
-    private async Task OnAttackKeyDown(AttackEventArgs attackEventArgs)
-    {
-        switch (attackEventArgs.Type)
-        {
-            case AttackType.Bomba when _bombCount > 0:
-                await DetonateBomb();
-                _bombCount--;
-                _isAtaka = false;
-                return;
-
-            case AttackType.Molot when _hammerCount > 0:
-                _isAtaka = true;
-                _hammerCount--;
-                break;
-
-            case AttackType.None:
-            default:
-                break;
-        }
     }
 
     private async Task DetonateBomb()
@@ -138,41 +137,23 @@ public partial class Maze
 
         await SoundService.PlayAsync(SoundType.Step);
 
-        if (!_labyrinth[_labyrinth.Player].IsExit)
+        Tile tile = _labyrinth[_labyrinth.Player];
+
+        if (tile.IsExit)
         {
-            if (_labyrinth[_labyrinth.Player].ItemType != null)
-            {
-                if (_labyrinth[_labyrinth.Player].ItemType == ItemType.Sand)
-                {
-                    _score += SandCost;
-                    _labyrinth[_labyrinth.Player].ItemType = null;
-                    await SoundService.PlayAsync(SoundType.Score);
-                }
-                else
-                if (_labyrinth[_labyrinth.Player].ItemType == ItemType.Hammer)
-                {
-                    if (_hammerCount < MaxHammerCount)
-                    {
-                        _hammerCount++;
-                        _labyrinth[_labyrinth.Player].ItemType = null;
-                        await SoundService.PlayAsync(SoundType.Score);
-                    }
-                }
-                else
-                if (_labyrinth[_labyrinth.Player].ItemType == ItemType.Bomb)
-                {
-                    if (_bombCount < MaxBombCount)
-                    {
-                        _bombCount++;
-                        _labyrinth[_labyrinth.Player].ItemType = null;
-                        await SoundService.PlayAsync(SoundType.Score);
-                    }
-                }
-            }
+            _isExitFound = true;
         }
         else
         {
-            _exitNotFound = false;
+            if (tile.ItemType != null)
+            {
+                // TODO вынести в ячейку
+                if (tile.ItemType.TryPeekUp())
+                {
+                    tile.ItemType = null;
+                    await SoundService.PlayAsync(SoundType.Score);
+                }
+            }
         }
 
         await Task.WhenAll(ForceRenderWalls(), ForceRenderSands());
@@ -188,20 +169,12 @@ public partial class Maze
 
         _seeder.Reload();
 
-        _score = 0;
-        _maxScore = 0;
-
-        _hammerCount = MaxHammerCount;
-        _bombCount = MaxBombCount;
-
-        _exitNotFound = true;
+        _isExitFound = false;
 
         _originalSize = Math.Max(MinSize, Math.Min(MaxSize, _originalSize));
 
         _labyrinth = new Labyrinth(_seeder);
         _labyrinth.Init(_originalSize, _originalSize, _density);
-
-        _maxScore = SandCost * _labyrinth.SandCount;
 
         _vision = new Vision(_originalSize, _originalSize);
         _vision.SetPosition(_labyrinth.Player);

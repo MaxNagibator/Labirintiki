@@ -16,15 +16,9 @@
     <div class="workspace" hidden="@(!IsInit)">
         @if (IsInit)
         {
-            int entityBoxSize = _boxSize - _wallWidth;
-            int playerSize = entityBoxSize / 2;
-
-            Position draw = _vision.GetDraw(_labyrinth.Player) * _boxSize + _wallWidth;
-            (int left, int top) = AlignmentHelper.CalculatePosition(Alignment.Center, draw, _boxSize, _wallWidth);
-
             <div class="info-panel">
                 <MudStack Row Spacing="3">
-                    <MudStack Row>
+                    @*<MudStack Row>
                         <MudIcon Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.Bitcoin" Size="Size.Large" />
                         <MudText Color="Color.Warning" Typo="Typo.h6">@_score/@_maxScore</MudText>
                     </MudStack>
@@ -35,9 +29,17 @@
                     <MudStack Row>
                         <MudIcon Color="Color.Error" Icon="@MaterialDesignIcons.Normal.Bomb" Size="Size.Large" />
                         <MudText Color="Color.Error" Typo="Typo.h6"> @_bombCount/@MaxBombCount</MudText>
-                    </MudStack>
+                    </MudStack>*@
+                    @foreach (Item item in _labyrinth.Items)
+                    {
+                        <MudStack>
+                            <MudText Typo="Typo.h5"> @item.DisplayName</MudText>
+                            <MudText Typo="Typo.h6"> @item.Count/@item.MaxCount</MudText>
+                            <MudText Color="Color.Warning" Typo="Typo.h6"> @item.InMazeCount</MudText>
+                        </MudStack>
+                    }
                     <MudStack Row>
-                        <MudText Typo="Typo.h6">X:@_labyrinth.Player.X (@left) Y:@_labyrinth.Player.Y (@top)</MudText>
+                        <MudText Typo="Typo.h6">X:@_labyrinth.Player.X Y:@_labyrinth.Player.Y</MudText>
                     </MudStack>
                 </MudStack>
             </div>
@@ -49,15 +51,22 @@
                     <MazeEntities @ref="_mazeSands" />
                 </CascadingValue>
 
-                <img src="/images/runner.png"
-                     style="position:absolute;
+                @{
+                    int entityBoxSize = _boxSize - _wallWidth;
+                    int playerSize = entityBoxSize / 2;
+
+                    Position draw = _vision.GetDraw(_labyrinth.Player) * _boxSize + _wallWidth;
+                    (int left, int top) = AlignmentHelper.CalculatePosition(Alignment.Center, draw, _boxSize, _wallWidth);
+
+                    <img src="/images/runner.png"
+                         style="position:absolute;
                             z-index: 100;
                             left: @(left)px;
                             top: @(top)px;
                             width: @(playerSize)px;
                             height: @(playerSize)px;"
-                     alt="Бегун" />
-
+                         alt="Бегун" />
+                }
             </div>
         }
 

@@ -1,6 +1,6 @@
 {
-  "name": "LabirintBlazorApp",
-  "short_name": "LabirintBlazorApp",
+  "name": "Labyrinth.Blazor",
+  "short_name": "Labyrinth.Blazor",
   "id": "./",
   "start_url": "./",
   "display": "standalone",
