@@ -12,7 +12,14 @@ public class LabyrinthTests
     {
         _randomMock = new TestRandom();
         _labyrinth = new Labyrinth(_randomMock);
-        _labyrinth.Init(Width, Height, Density);
+        _inventory = new Inventory();
+        _labyrinth.Init(Width, Height, Density, _inventory.Items.Select(x => x.Item));
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _inventory.Clear();
     }
 
     private const int Width = 16;
@@ -21,27 +28,24 @@ public class LabyrinthTests
 
     private IRandom _randomMock;
     private Labyrinth _labyrinth;
-
-    private static readonly Item[] TestItems =
-    [
-        new Sand(),
-        new Hammer(),
-        new Bomb()
-    ];
+    private Inventory _inventory;
 
     /// <summary>
     ///     Была ошибка, что выдавались только песочки.
     /// </summary>
     [Test]
-    [TestCaseSource(nameof(TestItems))]
-    public void PlacedCorrectCountOfItemsTest(Item expected)
+    public void PlacedCorrectCountOfItemsTest()
     {
-        (Item item, int expectedCount) = (expected, expected.CalculateCountInMaze(Width, Height, Density));
+        foreach (ItemStack itemStack in _inventory.Items)
+        {
+            (Item item, int expectedCount) = (itemStack.Item, itemStack.Item.CalculateCountInMaze(Width, Height, Density));
 
-        int count = _labyrinth.Enumerate()
-            .Where(x => x.ItemType != null)
-            .Count(x => x.ItemType!.Name == item.Name);
+            // TODO исправить костыль с определение по пути
+            int count = _labyrinth.Enumerate()
+                .Where(tile => tile.WorldItem != null)
+                .Count(tile => tile.WorldItem!.ImageSource.Contains(item.Name));
 
-        Assert.That(count, Is.EqualTo(expectedCount));
+            Assert.That(count, Is.EqualTo(expectedCount));
+        }
     }
 }

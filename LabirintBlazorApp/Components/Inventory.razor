@@ -1,0 +1,13 @@
+﻿<MudStack Row Spacing="3">
+    @foreach (ItemStack stack in Stacks)
+    {
+        Item item = stack.Item;
+
+        <div class="inventory-item">
+            <img src="@item.Icon" alt="@item.DisplayName">
+            <div class="item-name">@item.DisplayName</div>
+            <div class="count">@stack.Count</div>
+            <div class="max-count">@stack.MaxCount</div>
+        </div>
+    }
+</MudStack>

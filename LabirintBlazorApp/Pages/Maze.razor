@@ -17,17 +17,8 @@
         @if (IsInit)
         {
             <div class="info-panel">
-                <MudStack Row Spacing="3">
-                    @foreach (ItemStack stack in InventoryService.Stacks)
-                    {
-                        Item item = stack.Item;
-
-                        <MudStack>
-                            <MudText Typo="Typo.h5"> @item.DisplayName</MudText>
-                            <MudText Typo="Typo.h6"> @stack.Count/@stack.MaxCount</MudText>
-                        </MudStack>
-                    }
-
+                <MudStack Spacing="3">
+                    <Inventory Stacks="@InventoryService.Stacks"/>
                     <MudStack Row>
                         <MudText Typo="Typo.h6">X:@_labyrinth.Player.X Y:@_labyrinth.Player.Y</MudText>
                     </MudStack>

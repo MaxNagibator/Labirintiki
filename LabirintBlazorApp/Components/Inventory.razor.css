@@ -1,0 +1,50 @@
+﻿.inventory-item {
+    position: relative;
+    overflow: hidden;
+    width: 64px;
+    height: 78px;
+    border-radius: 4px;
+    background-color: #ccc;
+}
+
+.inventory-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.inventory-item .count {
+    font-size: 12px;
+    position: absolute;
+    right: 2px;
+    bottom: 16px;
+    padding: 2px 4px;
+    color: #fff;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.inventory-item .max-count {
+    font-size: 10px;
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    padding: 2px 4px;
+    color: #fff;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.inventory-item .item-name {
+    font-size: 8px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    width: 100%;
+    padding: 2px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.4);
+}

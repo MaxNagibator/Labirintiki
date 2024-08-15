@@ -8,6 +8,7 @@ public abstract class Item
     public string DisplayName { get; init; }
 
     public string SoundType { get; init; }
+    public string Icon => $"/images/items/{Name}.png";
 
     // TODO вынести в стэк
     public int DefaultCount { get; set; }
@@ -46,7 +47,7 @@ public abstract class Item
     {
         return new WorldItem
         {
-            ImageSource = $"/images/items/{Name}.png",
+            ImageSource = Icon,
             Alignment = Alignment.Center,
             PickUpSound = "score",
             Scale = 1,
