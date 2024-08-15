@@ -1,4 +1,4 @@
-﻿namespace LabirintBlazorApp.Common.Control;
+﻿namespace Labirint.Core;
 
 public record Key
 {

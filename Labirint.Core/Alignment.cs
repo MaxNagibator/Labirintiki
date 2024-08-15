@@ -1,4 +1,4 @@
-﻿namespace LabirintBlazorApp.Common.Drawing;
+﻿namespace Labirint.Core;
 
 public enum Alignment : byte
 {
