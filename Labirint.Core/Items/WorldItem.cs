@@ -8,6 +8,7 @@ public record WorldItem
     public required double Scale { get; init; }
 
     public required Func<WorldItem, bool> PickUp { get; init; }
+    public required Action<Position, Labyrinth> AfterPlace { get; init; }
 
     public bool TryPickUp()
     {

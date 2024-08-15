@@ -14,7 +14,7 @@ public class Sand : Item
         SoundSettings = new SoundSettings("", "score");
     }
 
-    public override bool TryPickUp(WorldItem worldItem)
+    protected override bool TryPickUp(WorldItem worldItem)
     {
         return _stack.TryAdd((int)Math.Floor(worldItem.Scale * 10 % 4 + 1));
     }

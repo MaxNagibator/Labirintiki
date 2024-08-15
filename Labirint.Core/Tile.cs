@@ -36,6 +36,11 @@ public class Tile
     /// <param name="direction">Направление добавления стенки.</param>
     public void AddWall(Direction direction)
     {
+        if (Walls.HasFlag(direction))
+        {
+            return;
+        }
+
         Walls |= direction;
     }
 
@@ -45,9 +50,14 @@ public class Tile
     /// <param name="direction">Направление удаления стенки.</param>
     public void RemoveWall(Direction direction)
     {
+        if (Walls.HasFlag(direction) == false)
+        {
+            return;
+        }
+        
         Walls &= ~direction;
     }
-    
+
     public bool TryPickUp(out WorldItem? item)
     {
         item = null;

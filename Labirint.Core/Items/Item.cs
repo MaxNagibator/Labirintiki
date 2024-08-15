@@ -23,7 +23,7 @@ public abstract class Item
         _stack = itemStack;
     }
 
-    public virtual bool TryPickUp(WorldItem worldItem)
+    protected virtual bool TryPickUp(WorldItem worldItem)
     {
         return _stack.TryAdd(1);
     }
@@ -31,6 +31,11 @@ public abstract class Item
     public virtual bool TryUse(Position position, Direction? direction, Labyrinth labyrinth)
     {
         return _stack.TryRemove(1);
+    }
+
+    protected virtual void AfterPlace(Position position, Labyrinth labyrinth)
+    {
+        _stack.InMazeCount++;
     }
 
     public IEnumerable<WorldItem> GetItemsForPlace(int width, int height, int density)
@@ -51,7 +56,8 @@ public abstract class Item
             Alignment = Alignment.Center,
             PickUpSound = SoundSettings.PickUpSound,
             Scale = 1,
-            PickUp = TryPickUp
+            PickUp = TryPickUp,
+            AfterPlace = AfterPlace
         };
     }
 }

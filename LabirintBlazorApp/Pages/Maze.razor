@@ -38,14 +38,14 @@
                         z-index: 100;
                         left: @(-30)px;
                         top: @(top - 4)px;">
-                        <MudText Typo="Typo.h6">@_labyrinth.Player.Y</MudText>
+                        <MudText Typo="Typo.h6">@(_labyrinth.Player.Y + 1)</MudText>
                     </div>
 
                     <div style="position:absolute;
                         z-index: 100;
                         left: @(left + 4)px;
                         top: @(-30)px;">
-                        <MudText Typo="Typo.h6">@_labyrinth.Player.X</MudText>
+                        <MudText Typo="Typo.h6">@(_labyrinth.Player.X + 1)</MudText>
                     </div>
 
                     <img src="/images/runner.png"
@@ -62,7 +62,7 @@
 
         <div class="control-panel">
             <MudStack Spacing="3">
-                <MudText Typo="Typo.h5">Параметры:</MudText>
+                <MudText title="@(string.Join(" | ", InventoryService.Stacks))" Typo="Typo.h5">Параметры: </MudText>
                 <MazeSeed @ref="_seeder" Seed="@Seed" Size="@_originalSize" Density="@_density" IsExitFound="@_isExitFound" />
                 <MudStack>
                     <MudNumericField Label="Размер" Min="@MinSize" Max="@MaxSize" DebounceInterval="300" @bind-Value="_originalSize" />

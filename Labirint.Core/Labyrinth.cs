@@ -47,8 +47,8 @@ public class Labyrinth(IRandom seeder)
 
                 AddBorderWalls(x, y, tile);
 
-                CreateWall((x, y), tile, Direction.Top, density);
-                CreateWall((x, y), tile, Direction.Left, density);
+                CreateWall((x, y), Direction.Top, density);
+                CreateWall((x, y), Direction.Left, density);
             }
         }
 
@@ -185,18 +185,19 @@ public class Labyrinth(IRandom seeder)
             if (requiredItems.TryDequeue(out WorldItem? placeable))
             {
                 this[x, y].WorldItem = placeable;
+                placeable.AfterPlace.Invoke((x, y), this);
             }
         }
     }
 
-    private void CreateWall(Position position, Tile tile, Direction wallDirection, int density)
+    public void CreateWall(Position position, Direction wallDirection, int density)
     {
         if (seeder.Random.Next(0, 100) >= density)
         {
             return;
         }
 
-        tile.AddWall(wallDirection);
+        this[position].AddWall(wallDirection);
 
         if (IsInBound(position, wallDirection) == false)
         {

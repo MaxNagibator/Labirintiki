@@ -11,6 +11,7 @@ public class ItemStack
         MaxCount = Item.MaxCount;
     }
 
+    public int InMazeCount { get; set; }
     public int Count { get; private set; }
     public int MaxCount { get; }
 
@@ -41,5 +42,11 @@ public class ItemStack
     public void Reset()
     {
         Count = Item.DefaultCount;
+        InMazeCount = 0;
+    }
+
+    public override string ToString()
+    {
+        return $"{Item.Name} ({InMazeCount})";
     }
 }

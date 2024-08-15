@@ -17,6 +17,8 @@
             audio.src = "/media/molots/molot" + rand + ".mp3";
             break;
         default:
+            audio.src = soundType;
+            break;
     }
 
     await audio.play();
