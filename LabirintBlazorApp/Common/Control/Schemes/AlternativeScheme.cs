@@ -8,7 +8,4 @@ public class AlternativeScheme : IControlScheme
     public Key MoveDown => Key.KeyS;
     public Key MoveLeft => Key.KeyA;
     public Key MoveRight => Key.KeyD;
-
-    public Key Molot => Key.Space;
-    public Key Bomba => Key.ControlLeft;
 }
