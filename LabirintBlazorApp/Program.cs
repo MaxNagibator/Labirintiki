@@ -14,6 +14,7 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddMudServices();
 
 builder.Services.AddSingleton<SoundService>();
+builder.Services.AddSingleton<InventoryService>();
 builder.Services.AddSingleton<IControlSchemeService, ControlSchemeService>();
 builder.Services.AddScoped<IClipboardService, ClipboardService>();
 

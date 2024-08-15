@@ -18,26 +18,16 @@
         {
             <div class="info-panel">
                 <MudStack Row Spacing="3">
-                    @*<MudStack Row>
-                        <MudIcon Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.Bitcoin" Size="Size.Large" />
-                        <MudText Color="Color.Warning" Typo="Typo.h6">@_score/@_maxScore</MudText>
-                    </MudStack>
-                    <MudStack Row>
-                        <MudIcon Color="Color.Inherit" Icon="@MaterialDesignIcons.Normal.Hammer" Size="Size.Large" />
-                        <MudText Color="Color.Inherit" Typo="Typo.h6">@_hammerCount/@MaxHammerCount</MudText>
-                    </MudStack>
-                    <MudStack Row>
-                        <MudIcon Color="Color.Error" Icon="@MaterialDesignIcons.Normal.Bomb" Size="Size.Large" />
-                        <MudText Color="Color.Error" Typo="Typo.h6"> @_bombCount/@MaxBombCount</MudText>
-                    </MudStack>*@
-                    @foreach (Item item in _labyrinth.Items)
+                    @foreach (ItemStack stack in InventoryService.Stacks)
                     {
+                        Item item = stack.Item;
+
                         <MudStack>
                             <MudText Typo="Typo.h5"> @item.DisplayName</MudText>
-                            <MudText Typo="Typo.h6"> @item.Count/@item.MaxCount</MudText>
-                            <MudText Color="Color.Warning" Typo="Typo.h6"> @item.InMazeCount</MudText>
+                            <MudText Typo="Typo.h6"> @stack.Count/@stack.MaxCount</MudText>
                         </MudStack>
                     }
+
                     <MudStack Row>
                         <MudText Typo="Typo.h6">X:@_labyrinth.Player.X Y:@_labyrinth.Player.Y</MudText>
                     </MudStack>

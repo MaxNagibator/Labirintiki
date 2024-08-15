@@ -1,7 +1,6 @@
 ﻿using LabirintBlazorApp.Common.Control;
 using LabirintBlazorApp.Common.Drawing;
 using LabirintBlazorApp.Components;
-using LabirintBlazorApp.Constants;
 using LabirintBlazorApp.Parameters;
 using Microsoft.AspNetCore.Components;
 
@@ -13,7 +12,6 @@ public partial class Maze
     private const int MaxSize = 500;
 
     private bool _isExitFound;
-    private bool _isAtaka;
     private bool _isInit;
 
     private int _originalSize;
@@ -29,6 +27,9 @@ public partial class Maze
     private Labyrinth _labyrinth = null!;
     private MazeSeed _seeder = null!;
     private Vision _vision = null!;
+
+    [Inject]
+    public required InventoryService InventoryService { get; set; }
 
     [Parameter]
     public string? Seed { get; set; }
@@ -69,65 +70,20 @@ public partial class Maze
             return;
         }
 
-        if (_isAtaka)
-        {
-            await Attack(moveEventArgs.Direction);
-            _isAtaka = false;
-        }
-
         await Move(moveEventArgs.Direction);
     }
 
     private async Task OnAttackKeyDown(AttackEventArgs attackEventArgs)
     {
-        // TODO Вариант для проверки работоспособности
-        switch (attackEventArgs.Type)
+        Item? item = attackEventArgs.Item;
+
+        if (item != null && item.TryUse(_labyrinth.Player, attackEventArgs.Direction, _labyrinth))
         {
-            case AttackType.Bomba:
-            {
-                if (_labyrinth.Items.First(x => x is Bomb).TryUse())
-                {
-                    await DetonateBomb();
-                    _isAtaka = false;
-                }
+            await SoundService.PlayAsync(item.SoundType);
 
-                break;
-            }
-
-            case AttackType.Molot:
-            {
-                if (_labyrinth.Items.First(x => x is Hammer).TryUse())
-                {
-                    _isAtaka = true;
-                }
-
-                break;
-            }
+            StateHasChanged();
+            await ForceRenderWalls();
         }
-    }
-
-    private async Task Attack(Direction direction)
-    {
-        BreakWall(direction);
-
-        await SoundService.PlayAsync(SoundType.Molot);
-        await ForceRenderWalls();
-    }
-
-    private async Task DetonateBomb()
-    {
-        BreakWall(Direction.Left);
-        BreakWall(Direction.Top);
-        BreakWall(Direction.Right);
-        BreakWall(Direction.Bottom);
-
-        await SoundService.PlayAsync(SoundType.Bomb);
-        await ForceRenderWalls();
-    }
-
-    private void BreakWall(Direction direction)
-    {
-        _labyrinth.BreakWall(direction);
     }
 
     private async Task Move(Direction direction)
@@ -135,8 +91,10 @@ public partial class Maze
         _labyrinth.Move(direction);
         _vision.SetPosition(_labyrinth.Player);
 
-        await SoundService.PlayAsync(SoundType.Step);
+        // TODO подумать как вынести строку
+        await SoundService.PlayAsync("step");
 
+        // TODO вынести в лабиринт 
         Tile tile = _labyrinth[_labyrinth.Player];
 
         if (tile.IsExit)
@@ -145,13 +103,15 @@ public partial class Maze
         }
         else
         {
-            if (tile.ItemType != null)
+            WorldItem? worldItem = tile.WorldItem;
+
+            if (worldItem != null)
             {
                 // TODO вынести в ячейку
-                if (tile.ItemType.TryPeekUp())
+                if (worldItem.PickUp())
                 {
-                    tile.ItemType = null;
-                    await SoundService.PlayAsync(SoundType.Score);
+                    await SoundService.PlayAsync(worldItem.PickUpSound);
+                    tile.WorldItem = null;
                 }
             }
         }
@@ -167,6 +127,7 @@ public partial class Maze
         StateHasChanged();
         await Task.Delay(1);
 
+        InventoryService.Clear();
         _seeder.Reload();
 
         _isExitFound = false;
@@ -174,7 +135,7 @@ public partial class Maze
         _originalSize = Math.Max(MinSize, Math.Min(MaxSize, _originalSize));
 
         _labyrinth = new Labyrinth(_seeder);
-        _labyrinth.Init(_originalSize, _originalSize, _density);
+        _labyrinth.Init(_originalSize, _originalSize, _density, InventoryService.Items);
 
         _vision = new Vision(_originalSize, _originalSize);
         _vision.SetPosition(_labyrinth.Player);
