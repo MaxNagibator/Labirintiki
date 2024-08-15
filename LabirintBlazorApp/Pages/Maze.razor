@@ -52,19 +52,17 @@
                 </CascadingValue>
 
                 @{
-                    int entityBoxSize = _boxSize - _wallWidth;
-                    int playerSize = entityBoxSize / 2;
-
                     Position draw = _vision.GetDraw(_labyrinth.Player) * _boxSize + _wallWidth;
-                    (int left, int top) = AlignmentHelper.CalculatePosition(Alignment.Center, draw, _boxSize, _wallWidth);
+                    (int offset, int entitySize) = AlignmentHelper.CalculateOffset(_boxSize, _wallWidth, 0.5);
+                    (int left, int top) = AlignmentHelper.CalculatePosition(Alignment.Center, draw, offset);
 
                     <img src="/images/runner.png"
                          style="position:absolute;
                             z-index: 100;
                             left: @(left)px;
                             top: @(top)px;
-                            width: @(playerSize)px;
-                            height: @(playerSize)px;"
+                            width: @(entitySize)px;
+                            height: @(entitySize)px;"
                          alt="Бегун" />
                 }
             </div>

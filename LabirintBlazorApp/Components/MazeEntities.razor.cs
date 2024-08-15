@@ -5,21 +5,11 @@ namespace LabirintBlazorApp.Components;
 
 public partial class MazeEntities : MazeComponent
 {
-    private int _entitySize;
-    private int _offset;
-
     protected override string CanvasId => "mazeEntitiesCanvas";
-
-    protected override void OnParametersSetInner()
-    {
-        int entityBoxSize = BoxSize - WallWidth;
-        _entitySize = entityBoxSize / 2;
-        _offset = _entitySize - entityBoxSize;
-    }
 
     protected override void DrawInner(int x, int y, DrawSequence sequence)
     {
-        Item? item = Maze[x, y].ItemType;
+        WorldItem? item = Maze[x, y].WorldItem;
 
         if (item == null)
         {
@@ -27,8 +17,9 @@ public partial class MazeEntities : MazeComponent
         }
 
         Position draw = Vision.GetDraw((x, y)) * BoxSize + WallWidth;
-        (int left, int top) = AlignmentHelper.CalculatePosition(Alignment.BottomCenter, draw, _offset);
+        (int offset, int entitySize) = AlignmentHelper.CalculateOffset(BoxSize, WallWidth, item.Scale);
+        (int left, int top) = AlignmentHelper.CalculatePosition(item.Alignment, draw, offset);
 
-        sequence.DrawImage($"/images/{item.Name}.png", left, top, _entitySize, _entitySize);
+        sequence.DrawImage(item.ImageSource, left, top, entitySize, entitySize);
     }
 }

@@ -2,16 +2,11 @@
 
 public static class AlignmentHelper
 {
-    public static int CalculateOffset(int boxSize, int wallWidth)
+    public static (int offset, int entitySize) CalculateOffset(int boxSize, int wallWidth, double scale)
     {
         int entityBoxSize = boxSize - wallWidth;
-        int entitySize = entityBoxSize / 2;
-        return entitySize - entityBoxSize;
-    }
-
-    public static Position CalculatePosition(Alignment alignment, Position draw, int boxSize, int wallWidth)
-    {
-        return CalculatePosition(alignment, draw, CalculateOffset(boxSize, wallWidth));
+        int entitySize = (int)(entityBoxSize * scale);
+        return (entitySize - entityBoxSize, entitySize);
     }
 
     public static Position CalculatePosition(Alignment alignment, Position draw, int offset)
