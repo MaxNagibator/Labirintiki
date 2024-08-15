@@ -1,17 +1,13 @@
 ﻿@using LabirintBlazorApp.Common.Schemes
 @inject IControlSchemeService ControlSchemeService
 
-<MudText Typo="Typo.h5">Схемы управления:</MudText>
-<MudStack>
-    @foreach (IControlScheme scheme in ControlSchemeService.AvailableSchemes)
-    {
-        if (scheme == ControlSchemeService.CurrentScheme)
+<MudText>Схемы управления:</MudText>
+
+<MudRadioGroup @bind-Value="ControlSchemeService.CurrentScheme">
+   <MudStack Spacing="0">
+        @foreach (IControlScheme scheme in ControlSchemeService.AvailableSchemes)
         {
-            <MudButton Variant="Variant.Filled" Color="Color.Inherit" FullWidth>@scheme.Name</MudButton>
-        }
-        else
-        {
-            <MudButton OnClick="() => SwitchScheme(scheme)" Variant="Variant.Outlined" Color="Color.Info" FullWidth>@scheme.Name</MudButton>
-        }
-    }
-</MudStack>
+            <MudRadio Color="Color.Primary" Value="scheme">@scheme.Name</MudRadio>
+        } 
+   </MudStack>
+</MudRadioGroup>
