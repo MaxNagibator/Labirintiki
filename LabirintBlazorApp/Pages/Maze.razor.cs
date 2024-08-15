@@ -63,60 +63,30 @@ public partial class Maze
         }
     }
 
-    private async Task OnMoveKeyDown(MoveEventArgs moveEventArgs)
+    private async Task OnMoveKeyDown(MoveEventArgs args)
     {
         if (_isExitFound)
         {
             return;
         }
 
-        await Move(moveEventArgs.Direction);
+        _labyrinth.Move(args.Direction);
+        _vision.SetPosition(_labyrinth.Player);
+
+        await Task.WhenAll(ForceRenderWalls(), ForceRenderSands());
     }
 
-    private async Task OnAttackKeyDown(AttackEventArgs attackEventArgs)
+    private async Task OnAttackKeyDown(AttackEventArgs args)
     {
-        Item? item = attackEventArgs.Item;
+        Item? item = args.Item;
 
-        if (item != null && item.TryUse(_labyrinth.Player, attackEventArgs.Direction, _labyrinth))
+        if (item != null && item.TryUse(_labyrinth.Player, args.Direction, _labyrinth))
         {
-            await SoundService.PlayAsync(item.SoundType);
+            await SoundService.PlayAsync(item.SoundSettings.UseSound);
 
             StateHasChanged();
             await ForceRenderWalls();
         }
-    }
-
-    private async Task Move(Direction direction)
-    {
-        _labyrinth.Move(direction);
-        _vision.SetPosition(_labyrinth.Player);
-
-        // TODO подумать как вынести строку
-        await SoundService.PlayAsync("step");
-
-        // TODO вынести в лабиринт 
-        Tile tile = _labyrinth[_labyrinth.Player];
-
-        if (tile.IsExit)
-        {
-            _isExitFound = true;
-        }
-        else
-        {
-            WorldItem? worldItem = tile.WorldItem;
-
-            if (worldItem != null)
-            {
-                // TODO вынести в ячейку
-                if (worldItem.PickUp())
-                {
-                    await SoundService.PlayAsync(worldItem.PickUpSound);
-                    tile.WorldItem = null;
-                }
-            }
-        }
-
-        await Task.WhenAll(ForceRenderWalls(), ForceRenderSands());
     }
 
     private async Task GenerateAsync()
@@ -130,12 +100,23 @@ public partial class Maze
         InventoryService.Clear();
         _seeder.Reload();
 
+        if (_labyrinth != null)
+        {
+            _labyrinth.PlayerMoved -= OnPlayerMoved;
+            _labyrinth.ExitFound -= OnExitFound;
+            _labyrinth.ItemPickedUp -= OnItemPickedUp;
+        }
+
         _isExitFound = false;
 
         _originalSize = Math.Max(MinSize, Math.Min(MaxSize, _originalSize));
 
         _labyrinth = new Labyrinth(_seeder);
         _labyrinth.Init(_originalSize, _originalSize, _density, InventoryService.Items);
+        
+        _labyrinth.PlayerMoved += OnPlayerMoved;
+        _labyrinth.ExitFound += OnExitFound;
+        _labyrinth.ItemPickedUp += OnItemPickedUp;
 
         _vision = new Vision(_originalSize, _originalSize);
         _vision.SetPosition(_labyrinth.Player);
@@ -148,6 +129,22 @@ public partial class Maze
 
         _isInit = true;
         StateHasChanged();
+    }
+
+    private async void OnPlayerMoved(object? sender, Position args)
+    {
+        // TODO подумать как вынести строку
+        await SoundService.PlayAsync("step");
+    }
+
+    private void OnExitFound(object? sender, EventArgs args)
+    {
+        _isExitFound = true;
+    }
+
+    private async void OnItemPickedUp(object? sender, WorldItem args)
+    {
+        await SoundService.PlayAsync(args.PickUpSound);
     }
 
     private Task ForceRenderSands()

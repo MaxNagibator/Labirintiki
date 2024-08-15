@@ -45,6 +45,7 @@ public class LabyrinthTests
                 .Where(tile => tile.WorldItem != null)
                 .Count(tile => tile.WorldItem!.ImageSource.Contains(item.Name));
 
+            Console.WriteLine($"{item.Name}: {count}/{expectedCount}");
             Assert.That(count, Is.EqualTo(expectedCount));
         }
     }

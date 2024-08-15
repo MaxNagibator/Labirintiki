@@ -29,8 +29,6 @@ public class Labyrinth(IRandom seeder)
 
     public int Height { get; private set; }
 
-    public int SandCount { get; private set; }
-
     public Position Player { get; private set; }
 
     public void Init(int width, int height, int density, IEnumerable<Item> placeableItems)
@@ -57,8 +55,7 @@ public class Labyrinth(IRandom seeder)
         this[width / 2, height - 1].IsExit = true;
         this[width / 2, height - 1].RemoveWall(Direction.Bottom);
 
-        // Делаем коррекцию кол-ва песочков, чтобы оно было числом размещенных песочков на поле
-        SandCount = PlaceItems(width, height, density, placeableItems);
+        PlaceItems(width, height, density, placeableItems);
     }
 
     public void Move(Direction direction)
@@ -69,7 +66,24 @@ public class Labyrinth(IRandom seeder)
         }
 
         Player += direction.ToPosition();
+        PlayerMoved?.Invoke(this, Player);
+
+        Tile tile = this[Player];
+
+        if (tile.IsExit)
+        {
+            ExitFound?.Invoke(this, EventArgs.Empty);
+        }
+
+        if (tile.TryPickUp(out WorldItem? item))
+        {
+            ItemPickedUp?.Invoke(this, item!);
+        }
     }
+
+    public event EventHandler? ExitFound;
+    public event EventHandler<Position>? PlayerMoved;
+    public event EventHandler<WorldItem>? ItemPickedUp;
 
     public void BreakWall(Direction direction)
     {
@@ -119,26 +133,41 @@ public class Labyrinth(IRandom seeder)
         }
     }
 
-    private int PlaceItems(int width, int height, int density, IEnumerable<Item> placeableItems)
+    private void PlaceItems(int width, int height, int density, IEnumerable<Item> placeableItems)
     {
         int length = width * height - 1;
+        Dictionary<Item, int> itemCounts = new();
         Queue<WorldItem> requiredItems = new();
         int totalItemsCount = 0;
 
         foreach (Item item in placeableItems)
         {
-            foreach (WorldItem worldItem in item.GetItemsForPlace(width, height, density))
+            int count = item.GetItemsForPlace(width, height, density).Count();
+            itemCounts[item] = count;
+            totalItemsCount += count;
+        }
+
+        if (totalItemsCount > length)
+        {
+            double reductionFactor = (double)length / totalItemsCount;
+
+            foreach ((Item? key, int value) in itemCounts)
             {
-                requiredItems.Enqueue(worldItem);
-                totalItemsCount++;
+                int reducedCount = (int)Math.Round(value * reductionFactor);
+                itemCounts[key] = reducedCount;
             }
         }
 
-        // TODO придумать механизм для равномерного уменьшения, а не обрезания
-        // int placingSandCount = totalItemsCount > length ? length : totalItemsCount;
-        int placingSandCount = totalItemsCount;
+        foreach ((Item? item, int count) in itemCounts)
+        {
+            foreach (WorldItem worldItem in item.GetItemsForPlace(width, height, density).Take(count))
+            {
+                requiredItems.Enqueue(worldItem);
+            }
+        }
 
-        // Исключаем клетку с игроком
+        int placingSandCount = requiredItems.Count;
+
         int[] indexes = Enumerable.Range(1, length).ToArray();
 
         for (int i = 0; i < placingSandCount; i++)
@@ -158,8 +187,6 @@ public class Labyrinth(IRandom seeder)
                 this[x, y].WorldItem = placeable;
             }
         }
-
-        return placingSandCount;
     }
 
     private void CreateWall(Position position, Tile tile, Direction wallDirection, int density)

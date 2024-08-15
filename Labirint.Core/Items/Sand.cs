@@ -2,13 +2,21 @@
 
 public class Sand : Item
 {
+    // TODO Подумать и возможно добавить сидирование
+    private readonly Random _random = new();
+
     public Sand()
     {
         Name = "sand";
-        DisplayName = "Песок";
+        DisplayName = "Песочек";
         MaxCount = 1000;
 
-        SoundType = "score";
+        SoundSettings = new SoundSettings("", "score");
+    }
+
+    public override bool TryPickUp(WorldItem worldItem)
+    {
+        return _stack.TryAdd((int)Math.Floor(worldItem.Scale * 10 % 4 + 1));
     }
 
     public override int CalculateCountInMaze(int width, int height, int density)
@@ -21,7 +29,7 @@ public class Sand : Item
         return base.GetWorldItem() with
         {
             Alignment = Alignment.BottomCenter,
-            Scale = 0.5
+            Scale = _random.Next(4, 7) / 10d
         };
     }
 }

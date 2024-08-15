@@ -47,6 +47,25 @@ public class Tile
     {
         Walls &= ~direction;
     }
+    
+    public bool TryPickUp(out WorldItem? item)
+    {
+        item = null;
+
+        if (WorldItem == null)
+        {
+            return false;
+        }
+
+        if (WorldItem.TryPickUp() == false)
+        {
+            return false;
+        }
+
+        item = WorldItem;
+        WorldItem = null;
+        return true;
+    }
 
     public override string ToString()
     {

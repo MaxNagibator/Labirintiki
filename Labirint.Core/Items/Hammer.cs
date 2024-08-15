@@ -9,9 +9,8 @@ public class Hammer : Item
         DefaultCount = 6;
         MaxCount = 6;
 
-        SoundType = "molot";
-
         ControlSettings = new ControlSettings(Key.KeyA, true);
+        SoundSettings = new SoundSettings("molot", "score");
     }
 
     public override int CalculateCountInMaze(int width, int height, int density)

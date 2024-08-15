@@ -2,12 +2,11 @@
 
 public abstract class Item
 {
-    private ItemStack _stack;
+    protected ItemStack _stack;
 
     public string Name { get; init; }
     public string DisplayName { get; init; }
 
-    public string SoundType { get; init; }
     public string Icon => $"/images/items/{Name}.png";
 
     // TODO вынести в стэк
@@ -15,6 +14,7 @@ public abstract class Item
     public int MaxCount { get; init; }
 
     public ControlSettings? ControlSettings { get; set; }
+    public SoundSettings SoundSettings { get; init; }
 
     public abstract int CalculateCountInMaze(int width, int height, int density);
 
@@ -23,7 +23,7 @@ public abstract class Item
         _stack = itemStack;
     }
 
-    public virtual bool TryPickUp()
+    public virtual bool TryPickUp(WorldItem worldItem)
     {
         return _stack.TryAdd(1);
     }
@@ -49,7 +49,7 @@ public abstract class Item
         {
             ImageSource = Icon,
             Alignment = Alignment.Center,
-            PickUpSound = "score",
+            PickUpSound = SoundSettings.PickUpSound,
             Scale = 1,
             PickUp = TryPickUp
         };

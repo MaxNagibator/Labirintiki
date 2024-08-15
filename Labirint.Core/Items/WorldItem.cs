@@ -7,5 +7,10 @@ public record WorldItem
     public required Alignment Alignment { get; init; }
     public required double Scale { get; init; }
 
-    public required Func<bool> PickUp { get; init; }
+    public required Func<WorldItem, bool> PickUp { get; init; }
+
+    public bool TryPickUp()
+    {
+        return PickUp.Invoke(this);
+    }
 }

@@ -3,6 +3,11 @@
     {
         Item item = stack.Item;
 
+        if (stack.Count <= 0)
+        {
+            continue;
+        }
+
         <div class="inventory-item">
             <img src="@item.Icon" alt="@item.DisplayName">
             <div class="item-name">@item.DisplayName</div>

@@ -9,9 +9,8 @@ public class Bomb : Item
         DefaultCount = 2;
         MaxCount = 2;
 
-        SoundType = "bomb";
-
         ControlSettings = new ControlSettings(Key.KeyB);
+        SoundSettings = new SoundSettings("bomb", "score");
     }
 
     public override int CalculateCountInMaze(int width, int height, int density)

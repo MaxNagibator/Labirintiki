@@ -46,7 +46,7 @@ public partial class MazeSeed : IRandom
 
     private bool IsGenerateRequired => _currentSeed < 0;
 
-    // TODO можно добавить кеширование, но это уже экономия на спичках
+    // Можно добавить кеширование, но это уже экономия на спичках
     private string Link => GetShareLink();
 
     public Random Random => _random ?? Random.Shared;

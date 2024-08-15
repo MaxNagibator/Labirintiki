@@ -18,10 +18,7 @@
         {
             <div class="info-panel">
                 <MudStack Spacing="3">
-                    <Inventory Stacks="@InventoryService.Stacks"/>
-                    <MudStack Row>
-                        <MudText Typo="Typo.h6">X:@_labyrinth.Player.X Y:@_labyrinth.Player.Y</MudText>
-                    </MudStack>
+                    <Inventory Stacks="@InventoryService.Stacks" />
                 </MudStack>
             </div>
 
@@ -36,6 +33,20 @@
                     Position draw = _vision.GetDraw(_labyrinth.Player) * _boxSize + _wallWidth;
                     (int offset, int entitySize) = AlignmentHelper.CalculateOffset(_boxSize, _wallWidth, 0.5);
                     (int left, int top) = AlignmentHelper.CalculatePosition(Alignment.Center, draw, offset);
+
+                    <div style="position:absolute;
+                        z-index: 100;
+                        left: @(-30)px;
+                        top: @(top - 4)px;">
+                        <MudText Typo="Typo.h6">@_labyrinth.Player.Y</MudText>
+                    </div>
+
+                    <div style="position:absolute;
+                        z-index: 100;
+                        left: @(left + 4)px;
+                        top: @(-30)px;">
+                        <MudText Typo="Typo.h6">@_labyrinth.Player.X</MudText>
+                    </div>
 
                     <img src="/images/runner.png"
                          style="position:absolute;
