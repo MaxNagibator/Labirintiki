@@ -8,7 +8,7 @@ public class Tile
     /// <summary>
     ///     Тип предмета в клетке.
     /// </summary>
-    public Item? ItemType { get; set; }
+    public WorldItem? WorldItem { get; set; }
 
     /// <summary>
     ///     Направления стенок клетки.
@@ -50,6 +50,6 @@ public class Tile
 
     public override string ToString()
     {
-        return $"{nameof(Walls)}: {Walls}, {nameof(ItemType)}: {ItemType}, {nameof(IsExit)}: {IsExit}";
+        return $"{nameof(Walls)}: {Walls}, {nameof(WorldItem)}: {WorldItem}, {nameof(IsExit)}: {IsExit}";
     }
 }

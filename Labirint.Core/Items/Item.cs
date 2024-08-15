@@ -2,46 +2,55 @@
 
 public abstract class Item
 {
+    private ItemStack _stack;
+
     public string Name { get; init; }
     public string DisplayName { get; init; }
 
-    /// <summary>
-    ///     Количество в инвентаре
-    /// </summary>
-    public int Count { get; set; }
+    public string SoundType { get; init; }
 
-    /// <summary>
-    ///     Максимальное количество в инвентаре
-    /// </summary>
+    // TODO вынести в стэк
+    public int DefaultCount { get; set; }
     public int MaxCount { get; init; }
 
-    /// <summary>
-    ///     Количество лежащие в лабиринте
-    /// </summary>
-    public int InMazeCount { get; set; }
+    public ControlSettings? ControlSettings { get; set; }
 
     public abstract int CalculateCountInMaze(int width, int height, int density);
 
-    public virtual bool TryPeekUp()
+    public void InitStack(ItemStack itemStack)
     {
-        if (Count >= MaxCount)
-        {
-            return false;
-        }
-
-        Count++;
-        InMazeCount--;
-        return true;
+        _stack = itemStack;
     }
 
-    public virtual bool TryUse()
+    public virtual bool TryPickUp()
     {
-        if (Count <= 0)
-        {
-            return false;
-        }
+        return _stack.TryAdd(1);
+    }
 
-        Count--;
-        return true;
+    public virtual bool TryUse(Position position, Direction? direction, Labyrinth labyrinth)
+    {
+        return _stack.TryRemove(1);
+    }
+
+    public IEnumerable<WorldItem> GetItemsForPlace(int width, int height, int density)
+    {
+        int requiredCount = CalculateCountInMaze(width, height, density);
+
+        for (int i = 0; i < requiredCount; i++)
+        {
+            yield return GetWorldItem();
+        }
+    }
+
+    public virtual WorldItem GetWorldItem()
+    {
+        return new WorldItem
+        {
+            ImageSource = $"/images/items/{Name}.png",
+            Alignment = Alignment.Center,
+            PickUpSound = "score",
+            Scale = 1,
+            PickUp = TryPickUp
+        };
     }
 }
