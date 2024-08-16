@@ -1,6 +1,6 @@
 ﻿namespace Labirint.Core.Items;
 
-public class Sand : Item
+public class Sand : ScoreItem
 {
     // TODO Подумать и возможно добавить сидирование
     private readonly Random _random = new();
@@ -10,6 +10,8 @@ public class Sand : Item
         Name = "sand";
         DisplayName = "Песочек";
         MaxCount = 1000;
+
+        CostPerItem = 100;
 
         SoundSettings = new SoundSettings("", "score");
     }

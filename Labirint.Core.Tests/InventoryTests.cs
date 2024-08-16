@@ -19,8 +19,20 @@ public class InventoryTests
         Console.WriteLine($"Загруженные предметы: {string.Join(", ", inventoryAvailableItems)}");
 
         Assert.That(inventoryAvailableItems, Is.Not.Empty);
-    }   
-    
+    }
+
+    [Test]
+    public void CorrectLoadScoredItemsTest()
+    {
+        List<string> inventoryAvailableItems = _inventory.ScoreItems
+            .Select(scoreItem => $"{scoreItem.Name} ({scoreItem.CostPerItem})")
+            .ToList();
+
+        Console.WriteLine($"Загруженные предметы: {string.Join(", ", inventoryAvailableItems)}");
+
+        Assert.That(inventoryAvailableItems, Is.Not.Empty);
+    }
+
     [Test]
     public void CorrectDefaultItemsCountTest()
     {

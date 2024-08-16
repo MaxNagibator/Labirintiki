@@ -1,20 +1,22 @@
 ﻿namespace Labirint.Core.Items;
 
-public class Oil : Item
+public class Oil : ScoreItem
 {
     public Oil()
     {
         Name = "oil";
         DisplayName = "Нефть";
         DefaultCount = 0;
-        MaxCount = 1;
+        MaxCount = 10;
+
+        CostPerItem = 100_000;
 
         SoundSettings = new SoundSettings(string.Empty, "/media/oil.mp3");
     }
 
     public override int CalculateCountInMaze(int width, int height, int density)
     {
-        return width + height > 30 + 30 ? 1 : 0;
+        return (width + height) / (32 + 32);
     }
 
     protected override void AfterPlace(Position position, Labyrinth labyrinth)
@@ -35,10 +37,7 @@ public class Oil : Item
 
                 if (x >= 0 && x < labyrinth.Width && y >= 0 && y < labyrinth.Height)
                 {
-                    labyrinth.CreateWall((x, y), Direction.Left, 100);
-                    labyrinth.CreateWall((x, y), Direction.Top, 100);
-                    labyrinth.CreateWall((x, y), Direction.Right, 100);
-                    labyrinth.CreateWall((x, y), Direction.Bottom, 100);
+                    labyrinth.CreateWall((x, y), Direction.Left, Direction.Top, Direction.Right, Direction.Bottom);
                 }
             }
         }

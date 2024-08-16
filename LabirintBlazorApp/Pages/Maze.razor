@@ -18,6 +18,15 @@
         {
             <div class="info-panel">
                 <MudStack Spacing="3">
+                    @{
+                        int score = InventoryService.ScoreItems.Sum(scoreItem => scoreItem.Score);
+
+                        <MudStack Row>
+                            <MudIcon Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.Bitcoin" Size="Size.Large" />
+                            <MudText Color="Color.Warning" Typo="Typo.h6">@score</MudText>
+                        </MudStack>
+                    }
+
                     <Inventory Stacks="@InventoryService.Stacks" />
                 </MudStack>
             </div>

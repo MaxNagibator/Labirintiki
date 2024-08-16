@@ -190,6 +190,14 @@ public class Labyrinth(IRandom seeder)
         }
     }
 
+    public void CreateWall(Position position, params Direction[] directions)
+    {
+        foreach (Direction direction in directions)
+        {
+            CreateWall(position, direction, 100);
+        }
+    }
+
     public void CreateWall(Position position, Direction wallDirection, int density)
     {
         if (seeder.Random.Next(0, 100) >= density)

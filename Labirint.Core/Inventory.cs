@@ -2,17 +2,19 @@
 
 public class Inventory
 {
-    private readonly List<Item> _items;
+    private readonly List<Item> _allItems;
+
+    private List<ScoreItem>? _scoreItems;
     private List<ItemStack>? _stacks;
 
     public Inventory()
     {
-        _items = GetAllDerivedItems().ToList();
+        _allItems = GetAllDerivedItems().ToList();
     }
 
-    public IEnumerable<ItemStack> Items => _stacks ??= _items
-        .Select(x => new ItemStack(x))
-        .ToList();
+    public IEnumerable<ItemStack> Items => _stacks ??= GetStacks();
+
+    public IEnumerable<ScoreItem> ScoreItems => _scoreItems ??= GetScoreItems();
 
     public void Clear()
     {
@@ -20,6 +22,22 @@ public class Inventory
         {
             stack.Reset();
         }
+    }
+
+    private List<ItemStack> GetStacks()
+    {
+        return _allItems
+            .Select(item => new ItemStack(item))
+            .ToList();
+    }
+
+    private List<ScoreItem> GetScoreItems()
+    {
+        return _allItems
+            .Where(item => item.GetType().IsSubclassOf(typeof(ScoreItem)))
+            .Select(item => (ScoreItem)item)
+            .OrderByDescending(item => item.CostPerItem)
+            .ToList();
     }
 
     private IEnumerable<Item> GetAllDerivedItems()
