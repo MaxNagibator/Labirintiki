@@ -1,4 +1,6 @@
-﻿namespace LabirintBlazorApp.Common.Control.Schemes;
+﻿using Labirint.Core.Common;
+
+namespace LabirintBlazorApp.Common.Control.Schemes;
 
 public interface IControlScheme
 {

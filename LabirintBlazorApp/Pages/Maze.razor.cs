@@ -1,5 +1,4 @@
-﻿using LabirintBlazorApp.Common.Control;
-using LabirintBlazorApp.Common.Drawing;
+﻿using Labirint.Core.Common;
 using LabirintBlazorApp.Components;
 using LabirintBlazorApp.Parameters;
 using Microsoft.AspNetCore.Components;
@@ -22,7 +21,7 @@ public partial class Maze
 
     private MazeWalls? _mazeWalls;
     private MazeEntities? _mazeSands;
-    private MazeRenderParameter? _renderParameter;
+    private MazeRenderParameters? _renderParameter;
 
     private Labyrinth _labyrinth = null!;
     private MazeSeed _seeder = null!;
@@ -113,7 +112,7 @@ public partial class Maze
 
         _labyrinth = new Labyrinth(_seeder);
         _labyrinth.Init(_originalSize, _originalSize, _density, InventoryService.Items);
-        
+
         _labyrinth.PlayerMoved += OnPlayerMoved;
         _labyrinth.ExitFound += OnExitFound;
         _labyrinth.ItemPickedUp += OnItemPickedUp;
@@ -121,7 +120,7 @@ public partial class Maze
         _vision = new Vision(_originalSize, _originalSize);
         _vision.SetPosition(_labyrinth.Player);
 
-        _renderParameter = new MazeRenderParameter(_labyrinth, _boxSize, _wallWidth, _vision);
+        _renderParameter = new MazeRenderParameters(_labyrinth, _boxSize, _wallWidth, _vision);
 
         StateHasChanged();
 

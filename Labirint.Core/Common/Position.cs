@@ -1,4 +1,4 @@
-﻿namespace Labirint.Core;
+﻿namespace Labirint.Core.Common;
 
 public record struct Position(int X, int Y)
 {

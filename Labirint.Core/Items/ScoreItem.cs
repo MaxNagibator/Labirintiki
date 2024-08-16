@@ -2,6 +2,11 @@
 
 public abstract class ScoreItem : Item
 {
+    protected ScoreItem()
+    {
+        Stack = new ScoreItemStack(this);
+    }
+
     public int CostPerItem { get; protected init; }
-    public int Score => (_stack?.Count ?? 0) * CostPerItem;
+    public int Score => Stack.Count * CostPerItem;
 }

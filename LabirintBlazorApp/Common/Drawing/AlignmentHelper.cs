@@ -1,4 +1,6 @@
-﻿namespace LabirintBlazorApp.Common.Drawing;
+﻿using Labirint.Core.Common;
+
+namespace LabirintBlazorApp.Common.Drawing;
 
 public static class AlignmentHelper
 {

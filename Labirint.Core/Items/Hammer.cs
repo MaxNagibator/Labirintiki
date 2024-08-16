@@ -6,8 +6,8 @@ public class Hammer : Item
     {
         Name = "hammer";
         DisplayName = "Молоток";
-        DefaultCount = 6;
-        MaxCount = 6;
+
+        Stack = new LimitedItemStack(this, 6, 6);
 
         ControlSettings = new ControlSettings(Key.KeyA, true);
         SoundSettings = new SoundSettings("molot", "score");
@@ -18,19 +18,13 @@ public class Hammer : Item
         return (width + height) * density / 400;
     }
 
-    public override bool TryUse(Position position, Direction? direction, Labyrinth labyrinth)
+    public override void AfterUse(Position position, Direction? direction, Labyrinth labyrinth)
     {
-        if (base.TryUse(position, direction, labyrinth) == false)
-        {
-            return false;
-        }
-
         if (direction == null)
         {
-            return false;
+            return;
         }
 
         labyrinth.BreakWall(position, direction.Value);
-        return true;
     }
 }

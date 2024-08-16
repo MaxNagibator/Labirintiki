@@ -1,6 +1,5 @@
-﻿using LabirintBlazorApp.Common.Control;
+﻿using Labirint.Core.Common;
 using LabirintBlazorApp.Common.Control.Schemes;
-using LabirintBlazorApp.Services.Base;
 using Microsoft.AspNetCore.Components;
 
 namespace LabirintBlazorApp.Components;
@@ -11,7 +10,7 @@ public partial class KeyInterceptor : IAsyncDisposable
 
     private Dictionary<string, Direction> _moveDirections = new();
     private Dictionary<string, Item?> _itemUsed = new();
-    
+
     private DotNetObjectReference<KeyInterceptor>? _reference;
     private Item? _waitItem;
 

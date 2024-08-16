@@ -1,6 +1,4 @@
-﻿using LabirintBlazorApp.Services.Base;
-
-namespace LabirintBlazorApp.Services;
+﻿namespace LabirintBlazorApp.Services;
 
 public class ClipboardService(IJSRuntime jsRuntime) : IClipboardService
 {

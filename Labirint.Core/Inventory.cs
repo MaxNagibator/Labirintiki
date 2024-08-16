@@ -27,7 +27,7 @@ public class Inventory
     private List<ItemStack> GetStacks()
     {
         return _allItems
-            .Select(item => new ItemStack(item))
+            .Select(item => item.Stack)
             .ToList();
     }
 
@@ -46,6 +46,6 @@ public class Inventory
             .GetTypes()
             .Where(type => type.IsSubclassOf(typeof(Item)) && type.IsAbstract == false)
             .Select(type => (Item)Activator.CreateInstance(type)!)
-            .OrderByDescending(item => item.MaxCount);
+            .OrderByDescending(item => item.Stack.MaxCount);
     }
 }

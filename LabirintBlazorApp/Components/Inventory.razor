@@ -1,4 +1,5 @@
-﻿<MudStack Row Spacing="3">
+﻿@using Labirint.Core.Stacks
+<MudStack Row Spacing="3">
     @foreach (ItemStack stack in Stacks)
     {
         Item item = stack.Item;
@@ -8,11 +9,11 @@
             continue;
         }
 
-        <div class="inventory-item">
+        <div class="inventory-item @(stack.IsInfinite ? "score" : string.Empty)">
             <img src="@item.Icon" alt="@item.DisplayName">
             <div class="item-name">@item.DisplayName</div>
             <div class="count">@stack.Count</div>
-            <div class="max-count" title="@stack.InMazeCount">@stack.MaxCount</div>
+            <div class="max-count" title="@stack.InMazeCount">@(stack.IsInfinite ? "∞" : stack.MaxCount)</div>
         </div>
     }
 </MudStack>

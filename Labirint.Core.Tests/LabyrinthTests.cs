@@ -1,5 +1,6 @@
 using Labirint.Core.Interfaces;
 using Labirint.Core.Items;
+using Labirint.Core.Stacks;
 using Labirint.Core.Tests.Helpers;
 
 namespace Labirint.Core.Tests;

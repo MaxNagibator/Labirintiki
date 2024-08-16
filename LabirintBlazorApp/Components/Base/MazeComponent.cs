@@ -1,5 +1,4 @@
-﻿using LabirintBlazorApp.Common.Drawing;
-using LabirintBlazorApp.Parameters;
+﻿using LabirintBlazorApp.Parameters;
 using Microsoft.AspNetCore.Components;
 
 namespace LabirintBlazorApp.Components.Base;
@@ -18,7 +17,7 @@ public abstract class MazeComponent : ComponentBase
     public required ILogger<MazeComponent> Logger { get; set; }
 
     [CascadingParameter]
-    public required MazeRenderParameter MazeRenderParameter { get; set; }
+    public required MazeRenderParameters RenderParameters { get; set; }
 
     protected int BoxSize { get; private set; }
     protected int WallWidth { get; private set; }
@@ -32,7 +31,7 @@ public abstract class MazeComponent : ComponentBase
 
     protected sealed override void OnParametersSet()
     {
-        (Maze, BoxSize, WallWidth, Vision) = MazeRenderParameter;
+        (Maze, BoxSize, WallWidth, Vision) = RenderParameters;
 
         // Данное замечание актуально, если в MazeWalls оставлять условия с исключением повторного рисования стен
         // и необходимо заменить перед прочтением 50 строку на данную: int renderRange = Vision.Range * 2 * BoxSize + WallWidth;

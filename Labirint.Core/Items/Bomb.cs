@@ -6,8 +6,8 @@ public class Bomb : Item
     {
         Name = "bomb";
         DisplayName = "Бомба";
-        DefaultCount = 2;
-        MaxCount = 2;
+
+        Stack = new LimitedItemStack(this, 2, 2);
 
         ControlSettings = new ControlSettings(Key.KeyB);
         SoundSettings = new SoundSettings("bomb", "score");
@@ -18,17 +18,11 @@ public class Bomb : Item
         return (width + height) * density / 400 / 2;
     }
 
-    public override bool TryUse(Position position, Direction? direction, Labyrinth labyrinth)
+    public override void AfterUse(Position position, Direction? direction, Labyrinth labyrinth)
     {
-        if (base.TryUse(position, direction, labyrinth) == false)
-        {
-            return false;
-        }
-
         labyrinth.BreakWall(position, Direction.Left);
         labyrinth.BreakWall(position, Direction.Top);
         labyrinth.BreakWall(position, Direction.Right);
         labyrinth.BreakWall(position, Direction.Bottom);
-        return true;
     }
 }

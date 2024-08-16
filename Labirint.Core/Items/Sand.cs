@@ -9,7 +9,6 @@ public class Sand : ScoreItem
     {
         Name = "sand";
         DisplayName = "Песочек";
-        MaxCount = 1000;
 
         CostPerItem = 100;
 
@@ -18,7 +17,7 @@ public class Sand : ScoreItem
 
     protected override bool TryPickUp(WorldItem worldItem)
     {
-        return _stack.TryAdd((int)Math.Floor(worldItem.Scale * 10 % 4 + 1));
+        return Stack.TryAdd((int)Math.Floor(worldItem.Scale * 10 % 4 + 1));
     }
 
     public override int CalculateCountInMaze(int width, int height, int density)

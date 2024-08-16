@@ -1,4 +1,6 @@
-﻿namespace LabirintBlazorApp.Common.Drawing;
+﻿using Labirint.Core.Common;
+
+namespace LabirintBlazorApp.Common.Drawing;
 
 public class Vision(int mazeWidth, int mazeHeight, int visionRange = 3)
 {

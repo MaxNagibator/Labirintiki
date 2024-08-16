@@ -1,4 +1,6 @@
-﻿namespace Labirint.Core.Tests;
+﻿using Labirint.Core.Stacks;
+
+namespace Labirint.Core.Tests;
 
 [TestFixture]
 public class InventoryTests
@@ -38,7 +40,7 @@ public class InventoryTests
     {
         foreach (ItemStack itemStack in _inventory.Items)
         {
-            Assert.That(itemStack.Count, Is.EqualTo(itemStack.Item.DefaultCount));
+            Assert.That(itemStack.Count, Is.EqualTo(itemStack.DefaultCount));
         }
     }
 }

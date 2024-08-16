@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using Labirint.Core.Stacks;
 
 namespace LabirintBlazorApp.Services;
 
@@ -13,7 +14,6 @@ public class InventoryService
         ScoreItems = new ObservableCollection<ScoreItem>(_inventory.ScoreItems);
     }
 
-    /// <inheritdoc cref="Inventory.Items" />
     public IEnumerable<Item> Items => _inventory.Items.Select(x => x.Item);
 
     public ObservableCollection<ItemStack> Stacks { get; }

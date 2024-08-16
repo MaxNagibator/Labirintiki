@@ -1,5 +1,4 @@
 ﻿using LabirintBlazorApp.Common.Control.Schemes;
-using LabirintBlazorApp.Services.Base;
 using Microsoft.AspNetCore.Components;
 
 namespace LabirintBlazorApp.Components;

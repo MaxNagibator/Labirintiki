@@ -1,4 +1,6 @@
-﻿namespace LabirintBlazorApp.Common.Control;
+﻿using Labirint.Core.Common;
+
+namespace LabirintBlazorApp.Common.Control;
 
 public class MoveEventArgs
 {

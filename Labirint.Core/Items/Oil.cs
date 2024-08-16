@@ -6,8 +6,6 @@ public class Oil : ScoreItem
     {
         Name = "oil";
         DisplayName = "Нефть";
-        DefaultCount = 0;
-        MaxCount = 10;
 
         CostPerItem = 100_000;
 
