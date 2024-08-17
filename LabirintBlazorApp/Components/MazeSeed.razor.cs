@@ -19,6 +19,8 @@ public partial class MazeSeed : IRandom
     private Random? _random;
     private string? _userSeed;
 
+    public Random Random => _random ?? Random.Shared;
+
     [Parameter]
     public string? Seed { get; set; }
 
@@ -48,16 +50,6 @@ public partial class MazeSeed : IRandom
     // Можно добавить кеширование, но это уже экономия на спичках
     private string Link => GetShareLink();
 
-    public Random Random => _random ?? Random.Shared;
-
-    protected override void OnInitialized()
-    {
-        if (string.IsNullOrWhiteSpace(Seed) == false)
-        {
-            _userSeed = Seed;
-        }
-    }
-
     public void Reload()
     {
         if (string.IsNullOrWhiteSpace(_userSeed))
@@ -72,6 +64,21 @@ public partial class MazeSeed : IRandom
 
         _random = new Random(_currentSeed);
         StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        if (string.IsNullOrWhiteSpace(Seed) == false)
+        {
+            _userSeed = Seed;
+        }
+    }
+
+    private static int GenerateSeed(string input)
+    {
+        byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));
+        int result = BitConverter.ToInt32(hashBytes, 0);
+        return Math.Abs(result);
     }
 
     private void ReloadWithRandomSeed()
@@ -115,12 +122,5 @@ public partial class MazeSeed : IRandom
 
         _messageBox?.Close();
         _messageBox?.ShowAsync();
-    }
-
-    private static int GenerateSeed(string input)
-    {
-        byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));
-        int result = BitConverter.ToInt32(hashBytes, 0);
-        return Math.Abs(result);
     }
 }

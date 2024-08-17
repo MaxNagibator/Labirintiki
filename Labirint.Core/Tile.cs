@@ -54,7 +54,7 @@ public class Tile
         {
             return;
         }
-        
+
         Walls &= ~direction;
     }
 

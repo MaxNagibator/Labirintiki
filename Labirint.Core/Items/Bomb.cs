@@ -20,9 +20,6 @@ public class Bomb : Item
 
     public override void AfterUse(Position position, Direction? direction, Labyrinth labyrinth)
     {
-        labyrinth.BreakWall(position, Direction.Left);
-        labyrinth.BreakWall(position, Direction.Top);
-        labyrinth.BreakWall(position, Direction.Right);
-        labyrinth.BreakWall(position, Direction.Bottom);
+        labyrinth.BreakWall(position, Direction.Left, Direction.Top, Direction.Right, Direction.Bottom);
     }
 }

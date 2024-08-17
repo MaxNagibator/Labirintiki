@@ -4,9 +4,9 @@ namespace LabirintBlazorApp.Services.Base;
 
 public interface IControlSchemeService
 {
+    event EventHandler<IControlScheme> ControlSchemeChanged;
     IControlScheme CurrentScheme { get; set; }
     IEnumerable<IControlScheme> AvailableSchemes { get; }
-    event EventHandler<IControlScheme> ControlSchemeChanged;
     void RegisterScheme(IControlScheme scheme);
     void UnregisterScheme(IControlScheme scheme);
 }

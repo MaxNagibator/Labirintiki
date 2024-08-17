@@ -8,6 +8,16 @@ namespace Labirint.Core;
 /// </summary>
 public class Labyrinth(IRandom seeder)
 {
+    public event EventHandler? ExitFound;
+    public event EventHandler<WorldItem>? ItemPickedUp;
+    public event EventHandler<Position>? PlayerMoved;
+
+    public int Width { get; private set; }
+
+    public int Height { get; private set; }
+
+    public Position Player { get; private set; }
+
     /// <summary>
     ///     Клеточки.
     /// </summary>
@@ -24,12 +34,6 @@ public class Labyrinth(IRandom seeder)
         get => Tiles[position.X, position.Y];
         private set => Tiles[position.X, position.Y] = value;
     }
-
-    public int Width { get; private set; }
-
-    public int Height { get; private set; }
-
-    public Position Player { get; private set; }
 
     public void Init(int width, int height, int density, IEnumerable<Item> placeableItems)
     {
@@ -81,13 +85,17 @@ public class Labyrinth(IRandom seeder)
         }
     }
 
-    public event EventHandler? ExitFound;
-    public event EventHandler<Position>? PlayerMoved;
-    public event EventHandler<WorldItem>? ItemPickedUp;
-
     public void BreakWall(Direction direction)
     {
         BreakWall(Player, direction);
+    }
+
+    public void BreakWall(Position position, params Direction[] directions)
+    {
+        foreach (Direction direction in directions)
+        {
+            BreakWall(position, direction);
+        }
     }
 
     public void BreakWall(Position position, Direction direction)
@@ -100,6 +108,31 @@ public class Labyrinth(IRandom seeder)
         this[position].RemoveWall(direction);
 
         PerformActionForAdjacent(position, direction, (adjacentTile, oppositeDirection) => adjacentTile.RemoveWall(oppositeDirection));
+    }
+
+    public void CreateWall(Position position, params Direction[] directions)
+    {
+        foreach (Direction direction in directions)
+        {
+            CreateWall(position, direction, 100);
+        }
+    }
+
+    public void CreateWall(Position position, Direction wallDirection, int density)
+    {
+        if (seeder.Random.Next(0, 100) >= density)
+        {
+            return;
+        }
+
+        this[position].AddWall(wallDirection);
+
+        if (IsInBound(position, wallDirection) == false)
+        {
+            return;
+        }
+
+        PerformActionForAdjacent(position, wallDirection, (adjacentTile, oppositeDirection) => adjacentTile.AddWall(oppositeDirection));
     }
 
     private Tile AddTile(Position position)
@@ -188,31 +221,6 @@ public class Labyrinth(IRandom seeder)
                 placeable.AfterPlace.Invoke((x, y), this);
             }
         }
-    }
-
-    public void CreateWall(Position position, params Direction[] directions)
-    {
-        foreach (Direction direction in directions)
-        {
-            CreateWall(position, direction, 100);
-        }
-    }
-
-    public void CreateWall(Position position, Direction wallDirection, int density)
-    {
-        if (seeder.Random.Next(0, 100) >= density)
-        {
-            return;
-        }
-
-        this[position].AddWall(wallDirection);
-
-        if (IsInBound(position, wallDirection) == false)
-        {
-            return;
-        }
-
-        PerformActionForAdjacent(position, wallDirection, (adjacentTile, oppositeDirection) => adjacentTile.AddWall(oppositeDirection));
     }
 
     private void PerformActionForAdjacent(Position position, Direction wallDirection, Action<Tile, Direction> action)

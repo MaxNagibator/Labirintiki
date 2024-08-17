@@ -5,10 +5,10 @@ namespace LabirintBlazorApp.Components.Base;
 
 public abstract class MazeComponent : ComponentBase
 {
-    private bool _isShouldRender;
-
-    private Canvas2DContext _context = null!;
     protected ElementReference CanvasRef;
+    
+    private bool _isShouldRender;
+    private Canvas2DContext _context = null!;
 
     [Inject]
     public required IJSRuntime JSRuntime { get; set; }
@@ -29,16 +29,30 @@ public abstract class MazeComponent : ComponentBase
 
     protected abstract string CanvasId { get; }
 
+    public async Task ForceRender()
+    {
+        _isShouldRender = true;
+
+        await DrawAsync();
+        StateHasChanged();
+
+        _isShouldRender = false;
+    }
+
+    protected virtual void OnParametersSetInner()
+    {
+    }
+
     protected sealed override void OnParametersSet()
     {
         (Maze, BoxSize, WallWidth, Vision) = RenderParameters;
 
         // Данное замечание актуально, если в MazeWalls оставлять условия с исключением повторного рисования стен
-        // и необходимо заменить перед прочтением 50 строку на данную: int renderRange = Vision.Range * 2 * BoxSize + WallWidth;
+        // и необходимо заменить перед прочтением 63 строку на данную: int renderRange = Vision.Range * 2 * BoxSize + WallWidth;
         // По факту рисуется Vision.Range * 2 * BoxSize + BoxSize + WallWidth,
         // но чтобы было (возможно) красивее оставлена только верхнюю часть ячейки (картинки были в предыдущем PR).
         // Из-за этого игрок размещается не в центре радиуса видимости.
-        // Если данное поведение не устраивает, нужно заменить стоку 50 на закомментированную ниже.
+        // Если данное поведение не устраивает, нужно заменить стоку 63 на закомментированную ниже.
         // int renderRange = Vision.Range * 2 * BoxSize + BoxSize + WallWidth;
 
         // Vision.Range * 2 -> область видимости во все стороны.
@@ -53,10 +67,6 @@ public abstract class MazeComponent : ComponentBase
         OnParametersSetInner();
     }
 
-    protected virtual void OnParametersSetInner()
-    {
-    }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -69,16 +79,6 @@ public abstract class MazeComponent : ComponentBase
     protected override bool ShouldRender()
     {
         return _isShouldRender;
-    }
-
-    public async Task ForceRender()
-    {
-        _isShouldRender = true;
-
-        await DrawAsync();
-        StateHasChanged();
-
-        _isShouldRender = false;
     }
 
     protected abstract void DrawInner(int x, int y, DrawSequence sequence);

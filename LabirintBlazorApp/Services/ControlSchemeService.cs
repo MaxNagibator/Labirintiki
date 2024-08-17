@@ -18,6 +18,8 @@ public class ControlSchemeService : IControlSchemeService
         _currentScheme = _controlSchemes.First();
     }
 
+    public event EventHandler<IControlScheme>? ControlSchemeChanged;
+
     public IControlScheme CurrentScheme
     {
         get => _currentScheme;
@@ -36,8 +38,6 @@ public class ControlSchemeService : IControlSchemeService
     }
 
     public IEnumerable<IControlScheme> AvailableSchemes => _controlSchemes;
-
-    public event EventHandler<IControlScheme>? ControlSchemeChanged;
 
     public void RegisterScheme(IControlScheme scheme)
     {

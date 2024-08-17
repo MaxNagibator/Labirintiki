@@ -40,6 +40,37 @@ public partial class KeyInterceptor : IAsyncDisposable
         GC.SuppressFinalize(this);
     }
 
+    [JSInvokable]
+    public async Task OnKeyDown(string code)
+    {
+        if (_isPause)
+        {
+            return;
+        }
+
+        if (PerformItemUse(code, out AttackEventArgs? attack) && _waitItem == null)
+        {
+            await OnAttackKeyDown.InvokeAsync(attack);
+        }
+
+        if (PerformMove(code, out MoveEventArgs? move))
+        {
+            if (_waitItem != null)
+            {
+                await OnAttackKeyDown.InvokeAsync(new AttackEventArgs
+                {
+                    Item = _waitItem,
+                    Direction = move.Direction,
+                    KeyCode = Key.Create(code)
+                });
+
+                _waitItem = null;
+            }
+
+            await OnMoveKeyDown.InvokeAsync(move);
+        }
+    }
+
     protected override void OnInitialized()
     {
         _reference = DotNetObjectReference.Create(this);
@@ -76,37 +107,6 @@ public partial class KeyInterceptor : IAsyncDisposable
             { ControlScheme.MoveRight, Direction.Right },
             { ControlScheme.MoveDown, Direction.Bottom }
         };
-    }
-
-    [JSInvokable]
-    public async Task OnKeyDown(string code)
-    {
-        if (_isPause)
-        {
-            return;
-        }
-
-        if (PerformItemUse(code, out AttackEventArgs? attack) && _waitItem == null)
-        {
-            await OnAttackKeyDown.InvokeAsync(attack);
-        }
-
-        if (PerformMove(code, out MoveEventArgs? move))
-        {
-            if (_waitItem != null)
-            {
-                await OnAttackKeyDown.InvokeAsync(new AttackEventArgs
-                {
-                    Item = _waitItem,
-                    Direction = move.Direction,
-                    KeyCode = Key.Create(code)
-                });
-
-                _waitItem = null;
-            }
-
-            await OnMoveKeyDown.InvokeAsync(move);
-        }
     }
 
     private bool PerformItemUse(string code, out AttackEventArgs? args)

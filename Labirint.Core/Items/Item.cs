@@ -12,7 +12,45 @@ public abstract class Item
     public ControlSettings? ControlSettings { get; protected init; }
     public SoundSettings SoundSettings { get; protected init; }
 
+    public virtual bool TryUse(Position position, Direction? direction, Labyrinth labyrinth)
+    {
+        if (Stack.TryRemove(1) == false)
+        {
+            return false;
+        }
+
+        AfterUse(position, direction, labyrinth);
+        return true;
+    }
+
+    public virtual void AfterUse(Position position, Direction? direction, Labyrinth labyrinth)
+    {
+    }
+
+    public virtual WorldItem GetWorldItem()
+    {
+        return new WorldItem
+        {
+            ImageSource = Icon,
+            Alignment = Alignment.Center,
+            PickUpSound = SoundSettings.PickUpSound,
+            Scale = 0.9,
+            PickUp = TryPickUp,
+            AfterPlace = AfterPlace
+        };
+    }
+
     public abstract int CalculateCountInMaze(int width, int height, int density);
+
+    public IEnumerable<WorldItem> GetItemsForPlace(int width, int height, int density)
+    {
+        int requiredCount = CalculateCountInMaze(width, height, density);
+
+        for (int i = 0; i < requiredCount; i++)
+        {
+            yield return GetWorldItem();
+        }
+    }
 
     protected virtual bool TryPickUp(WorldItem worldItem)
     {
@@ -29,46 +67,8 @@ public abstract class Item
     {
     }
 
-    public virtual bool TryUse(Position position, Direction? direction, Labyrinth labyrinth)
-    {
-        if (Stack.TryRemove(1) == false)
-        {
-            return false;
-        }
-
-        AfterUse(position, direction, labyrinth);
-        return true;
-    }
-
-    public virtual void AfterUse(Position position, Direction? direction, Labyrinth labyrinth)
-    {
-    }
-
     protected virtual void AfterPlace(Position position, Labyrinth labyrinth)
     {
         Stack.InMazeCount++;
-    }
-
-    public IEnumerable<WorldItem> GetItemsForPlace(int width, int height, int density)
-    {
-        int requiredCount = CalculateCountInMaze(width, height, density);
-
-        for (int i = 0; i < requiredCount; i++)
-        {
-            yield return GetWorldItem();
-        }
-    }
-
-    public virtual WorldItem GetWorldItem()
-    {
-        return new WorldItem
-        {
-            ImageSource = Icon,
-            Alignment = Alignment.Center,
-            PickUpSound = SoundSettings.PickUpSound,
-            Scale = 0.9,
-            PickUp = TryPickUp,
-            AfterPlace = AfterPlace
-        };
     }
 }

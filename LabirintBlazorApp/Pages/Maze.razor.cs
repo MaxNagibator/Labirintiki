@@ -62,6 +62,22 @@ public partial class Maze
         }
     }
 
+    private async void OnPlayerMoved(object? sender, Position args)
+    {
+        // TODO подумать как вынести строку
+        await SoundService.PlayAsync("step");
+    }
+
+    private void OnExitFound(object? sender, EventArgs args)
+    {
+        _isExitFound = true;
+    }
+
+    private async void OnItemPickedUp(object? sender, WorldItem args)
+    {
+        await SoundService.PlayAsync(args.PickUpSound);
+    }
+
     private async Task OnMoveKeyDown(MoveEventArgs args)
     {
         if (_isExitFound)
@@ -128,22 +144,6 @@ public partial class Maze
 
         _isInit = true;
         StateHasChanged();
-    }
-
-    private async void OnPlayerMoved(object? sender, Position args)
-    {
-        // TODO подумать как вынести строку
-        await SoundService.PlayAsync("step");
-    }
-
-    private void OnExitFound(object? sender, EventArgs args)
-    {
-        _isExitFound = true;
-    }
-
-    private async void OnItemPickedUp(object? sender, WorldItem args)
-    {
-        await SoundService.PlayAsync(args.PickUpSound);
     }
 
     private Task ForceRenderSands()
