@@ -9,11 +9,26 @@
             continue;
         }
 
-        <div class="inventory-item @(stack.IsInfinite ? "score" : string.Empty)">
-            <img src="@item.Icon" alt="@item.DisplayName">
-            <div class="item-name">@item.DisplayName</div>
-            <div class="count">@stack.Count</div>
-            <div class="max-count" title="@stack.InMazeCount">@(stack.IsInfinite ? "∞" : stack.MaxCount)</div>
+        <div class="inventory-item-container">
+            <div class="inventory-item @(stack.IsInfinite ? "score" : string.Empty) @(item == WaitItem ? "animate" : string.Empty)">
+                <img src="@item.Icon" alt="@item.DisplayName">
+                <div class="item-name">@item.DisplayName</div>
+                <div class="count">@stack.Count</div>
+                <div class="max-count" title="@stack.InMazeCount">@(stack.IsInfinite ? "∞" : stack.MaxCount)</div>
+            </div>
+
+            @{
+                ControlSettings? control = item.ControlSettings;
+
+                if (control != null)
+                {
+                    <div class="keyboard-button">
+                        <span @onclick="() => OnClicked(control.ActivateKey)">
+                            @control.ActivateKey.DisplaySymbol
+                        </span>
+                    </div>
+                }
+            }
         </div>
     }
 </MudStack>

@@ -22,6 +22,7 @@ public partial class Maze
     private MazeWalls? _mazeWalls;
     private MazeEntities? _mazeSands;
     private MazeRenderParameters? _renderParameter;
+    private KeyInterceptor? _keyInterceptor;
 
     private Labyrinth _labyrinth = null!;
     private MazeSeed _seeder = null!;

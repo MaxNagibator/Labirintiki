@@ -14,6 +14,8 @@ public partial class KeyInterceptor : IAsyncDisposable
     private DotNetObjectReference<KeyInterceptor>? _reference;
     private Item? _waitItem;
 
+    public event EventHandler<Item?>? ChangedWaitItem;
+
     [Inject]
     public required IControlSchemeService SchemeService { get; set; }
 
@@ -64,7 +66,7 @@ public partial class KeyInterceptor : IAsyncDisposable
                     KeyCode = Key.Create(code)
                 });
 
-                _waitItem = null;
+                ChangeWaitItem(null);
             }
 
             await OnMoveKeyDown.InvokeAsync(move);
@@ -120,7 +122,7 @@ public partial class KeyInterceptor : IAsyncDisposable
 
         if (item.ControlSettings!.MoveRequired && _waitItem == null)
         {
-            _waitItem = item;
+            ChangeWaitItem(item);
             return false;
         }
 
@@ -131,6 +133,12 @@ public partial class KeyInterceptor : IAsyncDisposable
         };
 
         return true;
+    }
+
+    private void ChangeWaitItem(Item? item)
+    {
+        _waitItem = item;
+        ChangedWaitItem?.Invoke(this, item);
     }
 
     private bool PerformMove(string code, out MoveEventArgs? args)

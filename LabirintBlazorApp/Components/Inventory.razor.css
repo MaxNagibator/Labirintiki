@@ -1,8 +1,14 @@
-﻿.inventory-item {
+﻿.inventory-item-container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.inventory-item {
     position: relative;
     overflow: hidden;
-    width: 64px;
-    height: 78px;
+    width: 80px;
+    height: 96px;
     border-radius: 4px;
     background-color: #ccc;
 }
@@ -17,11 +23,16 @@
     object-fit: contain;
 }
 
+.inventory-item.animate {
+    animation: pulse 0.8s infinite;
+}
+
 .inventory-item .count {
-    font-size: 12px;
+    font-size: 14px;
+    font-weight: bold;
     position: absolute;
-    right: 2px;
-    bottom: 16px;
+    right: 0;
+    bottom: 0;
     padding: 2px 4px;
     color: #fff;
     border-radius: 4px;
@@ -29,10 +40,10 @@
 }
 
 .inventory-item .max-count {
-    font-size: 10px;
+    font-size: 12px;
     position: absolute;
-    top: 2px;
-    right: 2px;
+    top: 0;
+    right: 0;
     padding: 2px 4px;
     color: #fff;
     border-radius: 4px;
@@ -40,14 +51,49 @@
 }
 
 .inventory-item .item-name {
-    font-size: 8px;
+    font-size: 11px;
     position: absolute;
-    bottom: 0;
+    top: 0;
     left: 0;
     overflow: hidden;
-    width: 100%;
-    padding: 2px;
+    padding: 2px 4px;
     white-space: nowrap;
     text-overflow: ellipsis;
+    color: #fff;
+    border-radius: 4px;
     background-color: rgba(0, 0, 0, 0.4);
+}
+
+.keyboard-button {
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin-top: 4px;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+    color: #fff;
+    border-radius: 4px;
+    background-color: #333;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.keyboard-button:hover {
+    transform: translateY(2px);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
 }

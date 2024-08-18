@@ -27,7 +27,7 @@
                         </MudStack>
                     }
 
-                    <Inventory Stacks="@InventoryService.Stacks" />
+                    <Inventory Interceptor="_keyInterceptor" Stacks="@InventoryService.Stacks" />
                 </MudStack>
             </div>
 
@@ -83,7 +83,7 @@
                 </MudStack>
 
                 <MudButton OnClick="GenerateAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Генерировать</MudButton>
-                <KeyInterceptor OnMoveKeyDown="OnMoveKeyDown" OnAttackKeyDown="OnAttackKeyDown" />
+                <KeyInterceptor @ref="_keyInterceptor" OnMoveKeyDown="OnMoveKeyDown" OnAttackKeyDown="OnAttackKeyDown" />
             </MudStack>
         </div>
     </div>
