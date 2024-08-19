@@ -12,13 +12,27 @@ public class Inventory
         _allItems = GetAllDerivedItems().ToList();
     }
 
-    public IEnumerable<ItemStack> Items => _stacks ??= GetStacks();
+    /// <summary>
+    ///     Все доступные предметы.
+    /// </summary>
+    public IEnumerable<Item> AllItems => _allItems;
 
+    /// <summary>
+    ///     Все стеки предметов в инвентаре.
+    /// </summary>
+    public IEnumerable<ItemStack> Stacks => _stacks ??= GetStacks();
+
+    /// <summary>
+    ///     Все ценные предметы в инвентаре, отсортированных по убыванию стоимости.
+    /// </summary>
     public IEnumerable<ScoreItem> ScoreItems => _scoreItems ??= GetScoreItems();
 
+    /// <summary>
+    ///     Сбросить количество всех предметов в инвентаре к значению по умолчанию.
+    /// </summary>
     public void Clear()
     {
-        foreach (ItemStack stack in Items)
+        foreach (ItemStack stack in Stacks)
         {
             stack.Reset();
         }

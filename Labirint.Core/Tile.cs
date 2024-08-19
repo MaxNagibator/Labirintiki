@@ -6,7 +6,7 @@
 public class Tile
 {
     /// <summary>
-    ///     Тип предмета в клетке.
+    ///     Предмет в клетке.
     /// </summary>
     public WorldItem? WorldItem { get; set; }
 
@@ -31,7 +31,7 @@ public class Tile
     }
 
     /// <summary>
-    ///     Добавляет стенку в указанном направлении.
+    ///     Добавить стенку в указанном направлении.
     /// </summary>
     /// <param name="direction">Направление добавления стенки.</param>
     public void AddWall(Direction direction)
@@ -45,7 +45,7 @@ public class Tile
     }
 
     /// <summary>
-    ///     Удаляет стенку в указанном направлении.
+    ///     Удалить стенку в указанном направлении.
     /// </summary>
     /// <param name="direction">Направление удаления стенки.</param>
     public void RemoveWall(Direction direction)
@@ -58,16 +58,16 @@ public class Tile
         Walls &= ~direction;
     }
 
+    /// <summary>
+    ///     Попробовать подобрать предмет, находящийся в клетке.
+    /// </summary>
+    /// <param name="item">Подобранный предмет, если операция успешна; иначе null.</param>
+    /// <returns>True, если предмет был успешно подобран; иначе false.</returns>
     public bool TryPickUp(out WorldItem? item)
     {
         item = null;
 
-        if (WorldItem == null)
-        {
-            return false;
-        }
-
-        if (WorldItem.TryPickUp() == false)
+        if (WorldItem == null || WorldItem.TryPickUp() == false)
         {
             return false;
         }

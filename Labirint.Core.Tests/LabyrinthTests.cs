@@ -11,10 +11,9 @@ public class LabyrinthTests
     [SetUp]
     public void SetUp()
     {
-        _randomMock = new TestRandom();
-        _labyrinth = new Labyrinth(_randomMock);
+        _random = new TestRandom();
+        _labyrinth = new Labyrinth(_random);
         _inventory = new Inventory();
-        _labyrinth.Init(Width, Height, Density, _inventory.Items.Select(x => x.Item));
     }
 
     [TearDown]
@@ -23,23 +22,30 @@ public class LabyrinthTests
         _inventory.Clear();
     }
 
-    private const int Width = 16;
-    private const int Height = 16;
-    private const int Density = 40;
-
-    private IRandom _randomMock;
+    private IRandom _random;
     private Labyrinth _labyrinth;
     private Inventory _inventory;
 
     /// <summary>
-    ///     Была ошибка, что выдавались только песочки.
+    ///     Тестирует, что класс Labyrinth размещает правильное количество предметов в лабиринте.
+    ///     Проверяет, что количество размещенных предметов соответствует нужному количеству.
     /// </summary>
+    /// <param name="width">Ширина лабиринта</param>
+    /// <param name="height">Высота лабиринта</param>
+    /// <param name="density">Плотность стен в лабиринте</param>
+    /// <remarks>Была ошибка, что выдавались только песочки.</remarks>
     [Test]
-    public void PlacedCorrectCountOfItemsTest()
+    [TestCase(16, 16, 40)]
+    [TestCase(32, 32, 80)]
+    [TestCase(128, 128, 10)]
+    public void PlacedCorrectCountOfItemsTest(int width, int height, int density)
     {
-        foreach (ItemStack itemStack in _inventory.Items)
+        _labyrinth.Init(width, height, density, _inventory.AllItems);
+
+        foreach (ItemStack itemStack in _inventory.Stacks)
         {
-            (Item item, int expectedCount) = (itemStack.Item, itemStack.Item.CalculateCountInMaze(Width, Height, Density));
+            Item item = itemStack.Item;
+            int expectedCount = itemStack.Item.CalculateCountInMaze(width, height, density);
 
             // TODO исправить костыль с определение по пути
             int count = _labyrinth.Enumerate()
