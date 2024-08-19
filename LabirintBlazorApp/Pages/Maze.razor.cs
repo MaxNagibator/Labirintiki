@@ -1,4 +1,5 @@
-﻿using LabirintBlazorApp.Common;
+﻿using BlazorAnimation;
+using LabirintBlazorApp.Common;
 using LabirintBlazorApp.Components;
 using LabirintBlazorApp.Constants;
 using LabirintBlazorApp.Dto;
@@ -41,8 +42,8 @@ public partial class Maze
     [Parameter]
     public string? Seed { get; set; }
 
-    private bool IsInit => _isInit && _labyrinth != null && _seeder != null && _vision != null && _renderParameter != null;
-
+    private bool IsInit => _isInit && _labyrinth != null && _seeder != null && _vision != null && _renderParameter != null; 
+    
     protected override void OnInitialized()
     {
         _boxSize = 48;
@@ -167,10 +168,10 @@ public partial class Maze
 
     private async Task GenerateAsync()
     {
+        AnimationService.StartRandomAnimationEffect(); 
         // todo Костыль чтоб цвет обновлялся, надо больше времени подумать.
         // (Не перерисовывает если стена осталась на прежнем месте)
-        // Но в принципе то работает))))))
-        StateHasChanged();
+        // Но в принципе то работает)))))) 
         await Task.Delay(1);
 
         _score = 0;
@@ -209,5 +210,5 @@ public partial class Maze
     private Task ForceRenderWalls()
     {
         return _mazeWalls?.ForceRender() ?? Task.CompletedTask;
-    }
+    } 
 }

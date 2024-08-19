@@ -1,6 +1,6 @@
-﻿async function playSound(soundType) {
+﻿async function playSound(soundType, volume) {
     let audio = new Audio();
-
+    audio.volume = volume;
     switch (soundType) {
         case "bomb":
             audio.src = "/media/baxbax.mp3";

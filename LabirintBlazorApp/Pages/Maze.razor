@@ -1,5 +1,6 @@
 @page "/labirint/{seed?}"
 @inject SoundService SoundService
+@inject AnimationService AnimationService
 
 <PageTitle>Labirint</PageTitle>
 <MudStack Spacing="3">
@@ -43,21 +44,21 @@
             </div>
 
             <div class="field">
+                <Animation Effect="AnimationService.AnimationEffect" Speed="TimeSpan.FromMilliseconds(200.0)" Delay="@Delay.None" IterationCount="1">
+                    <CascadingValue Value="_renderParameter">
+                        <MazeWalls @ref="_mazeWalls" />
+                        <MazeEntities @ref="_mazeSands" />
+                    </CascadingValue>
 
-                <CascadingValue Value="_renderParameter">
-                    <MazeWalls @ref="_mazeWalls" />
-                    <MazeEntities @ref="_mazeSands" />
-                </CascadingValue>
-
-                <img src="/images/runner.png"
-                     style="position:absolute;
+                    <img src="/images/runner.png"
+                         style="position:absolute;
                             z-index: 100;
                             left: @(left)px;
                             top: @(top)px;
                             width: @(playerSize)px;
                             height: @(playerSize)px;"
-                     alt="Бегун" />
-
+                         alt="Бегун" />
+                </Animation>
             </div>
         }
 
@@ -74,10 +75,11 @@
                     <MudSlider @bind-Value="_density" Min="0" Max="100" Color="Color.Info" Size="Size.Medium" />
                 </MudStack>
 
-                <MudButton OnClick="GenerateAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Генерировать</MudButton>
+                <MudButton OnClick="GenerateAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Генерировать</MudButton> 
                 <KeyInterceptor OnMoveKeyDown="OnMoveKeyDown" OnAttackKeyDown="OnAttackKeyDown" />
             </MudStack>
         </div>
     </div>
 
 </MudStack>
+ 

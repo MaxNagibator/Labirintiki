@@ -1,4 +1,4 @@
-﻿<MudStack Row>
+﻿<MudStack AlignItems="AlignItems.Center" Row>
     <MudTextField @bind-Value="_userSeed" OnBlur="Reset" Label="Зерно генерации" DebounceInterval="300" HelperText="@_seed.ToString()" />
     <MudIconButton Icon="@Icons.Material.TwoTone.Share" OnClick="ShowMessageBox" Color="Color.Info" />
 </MudStack>

@@ -11,6 +11,6 @@ public class SoundService(IJSRuntime jsRuntime)
             return ValueTask.CompletedTask;
         }
 
-        return jsRuntime.InvokeVoidAsync("playSound", soundType);
+        return jsRuntime.InvokeVoidAsync("playSound", soundType, Parameters.Labyrinth.SoundVolume);
     }
 }
