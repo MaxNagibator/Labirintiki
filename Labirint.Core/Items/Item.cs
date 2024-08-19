@@ -23,11 +23,7 @@ public abstract class Item
         return true;
     }
 
-    public virtual void AfterUse(Position position, Direction? direction, Labyrinth labyrinth)
-    {
-    }
-
-    public virtual WorldItem GetWorldItem()
+    public virtual WorldItem GetWorldItem(WorldItemParameters parameters)
     {
         return new WorldItem
         {
@@ -42,13 +38,13 @@ public abstract class Item
 
     public abstract int CalculateCountInMaze(int width, int height, int density);
 
-    public IEnumerable<WorldItem> GetItemsForPlace(int width, int height, int density)
+    public IEnumerable<WorldItem> GetItemsForPlace(WorldItemParameters parameters)
     {
-        int requiredCount = CalculateCountInMaze(width, height, density);
+        int requiredCount = CalculateCountInMaze(parameters.Width, parameters.Height, parameters.Density);
 
         for (int i = 0; i < requiredCount; i++)
         {
-            yield return GetWorldItem();
+            yield return GetWorldItem(parameters);
         }
     }
 
@@ -61,6 +57,10 @@ public abstract class Item
 
         AfterPickUp(worldItem);
         return true;
+    }
+
+    protected virtual void AfterUse(Position position, Direction? direction, Labyrinth labyrinth)
+    {
     }
 
     protected virtual void AfterPickUp(WorldItem worldItem)

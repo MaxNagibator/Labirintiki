@@ -9,7 +9,7 @@ public class Bomb : Item
 
         Stack = new LimitedItemStack(this, 2, 2);
 
-        ControlSettings = new ControlSettings(Key.KeyB);
+        ControlSettings = new ControlSettings(Key.KeyB, Key.ControlLeft);
         SoundSettings = new SoundSettings("bomb", "score");
     }
 
@@ -18,7 +18,7 @@ public class Bomb : Item
         return (width + height) * density / 400 / 2;
     }
 
-    public override void AfterUse(Position position, Direction? direction, Labyrinth labyrinth)
+    protected override void AfterUse(Position position, Direction? direction, Labyrinth labyrinth)
     {
         labyrinth.BreakWall(position, Direction.Left, Direction.Top, Direction.Right, Direction.Bottom);
     }

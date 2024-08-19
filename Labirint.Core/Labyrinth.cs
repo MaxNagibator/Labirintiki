@@ -173,9 +173,11 @@ public class Labyrinth(IRandom seeder)
         Queue<WorldItem> requiredItems = new();
         int totalItemsCount = 0;
 
+        WorldItemParameters parameters = new(seeder, width, height, density);
+
         foreach (Item item in placeableItems)
         {
-            int count = item.GetItemsForPlace(width, height, density).Count();
+            int count = item.GetItemsForPlace(parameters).Count();
             itemCounts[item] = count;
             totalItemsCount += count;
         }
@@ -193,7 +195,7 @@ public class Labyrinth(IRandom seeder)
 
         foreach ((Item? item, int count) in itemCounts)
         {
-            foreach (WorldItem worldItem in item.GetItemsForPlace(width, height, density).Take(count))
+            foreach (WorldItem worldItem in item.GetItemsForPlace(parameters).Take(count))
             {
                 requiredItems.Enqueue(worldItem);
             }

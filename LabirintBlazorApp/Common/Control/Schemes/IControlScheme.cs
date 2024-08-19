@@ -10,4 +10,6 @@ public interface IControlScheme
     Key MoveDown { get; }
     Key MoveLeft { get; }
     Key MoveRight { get; }
+
+    Key GetActivateKey(ControlSettings settings);
 }

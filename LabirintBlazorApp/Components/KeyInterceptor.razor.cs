@@ -77,11 +77,6 @@ public partial class KeyInterceptor : IAsyncDisposable
     {
         _reference = DotNetObjectReference.Create(this);
 
-        _itemUsed = InventoryService.Items
-            .Where(item => item.ControlSettings != null)
-            .Select(item => (item.ControlSettings!.ActivateKey!.KeyCode, x: item))
-            .ToDictionary()!;
-
         Initialize();
         SchemeService.ControlSchemeChanged += OnSchemeChanged;
     }
@@ -102,6 +97,11 @@ public partial class KeyInterceptor : IAsyncDisposable
 
     private void Initialize()
     {
+        _itemUsed = InventoryService.Items
+            .Where(item => item.ControlSettings != null)
+            .Select(item => (ControlScheme.GetActivateKey(item.ControlSettings!).KeyCode, item))
+            .ToDictionary()!;
+
         _moveDirections = new Dictionary<string, Direction>
         {
             { ControlScheme.MoveLeft, Direction.Left },

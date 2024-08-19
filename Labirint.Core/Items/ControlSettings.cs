@@ -1,3 +1,3 @@
 ﻿namespace Labirint.Core.Items;
 
-public record ControlSettings(Key ActivateKey, bool MoveRequired = false);
+public record ControlSettings(Key ActivateKey, Key AlternativeActivateKey, bool MoveRequired = false);

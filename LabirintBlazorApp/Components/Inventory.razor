@@ -24,7 +24,7 @@
                 {
                     <div class="keyboard-button">
                         <span @onclick="() => OnClicked(control.ActivateKey)">
-                            @control.ActivateKey.DisplaySymbol
+                            @ControlScheme.GetActivateKey(control).DisplaySymbol
                         </span>
                     </div>
                 }

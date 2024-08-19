@@ -2,9 +2,6 @@
 
 public class Sand : ScoreItem
 {
-    // TODO Подумать и возможно добавить сидирование
-    private readonly Random _random = new();
-
     public Sand()
     {
         Name = "sand";
@@ -20,12 +17,12 @@ public class Sand : ScoreItem
         return (width + height) / 2;
     }
 
-    public override WorldItem GetWorldItem()
+    public override WorldItem GetWorldItem(WorldItemParameters parameters)
     {
-        return base.GetWorldItem() with
+        return base.GetWorldItem(parameters) with
         {
             Alignment = Alignment.BottomCenter,
-            Scale = _random.Next(4, 7) / 10d
+            Scale = parameters.Random.Random.Next(4, 7) / 10d
         };
     }
 

@@ -9,7 +9,7 @@ public class Hammer : Item
 
         Stack = new LimitedItemStack(this, 6, 6);
 
-        ControlSettings = new ControlSettings(Key.KeyA, true);
+        ControlSettings = new ControlSettings(Key.KeyA, Key.Space, true);
         SoundSettings = new SoundSettings("molot", "score");
     }
 
@@ -18,7 +18,7 @@ public class Hammer : Item
         return (width + height) * density / 400;
     }
 
-    public override void AfterUse(Position position, Direction? direction, Labyrinth labyrinth)
+    protected override void AfterUse(Position position, Direction? direction, Labyrinth labyrinth)
     {
         if (direction == null)
         {

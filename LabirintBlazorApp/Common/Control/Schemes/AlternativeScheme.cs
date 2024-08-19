@@ -10,4 +10,9 @@ public class AlternativeScheme : IControlScheme
     public Key MoveDown => Key.KeyS;
     public Key MoveLeft => Key.KeyA;
     public Key MoveRight => Key.KeyD;
+
+    public Key GetActivateKey(ControlSettings settings)
+    {
+        return settings.AlternativeActivateKey;
+    }
 }
