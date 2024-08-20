@@ -4,7 +4,7 @@ namespace LabirintBlazorApp.Common.Control.Schemes;
 
 public class ClassicScheme : IControlScheme
 {
-    public string Name => "Классическая схема";
+    public string Name => "Классическая схема (←↕→)";
 
     public Key MoveUp => Key.ArrowUp;
     public Key MoveDown => Key.ArrowDown;

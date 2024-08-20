@@ -1,4 +1,4 @@
-﻿<MudStack Row>
+﻿<MudStack AlignItems="AlignItems.Center" Row>
     <MudTextField @bind-Value="_userSeed"
                   HelperText="@(IsGenerateRequired ? "Необходима генерация" : _currentSeed.ToString())"
                   Label="Зерно генерации"

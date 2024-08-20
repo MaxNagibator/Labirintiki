@@ -4,7 +4,7 @@ namespace LabirintBlazorApp.Common.Control.Schemes;
 
 public class AlternativeScheme : IControlScheme
 {
-    public string Name => "Альтернативная схема";
+    public string Name => "Альтернативная схема (WASD)";
 
     public Key MoveUp => Key.KeyW;
     public Key MoveDown => Key.KeyS;

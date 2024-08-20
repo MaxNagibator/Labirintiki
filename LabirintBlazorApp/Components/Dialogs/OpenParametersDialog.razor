@@ -13,8 +13,13 @@
         <MudStack Spacing="2">
             <ControlSchemeSwitcher />
 
-            <MudSwitch @bind-Value="@GlobalParameters.Labyrinth.IsSoundOn" Color="Color.Success" Label="Звук" UncheckedColor="Color.Error" />
-
+            <MudStack AlignItems="AlignItems.Center" Row>
+                <MudSwitch @bind-Value="@GlobalParameters.Labyrinth.IsSoundOn" Color="Color.Success" Label="Звук" UncheckedColor="Color.Error"  />
+                @if (GlobalParameters.Labyrinth.IsSoundOn)
+                {
+                    <MudSlider @bind-Value="@GlobalParameters.Labyrinth.SoundVolume" Class="pr-2" Max="1.0f" Min="0f" Size="Size.Medium" Step="0.01f" T="float" ValueLabel="true" ValueLabelFormat="0%"  />
+                }
+            </MudStack>
             <MudStack>
                 <MudText>Цвет лабиринта</MudText>
                 <MudColorPicker @bind-Text="@GlobalParameters.Labyrinth.Color"
@@ -61,7 +66,7 @@
         try
         {
             await LocalStorage.SetItemAsync(LabyrinthParameters.LocalStorageKey, GlobalParameters.Labyrinth);
-            SnackbarService.Add("Сохранено! Применится с следующей генерации", Severity.Success);
+            SnackbarService.Add("Сохранено!", Severity.Success);
             MudDialog.Close();
         }
         catch

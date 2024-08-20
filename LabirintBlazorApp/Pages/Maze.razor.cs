@@ -107,10 +107,10 @@ public partial class Maze
 
     private async Task GenerateAsync()
     {
+        AnimationService.StartRandomAnimationEffect();
         // todo Костыль чтоб цвет обновлялся, надо больше времени подумать.
         // (Не перерисовывает если стена осталась на прежнем месте)
-        // Но в принципе то работает))))))
-        StateHasChanged();
+        // Но в принципе то работает)))))) 
         await Task.Delay(1);
 
         InventoryService.Clear();

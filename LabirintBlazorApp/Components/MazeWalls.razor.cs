@@ -4,8 +4,8 @@ namespace LabirintBlazorApp.Components;
 
 public partial class MazeWalls : MazeComponent
 {
-    private int _height;
     private int _width;
+    private int _height;
 
     protected override string CanvasId => "mazeWallsCanvas";
 
