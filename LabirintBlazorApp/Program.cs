@@ -1,6 +1,5 @@
 using Blazored.LocalStorage;
 using LabirintBlazorApp;
-using LabirintBlazorApp.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
@@ -15,6 +14,7 @@ builder.Services.AddMudServices();
 
 builder.Services.AddSingleton<SoundService>();
 builder.Services.AddSingleton<AnimationService>();
+builder.Services.AddSingleton<InventoryService>();
 builder.Services.AddSingleton<IControlSchemeService, ControlSchemeService>();
 builder.Services.AddScoped<IClipboardService, ClipboardService>();
 

@@ -4,8 +4,7 @@ namespace LabirintBlazorApp.Services;
 
 public class AnimationService
 {
-    public AnimationEffect AnimationEffect { get; set; } = Effect.FlipInY;
-    private readonly IReadOnlyList<AnimationEffect> _animateEffects =
+    private readonly AnimationEffect[] _animateEffects =
     [
         Effect.ShakeX,
         Effect.ShakeX,
@@ -14,11 +13,14 @@ public class AnimationService
         Effect.Jello,
         Effect.RubberBand
     ];
+
+    public AnimationEffect AnimationEffect { get; set; } = Effect.FlipInY;
+
     public void StartRandomAnimationEffect()
     {
         AnimationEffect = _animateEffects
-            .Where(x=>x != AnimationEffect)
-            .ToList()
-            [Random.Shared.Next(_animateEffects.Count - 2)]; 
+            .Where(effect => effect != AnimationEffect)
+            .ToArray()
+            [Random.Shared.Next(_animateEffects.Length - 2)];
     }
 }

@@ -1,6 +1,4 @@
-﻿using Microsoft.JSInterop;
-
-namespace LabirintBlazorApp.Services;
+﻿namespace LabirintBlazorApp.Services;
 
 public class ClipboardService(IJSRuntime jsRuntime) : IClipboardService
 {

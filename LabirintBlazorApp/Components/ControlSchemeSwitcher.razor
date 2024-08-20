@@ -1,13 +1,11 @@
-﻿@using LabirintBlazorApp.Common.Schemes
-@inject IControlSchemeService ControlSchemeService
-
+﻿@using LabirintBlazorApp.Common.Control.Schemes
 <MudText>Схемы управления:</MudText>
 
 <MudRadioGroup @bind-Value="ControlSchemeService.CurrentScheme">
-   <MudStack Spacing="0">
+    <MudStack Spacing="0">
         @foreach (IControlScheme scheme in ControlSchemeService.AvailableSchemes)
         {
             <MudRadio Color="Color.Primary" Value="scheme">@scheme.Name</MudRadio>
-        } 
-   </MudStack>
+        }
+    </MudStack>
 </MudRadioGroup>

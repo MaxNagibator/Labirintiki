@@ -1,4 +1,5 @@
 ﻿@using Blazored.LocalStorage
+@using LabirintBlazorApp.Parameters
 @inject ISnackbar SnackbarService
 @inject ILocalStorageService LocalStorage
 
@@ -13,15 +14,15 @@
             <ControlSchemeSwitcher />
 
             <MudStack AlignItems="AlignItems.Center" Row>
-                <MudSwitch @bind-Value="@Parameters.Labyrinth.IsSoundOn" Color="Color.Success" Label="Звук" UncheckedColor="Color.Error" />
-                @if (Parameters.Labyrinth.IsSoundOn)
+                <MudSwitch @bind-Value="@GlobalParameters.Labyrinth.IsSoundOn" Color="Color.Success" Label="Звук" UncheckedColor="Color.Error"  />
+                @if (GlobalParameters.Labyrinth.IsSoundOn)
                 {
-                    <MudSlider Size="Size.Medium" Class="pr-2" T="float" @bind-Value="@Parameters.Labyrinth.SoundVolume" ValueLabel="true" Min="0f" Max="1.0f" Step="0.01f" ValueLabelFormat="0%" />
+                    <MudSlider @bind-Value="@GlobalParameters.Labyrinth.SoundVolume" Class="pr-2" Max="1.0f" Min="0f" Size="Size.Medium" Step="0.01f" T="float" ValueLabel="true" ValueLabelFormat="0%"  />
                 }
             </MudStack>
             <MudStack>
                 <MudText>Цвет лабиринта</MudText>
-                <MudColorPicker @bind-Text="@Parameters.Labyrinth.Color"
+                <MudColorPicker @bind-Text="@GlobalParameters.Labyrinth.Color"
                                 ColorPickerMode="ColorPickerMode.HEX"
                                 PickerVariant="PickerVariant.Static"
                                 Rounded="true"
@@ -64,7 +65,7 @@
 
         try
         {
-            await LocalStorage.SetItemAsync(LabyrinthParameters.LocalStorageKey, Parameters.Labyrinth);
+            await LocalStorage.SetItemAsync(LabyrinthParameters.LocalStorageKey, GlobalParameters.Labyrinth);
             SnackbarService.Add("Сохранено!", Severity.Success);
             MudDialog.Close();
         }
@@ -78,7 +79,7 @@
 
     private void Reset()
     {
-        Parameters.Labyrinth = new LabyrinthParameters();
+        GlobalParameters.Labyrinth = new LabyrinthParameters();
     }
 
     private void Cancel()

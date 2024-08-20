@@ -1,4 +1,4 @@
-﻿using Microsoft.JSInterop;
+﻿using LabirintBlazorApp.Parameters;
 
 namespace LabirintBlazorApp.Services;
 
@@ -6,11 +6,11 @@ public class SoundService(IJSRuntime jsRuntime)
 {
     public ValueTask PlayAsync(string soundType)
     {
-        if (Parameters.Labyrinth.IsSoundOn == false)
+        if (GlobalParameters.Labyrinth.IsSoundOn == false)
         {
             return ValueTask.CompletedTask;
         }
 
-        return jsRuntime.InvokeVoidAsync("playSound", soundType, Parameters.Labyrinth.SoundVolume);
+        return jsRuntime.InvokeVoidAsync("playSound", soundType, GlobalParameters.Labyrinth.SoundVolume);
     }
 }

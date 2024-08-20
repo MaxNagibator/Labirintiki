@@ -17,29 +17,18 @@
     <div class="workspace" hidden="@(!IsInit)">
         @if (IsInit)
         {
-            int entityBoxSize = _boxSize - _wallWidth;
-            int playerSize = entityBoxSize / 2;
-
-            Position draw = _vision.GetDraw(_labyrinth.Player) * _boxSize + _wallWidth;
-            (int left, int top) = AlignmentHelper.CalculatePosition(Alignment.Center, draw, _boxSize, _wallWidth);
-
             <div class="info-panel">
-                <MudStack Row Spacing="3">
-                    <MudStack Row>
-                        <MudIcon Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.Bitcoin" Size="Size.Large" />
-                        <MudText Color="Color.Warning" Typo="Typo.h6">@_score/@_maxScore</MudText>
-                    </MudStack>
-                    <MudStack Row>
-                        <MudIcon Color="Color.Inherit" Icon="@MaterialDesignIcons.Normal.Hammer" Size="Size.Large" />
-                        <MudText Color="Color.Inherit" Typo="Typo.h6">@_hammerCount/@MaxHammerCount</MudText>
-                    </MudStack>
-                    <MudStack Row>
-                        <MudIcon Color="Color.Error" Icon="@MaterialDesignIcons.Normal.Bomb" Size="Size.Large" />
-                        <MudText Color="Color.Error" Typo="Typo.h6"> @_bombCount/@MaxBombCount</MudText>
-                    </MudStack>
-                    <MudStack Row>
-                        <MudText Typo="Typo.h6">X:@_labyrinth.Player.X (@left) Y:@_labyrinth.Player.Y (@top)</MudText>
-                    </MudStack>
+                <MudStack Spacing="3">
+                    @{
+                        int score = InventoryService.ScoreItems.Sum(scoreItem => scoreItem.Score);
+
+                        <MudStack Row>
+                            <MudIcon Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.Bitcoin" Size="Size.Large" />
+                            <MudText Color="Color.Warning" Typo="Typo.h6">@score</MudText>
+                        </MudStack>
+                    }
+
+                    <Inventory Interceptor="_keyInterceptor" Stacks="@InventoryService.Stacks" />
                 </MudStack>
             </div>
 
@@ -50,22 +39,42 @@
                         <MazeEntities @ref="_mazeSands" />
                     </CascadingValue>
 
-                    <img src="/images/runner.png"
-                         style="position:absolute;
-                            z-index: 100;
-                            left: @(left)px;
-                            top: @(top)px;
-                            width: @(playerSize)px;
-                            height: @(playerSize)px;"
-                         alt="Бегун" />
+                    @{
+                        Position draw = _vision.GetDraw(_labyrinth.Player) * _boxSize + _wallWidth;
+                        (int offset, int entitySize) = AlignmentHelper.CalculateOffset(_boxSize, _wallWidth, 0.5);
+                        (int left, int top) = AlignmentHelper.CalculatePosition(Alignment.Center, draw, offset);
+
+                        <div style="position:absolute;
+                                    z-index: 100;
+                                    left: @(-30)px;
+                                    top: @(top - 4)px;">
+                            <MudText Typo="Typo.h6">@(_labyrinth.Player.Y + 1)</MudText>
+                        </div>
+
+                        <div style="position:absolute;
+                                    z-index: 100;
+                                    left: @(left + 4)px;
+                                    top: @(-30)px;">
+                            <MudText Typo="Typo.h6">@(_labyrinth.Player.X + 1)</MudText>
+                        </div>
+
+                        <img src="/images/runner.png"
+                             style="position:absolute;
+                                    z-index: 100;
+                                    left: @(left)px;
+                                    top: @(top)px;
+                                    width: @(entitySize)px;
+                                    height: @(entitySize)px;"
+                             alt="Бегун" />
+                    }
                 </Animation>
             </div>
         }
 
         <div class="control-panel">
             <MudStack Spacing="3">
-                <MudText Typo="Typo.h5">Параметры:</MudText>
-                <MazeSeed Seed="@Seed" @ref="_seeder" />
+                <MudText title="@(string.Join(" | ", InventoryService.Stacks))" Typo="Typo.h5">Параметры: </MudText>
+                <MazeSeed @ref="_seeder" Seed="@Seed" Size="@_originalSize" Density="@_density" IsExitFound="@_isExitFound" />
                 <MudStack>
                     <MudNumericField Label="Размер" Min="@MinSize" Max="@MaxSize" DebounceInterval="300" @bind-Value="_originalSize" />
                     <MudSlider @bind-Value="_originalSize" Min="@MinSize" Max="@MaxSize" Color="Color.Info" Size="Size.Medium" />
@@ -75,11 +84,10 @@
                     <MudSlider @bind-Value="_density" Min="0" Max="100" Color="Color.Info" Size="Size.Medium" />
                 </MudStack>
 
-                <MudButton OnClick="GenerateAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Генерировать</MudButton> 
-                <KeyInterceptor OnMoveKeyDown="OnMoveKeyDown" OnAttackKeyDown="OnAttackKeyDown" />
+                <MudButton OnClick="GenerateAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Генерировать</MudButton>
+                <KeyInterceptor @ref="_keyInterceptor" OnMoveKeyDown="OnMoveKeyDown" OnAttackKeyDown="OnAttackKeyDown" />
             </MudStack>
         </div>
     </div>
 
 </MudStack>
- 

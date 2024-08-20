@@ -1,8 +1,6 @@
-﻿using BlazorAnimation;
-using LabirintBlazorApp.Common;
+﻿using Labirint.Core.Common;
 using LabirintBlazorApp.Components;
-using LabirintBlazorApp.Constants;
-using LabirintBlazorApp.Dto;
+using LabirintBlazorApp.Parameters;
 using Microsoft.AspNetCore.Components;
 
 namespace LabirintBlazorApp.Pages;
@@ -12,42 +10,49 @@ public partial class Maze
     private const int MinSize = 1;
     private const int MaxSize = 500;
 
-    private const int MaxHammerCount = 6;
-    private const int MaxBombCount = 2;
-    private const int SandCost = 100;
-
-    private int _hammerCount;
-    private int _bombCount;
-    private bool _isAtaka;
-
-    private bool _exitNotFound;
+    private bool _isExitFound;
     private bool _isInit;
 
-    private int _originalSize = 16;
-    private int _density = 40;
-    private int _score;
-    private int _maxScore;
+    private int _originalSize;
+    private int _density;
 
     private int _boxSize;
     private int _wallWidth;
 
     private MazeWalls? _mazeWalls;
     private MazeEntities? _mazeSands;
-    private MazeRenderParameter? _renderParameter;
+    private MazeRenderParameters? _renderParameter;
+    private KeyInterceptor? _keyInterceptor;
 
     private Labyrinth _labyrinth = null!;
     private MazeSeed _seeder = null!;
     private Vision _vision = null!;
 
+    [Inject]
+    public required InventoryService InventoryService { get; set; }
+
     [Parameter]
     public string? Seed { get; set; }
 
-    private bool IsInit => _isInit && _labyrinth != null && _seeder != null && _vision != null && _renderParameter != null; 
-    
+    [SupplyParameterFromQuery(Name = MazeSeed.SizeQueryName)]
+    public int? MazeSize { get; set; }
+
+    [SupplyParameterFromQuery(Name = MazeSeed.DensityQueryName)]
+    public int? MazeDensity { get; set; }
+
+    // Проверка на null и инициализацию (дополнительная проверка, если флаг выставили в true, а значение у не null полей не выставили)
+    private bool IsInit => _isInit && _labyrinth != null && _seeder != null && _vision != null && _renderParameter != null;
+
     protected override void OnInitialized()
     {
         _boxSize = 48;
         _wallWidth = Math.Max(1, _boxSize / 10);
+    }
+
+    protected override void OnParametersSet()
+    {
+        _originalSize = MazeSize ?? 16;
+        _density = MazeDensity ?? 16;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -58,141 +63,81 @@ public partial class Maze
         }
     }
 
-    private async Task OnMoveKeyDown(MoveEventArgs moveEventArgs)
+    private async void OnPlayerMoved(object? sender, Position args)
     {
-        if (_exitNotFound == false)
+        // TODO подумать как вынести строку
+        await SoundService.PlayAsync("step");
+    }
+
+    private void OnExitFound(object? sender, EventArgs args)
+    {
+        _isExitFound = true;
+    }
+
+    private async void OnItemPickedUp(object? sender, WorldItem args)
+    {
+        await SoundService.PlayAsync(args.PickUpSound);
+    }
+
+    private async Task OnMoveKeyDown(MoveEventArgs args)
+    {
+        if (_isExitFound)
         {
             return;
         }
 
-        if (_isAtaka)
-        {
-            await Attack(moveEventArgs.Direction);
-            _isAtaka = false;
-        }
-
-        await Move(moveEventArgs.Direction);
-    }
-
-    private async Task Attack(Direction direction)
-    {
-        BreakWall(direction);
-
-        await SoundService.PlayAsync(SoundType.Molot);
-        await ForceRenderWalls();
-    }
-
-    private async Task OnAttackKeyDown(AttackEventArgs attackEventArgs)
-    {
-        switch (attackEventArgs.Type)
-        {
-            case AttackType.Bomba when _bombCount > 0:
-                await DetonateBomb();
-                _bombCount--;
-                _isAtaka = false;
-                return;
-
-            case AttackType.Molot when _hammerCount > 0:
-                _isAtaka = true;
-                _hammerCount--;
-                break;
-
-            case AttackType.None:
-            default:
-                break;
-        }
-    }
-
-    private async Task DetonateBomb()
-    {
-        BreakWall(Direction.Left);
-        BreakWall(Direction.Top);
-        BreakWall(Direction.Right);
-        BreakWall(Direction.Bottom);
-
-        await SoundService.PlayAsync(SoundType.Bomb);
-        await ForceRenderWalls();
-    }
-
-    private void BreakWall(Direction direction)
-    {
-        _labyrinth.BreakWall(direction);
-    }
-
-    private async Task Move(Direction direction)
-    {
-        _labyrinth.Move(direction);
+        _labyrinth.Move(args.Direction);
         _vision.SetPosition(_labyrinth.Player);
-
-        await SoundService.PlayAsync(SoundType.Step);
-
-        if (!_labyrinth[_labyrinth.Player].IsExit)
-        {
-            if (_labyrinth[_labyrinth.Player].ItemType != null)
-            {
-                if (_labyrinth[_labyrinth.Player].ItemType == ItemType.Sand)
-                {
-                    _score += SandCost;
-                    _labyrinth[_labyrinth.Player].ItemType = null;
-                    await SoundService.PlayAsync(SoundType.Score);
-                }
-                else
-                if (_labyrinth[_labyrinth.Player].ItemType == ItemType.Hammer)
-                {
-                    if (_hammerCount < MaxHammerCount)
-                    {
-                        _hammerCount++;
-                        _labyrinth[_labyrinth.Player].ItemType = null;
-                        await SoundService.PlayAsync(SoundType.Score);
-                    }
-                }
-                else
-                if (_labyrinth[_labyrinth.Player].ItemType == ItemType.Bomb)
-                {
-                    if (_bombCount < MaxBombCount)
-                    {
-                        _bombCount++;
-                        _labyrinth[_labyrinth.Player].ItemType = null;
-                        await SoundService.PlayAsync(SoundType.Score);
-                    }
-                }
-            }
-        }
-        else
-        {
-            _exitNotFound = false;
-        }
 
         await Task.WhenAll(ForceRenderWalls(), ForceRenderSands());
     }
 
+    private async Task OnAttackKeyDown(AttackEventArgs args)
+    {
+        Item? item = args.Item;
+
+        if (item != null && item.TryUse(_labyrinth.Player, args.Direction, _labyrinth))
+        {
+            await SoundService.PlayAsync(item.SoundSettings.UseSound);
+
+            StateHasChanged();
+            await ForceRenderWalls();
+        }
+    }
+
     private async Task GenerateAsync()
     {
-        AnimationService.StartRandomAnimationEffect(); 
+        AnimationService.StartRandomAnimationEffect();
         // todo Костыль чтоб цвет обновлялся, надо больше времени подумать.
         // (Не перерисовывает если стена осталась на прежнем месте)
         // Но в принципе то работает)))))) 
         await Task.Delay(1);
 
-        _score = 0;
-        _maxScore = 0;
+        InventoryService.Clear();
+        _seeder.Reload();
 
-        _hammerCount = MaxHammerCount;
-        _bombCount = MaxBombCount;
+        if (_labyrinth != null)
+        {
+            _labyrinth.PlayerMoved -= OnPlayerMoved;
+            _labyrinth.ExitFound -= OnExitFound;
+            _labyrinth.ItemPickedUp -= OnItemPickedUp;
+        }
 
-        _exitNotFound = true;
+        _isExitFound = false;
 
         _originalSize = Math.Max(MinSize, Math.Min(MaxSize, _originalSize));
 
         _labyrinth = new Labyrinth(_seeder);
-        _labyrinth.Init(_originalSize, _originalSize, _density);
+        _labyrinth.Init(_originalSize, _originalSize, _density, InventoryService.Items);
 
-        _maxScore = SandCost * _labyrinth.SandCount;
+        _labyrinth.PlayerMoved += OnPlayerMoved;
+        _labyrinth.ExitFound += OnExitFound;
+        _labyrinth.ItemPickedUp += OnItemPickedUp;
 
         _vision = new Vision(_originalSize, _originalSize);
         _vision.SetPosition(_labyrinth.Player);
 
-        _renderParameter = new MazeRenderParameter(_labyrinth, _boxSize, _wallWidth, _vision);
+        _renderParameter = new MazeRenderParameters(_labyrinth, _boxSize, _wallWidth, _vision);
 
         StateHasChanged();
 
@@ -210,5 +155,5 @@ public partial class Maze
     private Task ForceRenderWalls()
     {
         return _mazeWalls?.ForceRender() ?? Task.CompletedTask;
-    } 
+    }
 }

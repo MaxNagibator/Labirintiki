@@ -1,16 +1,69 @@
 ﻿<MudStack AlignItems="AlignItems.Center" Row>
-    <MudTextField @bind-Value="_userSeed" OnBlur="Reset" Label="Зерно генерации" DebounceInterval="300" HelperText="@_seed.ToString()" />
-    <MudIconButton Icon="@Icons.Material.TwoTone.Share" OnClick="ShowMessageBox" Color="Color.Info" />
+    <MudTextField @bind-Value="_userSeed"
+                  HelperText="@(IsGenerateRequired ? "Необходима генерация" : _currentSeed.ToString())"
+                  Label="Зерно генерации"
+                  OnBlur="ResetSeed" />
+    <MudIconButton Color="Color.Info" Disabled="IsGenerateRequired" Icon="@Icons.Material.TwoTone.Share" OnClick="ShowMessageBox" />
 </MudStack>
 
 <MudMessageBox @ref="_messageBox">
     <TitleContent>
-        <MudText Typo="Typo.h6">Поделиться ссылкой</MudText>
+        <MudStack Row>
+            <MudText Color="Color.Primary" Typo="Typo.h5">Поделиться лабиринтом</MudText>
+            <MudSpacer />
+            <MudImage Alt="Мотивация" Height="40" @onclick="ToggleMotivation" Src="images/motivation.png" />
+        </MudStack>
     </TitleContent>
     <MessageContent>
-        <MudText Typo="Typo.body1">Если вы хотите поделиться с другом лабиринтом, отправьте ему эту ссылку:</MudText>
-        <MudTextField Value="Link" ReadOnly="true" Margin="Margin.Dense" />
-        <MudButton OnClick="CopyLink" Color="Color.Primary" Margin="Margin.Dense">Скопировать ссылку</MudButton>
+        @if (_isShowMotivation)
+        {
+            if (IsExitFound)
+            {
+                <MudText Typo="Typo.body1">
+                    Думал, что смог пройти этот лабиринт, как ты думаешь - быстро и совершенно?
+                </MudText>
+
+                <MudText Typo="Typo.body1">
+                    Хочешь рискнуть и узнать, настолько ли ты хорош, как считаешь?
+                </MudText>
+
+                <MudText Inline Typo="Typo.body1">
+                    Отправь ссылку ниже своему самому главному сопернику и узнай, действительно ли ты король лабиринтов!
+                </MudText>
+            }
+            else
+            {
+                <MudText Typo="Typo.body1">
+                    И это всё? Только начал и уже сдаёшься?
+                </MudText>
+
+                <MudText Typo="Typo.body1">
+                    Дойди до конца, стремись к победе и пройди этот лабиринт!
+                </MudText>
+
+                <MudText Typo="Typo.body1">
+                    Если не хватает сил, желания, знаний сейчас - сохрани ссылку, распечатай и прикрепи у кровати, чтобы каждый день начинался только с одной мысли.
+                </MudText>
+
+                <MudText Typo="Typo.h6">
+                    Нужно пройти этот чёртов лабиринт до конца!
+                </MudText>
+            }
+        }
+        else
+        {
+            <MudText Typo="Typo.body1">Если вы хотите поделиться с другом лабиринтом, отправьте ему эту ссылку:</MudText>
+        }
+
+        <MudStack Row Spacing="2">
+            <MudTextField Margin="Margin.Dense" ReadOnly="true" Value="Link" />
+            <MudIconButton Color="Color.Primary" Icon="@Icons.Material.TwoTone.ContentCopy" OnClick="CopyLink"></MudIconButton>
+        </MudStack>
+        <MudText Typo="Typo.caption">
+            Лабиринт сотворил сам @(string.IsNullOrWhiteSpace(_userSeed)
+                                      ? "Псевдослучайный Бог"
+                                      : $"пользователь благодаря кодовой фразе: {_userSeed}")
+        </MudText>
     </MessageContent>
     <YesButton>
         <MudButton Color="Color.Secondary">Закрыть</MudButton>

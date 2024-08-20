@@ -1,0 +1,34 @@
+﻿@using Labirint.Core.Stacks
+<MudStack Row Spacing="3">
+    @foreach (ItemStack stack in Stacks)
+    {
+        Item item = stack.Item;
+
+        if (stack.Count <= 0)
+        {
+            continue;
+        }
+
+        <div class="inventory-item-container">
+            <div class="inventory-item @(stack.IsInfinite ? "score" : string.Empty) @(item == WaitItem ? "animate" : string.Empty)">
+                <img src="@item.Icon" alt="@item.DisplayName">
+                <div class="item-name">@item.DisplayName</div>
+                <div class="count">@stack.Count</div>
+                <div class="max-count" title="@stack.InMazeCount">@(stack.IsInfinite ? "∞" : stack.MaxCount)</div>
+            </div>
+
+            @{
+                ControlSettings? control = item.ControlSettings;
+
+                if (control != null)
+                {
+                    <div class="keyboard-button" @onclick="() => OnClicked(control.ActivateKey)">
+                        <span >
+                            @ControlScheme.GetActivateKey(control).DisplaySymbol
+                        </span>
+                    </div>
+                }
+            }
+        </div>
+    }
+</MudStack>
