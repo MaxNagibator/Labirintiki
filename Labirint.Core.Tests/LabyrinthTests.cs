@@ -30,6 +30,47 @@ public class LabyrinthTests
     private Inventory _inventory;
 
     /// <summary>
+    ///     Тестирует, что класс Labyrinth размещает правильное количество предметов в лабиринте
+    ///     при превышении количества ячеек.
+    ///     Проверяет, что количество размещенных предметов не превышает допустимое количеству.
+    /// </summary>
+    /// <param name="width">Ширина лабиринта</param>
+    /// <param name="height">Высота лабиринта</param>
+    /// <param name="counts">Массив предметов с их количеством</param>
+    /// <remarks>Была ошибка, что выдавались только песочки.</remarks>
+    [Test]
+    [TestCase(2, 2, 1, 2)]
+    [TestCase(2, 2, 2, 2)]
+    [TestCase(2, 2, 1, 1, 1, 1)]
+    [TestCase(2, 2, 10, 1, 1, 1)]
+    [TestCase(2, 2, 2, 0, 1, 1)]
+    public void DistributionOfRemainderTest(int width, int height, params int[] counts)
+    {
+        int allCount = counts.Sum();
+        int placedCount = 0;
+
+        List<TestItem> items = counts.Select(x => new TestItem(x)).ToList();
+        _labyrinth.Init(width, height, 40, items);
+
+        foreach (TestItem item in items)
+        {
+            int expectedCount = Math.Min(item.Count, Math.Min(placedCount + item.Count, width * height - 1 - placedCount));
+
+            // TODO исправить костыль с определение по пути
+            int count = _labyrinth.Enumerate()
+                .Where(tile => tile.WorldItem != null)
+                .Count(tile => tile.WorldItem!.ImageSource.Contains(item.Name));
+
+            placedCount += count;
+
+            Console.WriteLine($"{item.Name}({item.Count}): {count}/{expectedCount}");
+            Assert.That(count, Is.EqualTo(expectedCount));
+        }
+
+        Console.WriteLine($"Всего: {placedCount}/{allCount}");
+    }
+
+    /// <summary>
     ///     Тестирует, что класс Labyrinth размещает правильное количество предметов в лабиринте.
     ///     Проверяет, что количество размещенных предметов соответствует нужному количеству.
     /// </summary>

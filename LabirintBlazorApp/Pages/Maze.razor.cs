@@ -52,7 +52,7 @@ public partial class Maze
     protected override void OnParametersSet()
     {
         _originalSize = MazeSize ?? 16;
-        _density = MazeDensity ?? 16;
+        _density = MazeDensity ?? 40;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

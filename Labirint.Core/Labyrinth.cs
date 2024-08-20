@@ -38,7 +38,7 @@ public class Labyrinth(IRandom seeder)
     /// </summary>
     public Position Player { get; private set; }
 
-    private Tile[,] Tiles { get; set; }
+    private Tile[,] Tiles { get; set; } = null!;
 
     /// <summary>
     ///     Клетка лабиринта по координатам.
@@ -89,7 +89,13 @@ public class Labyrinth(IRandom seeder)
         this[width / 2, height - 1].IsExit = true;
         this[width / 2, height - 1].RemoveWall(Direction.Bottom);
 
-        PlaceItems(width, height, density, placeableItems);
+        ItemPlacer itemPlacer = new(seeder, (x, y, item) =>
+        {
+            this[x, y].WorldItem = item;
+            item.AfterPlace.Invoke((x, y), this);
+        });
+
+        itemPlacer.PlaceItems(width, height, density, placeableItems);
     }
 
     /// <summary>
@@ -245,65 +251,6 @@ public class Labyrinth(IRandom seeder)
         if (y == Height - 1)
         {
             tile.AddWall(Direction.Bottom);
-        }
-    }
-
-    private void PlaceItems(int width, int height, int density, IEnumerable<Item> placeableItems)
-    {
-        int length = width * height - 1;
-        Dictionary<Item, int> itemCounts = new();
-        Queue<WorldItem> requiredItems = new();
-        int totalItemsCount = 0;
-
-        WorldItemParameters parameters = new(seeder, width, height, density);
-
-        foreach (Item item in placeableItems)
-        {
-            int count = item.GetItemsForPlace(parameters).Count();
-            itemCounts[item] = count;
-            totalItemsCount += count;
-        }
-
-        if (totalItemsCount > length)
-        {
-            double reductionFactor = (double)length / totalItemsCount;
-
-            foreach ((Item? key, int value) in itemCounts)
-            {
-                int reducedCount = (int)Math.Floor(value * reductionFactor);
-                itemCounts[key] = reducedCount;
-            }
-        }
-
-        foreach ((Item? item, int count) in itemCounts)
-        {
-            foreach (WorldItem worldItem in item.GetItemsForPlace(parameters).Take(count))
-            {
-                requiredItems.Enqueue(worldItem);
-            }
-        }
-
-        int placingSandCount = requiredItems.Count;
-
-        int[] indexes = Enumerable.Range(1, length).ToArray();
-
-        for (int i = 0; i < placingSandCount; i++)
-        {
-            int j = seeder.Random.Next(i + 1, length);
-            (indexes[i], indexes[j]) = (indexes[j], indexes[i]);
-        }
-
-        for (int i = 0; i < placingSandCount; i++)
-        {
-            int index = indexes[i];
-            int x = index / width;
-            int y = index % width;
-
-            if (requiredItems.TryDequeue(out WorldItem? placeable))
-            {
-                this[x, y].WorldItem = placeable;
-                placeable.AfterPlace.Invoke((x, y), this);
-            }
         }
     }
 
