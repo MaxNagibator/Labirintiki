@@ -98,7 +98,7 @@ public class Labyrinth(IRandom seeder)
     /// <param name="direction">Направление перемещения</param>
     public void Move(Direction direction)
     {
-        if (this[Player].ContainsWall(direction))
+        if (direction == Direction.All || this[Player].ContainsWall(direction))
         {
             return;
         }
@@ -148,6 +148,17 @@ public class Labyrinth(IRandom seeder)
     /// <param name="direction">Направление, в котором нужно разрушить стену</param>
     public void BreakWall(Position position, Direction direction)
     {
+        if (direction == Direction.All)
+        {
+            BreakWall(position, Direction.Left, Direction.Top, Direction.Right, Direction.Bottom);
+            return;
+        }
+
+        if (IsCorrectPosition(position) == false)
+        {
+            return;
+        }
+
         if (IsInBound(position, direction) == false)
         {
             return;
@@ -162,12 +173,13 @@ public class Labyrinth(IRandom seeder)
     ///     Создать стену в указанной позиции в указанных направлениях.
     /// </summary>
     /// <param name="position">Позиция, в которой нужно создать стены</param>
+    /// <param name="density">Плотность стены (вероятность ее создания)</param>
     /// <param name="directions">Направления, в которых нужно создать стены</param>
-    public void CreateWall(Position position, params Direction[] directions)
+    public void CreateWall(Position position, int density = 100, params Direction[] directions)
     {
         foreach (Direction direction in directions)
         {
-            CreateWall(position, direction, 100);
+            CreateWall(position, direction, density);
         }
     }
 
@@ -177,8 +189,19 @@ public class Labyrinth(IRandom seeder)
     /// <param name="position">Позиция, в которой нужно создать стену</param>
     /// <param name="wallDirection">Направление, в котором нужно создать стену</param>
     /// <param name="density">Плотность стены (вероятность ее создания)</param>
-    public void CreateWall(Position position, Direction wallDirection, int density)
+    public void CreateWall(Position position, Direction wallDirection, int density = 100)
     {
+        if (wallDirection == Direction.All)
+        {
+            CreateWall(position, density, Direction.Left, Direction.Top, Direction.Right, Direction.Bottom);
+            return;
+        }
+
+        if (IsCorrectPosition(position) == false)
+        {
+            return;
+        }
+
         if (seeder.Random.Next(0, 100) >= density)
         {
             return;
@@ -301,5 +324,12 @@ public class Labyrinth(IRandom seeder)
             Direction.Bottom => position.Y < Height - 1,
             var _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
         };
+    }
+
+    private bool IsCorrectPosition(Position position)
+    {
+        (int x, int y) = position;
+
+        return x >= 0 && x < Width && y >= 0 && y < Height;
     }
 }

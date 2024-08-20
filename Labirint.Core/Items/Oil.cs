@@ -28,15 +28,13 @@ public class Oil : ScoreItem
         {
             for (int y = start.Y; y <= end.Y; y++)
             {
+                // Условие для создания формы в виде креста
                 if ((x == start.X || x == end.X) && (y == start.Y || y == end.Y))
                 {
                     continue;
                 }
 
-                if (x >= 0 && x < labyrinth.Width && y >= 0 && y < labyrinth.Height)
-                {
-                    labyrinth.CreateWall((x, y), Direction.Left, Direction.Top, Direction.Right, Direction.Bottom);
-                }
+                labyrinth.CreateWall((x, y), Direction.All);
             }
         }
     }

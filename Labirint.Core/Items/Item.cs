@@ -2,15 +2,15 @@
 
 public abstract class Item
 {
-    public string Name { get; protected init; }
-    public string DisplayName { get; protected init; }
+    public string Name { get; protected init; } = null!;
+    public string DisplayName { get; protected init; } = null!;
 
     public virtual string Icon => $"/images/items/{Name}.png";
 
-    public ItemStack Stack { get; protected init; }
+    public ItemStack Stack { get; protected init; } = null!;
 
     public ControlSettings? ControlSettings { get; protected init; }
-    public SoundSettings SoundSettings { get; protected init; }
+    public SoundSettings? SoundSettings { get; protected init; }
 
     public virtual bool TryUse(Position position, Direction? direction, Labyrinth labyrinth)
     {
@@ -29,7 +29,7 @@ public abstract class Item
         {
             ImageSource = Icon,
             Alignment = Alignment.Center,
-            PickUpSound = SoundSettings.PickUpSound,
+            PickUpSound = SoundSettings?.PickUpSound ?? string.Empty,
             Scale = 0.9,
             PickUp = TryPickUp,
             AfterPlace = AfterPlace

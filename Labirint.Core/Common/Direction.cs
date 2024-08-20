@@ -3,8 +3,10 @@
 [Flags]
 public enum Direction : byte
 {
-    Left = 1 << 1,
-    Top = 1 << 2,
-    Right = 1 << 3,
-    Bottom = 1 << 4
+    None = 0,
+    Left = 1,
+    Top = 1 << 1,
+    Right = 1 << 2,
+    Bottom = 1 << 3,
+    All = Left | Top | Right | Bottom
 }

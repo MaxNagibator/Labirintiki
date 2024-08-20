@@ -1,7 +1,9 @@
+using Labirint.Core.Common;
 using Labirint.Core.Interfaces;
 using Labirint.Core.Items;
 using Labirint.Core.Stacks;
 using Labirint.Core.Tests.Helpers;
+using DirectionExtensions = Labirint.Core.Tests.Helpers.DirectionExtensions;
 
 namespace Labirint.Core.Tests;
 
@@ -14,6 +16,7 @@ public class LabyrinthTests
         _random = new TestRandom();
         _labyrinth = new Labyrinth(_random);
         _inventory = new Inventory();
+        _labyrinth.Init(16, 16, 40, _inventory.AllItems);
     }
 
     [TearDown]
@@ -55,5 +58,35 @@ public class LabyrinthTests
             Console.WriteLine($"{item.Name}: {count}/{expectedCount}");
             Assert.That(count, Is.EqualTo(expectedCount));
         }
+    }
+
+    /// <summary>
+    ///     Тестирует, что класс Labyrinth не создает и не разрушает стены с некорректными координатами.
+    ///     Проверяет, что вызов методов CreateWall и BreakWall с отрицательными координатами не вызывает исключений.
+    /// </summary>
+    /// <param name="x">Позиция X клетки</param>
+    /// <param name="y">Позиция Y клетки</param>
+    [Test]
+    [TestCase(0, 0)]
+    [TestCase(-1, 0)]
+    [TestCase(0, -1)]
+    [TestCase(-1, -1)]
+    [TestCase(10, 10)]
+    [TestCase(-11, 10)]
+    [TestCase(10, -11)]
+    [TestCase(-11, -11)]
+    public void DontCreateOrBreakIncorrectWallsTest(int x, int y)
+    {
+        foreach (Direction direction in DirectionExtensions.GetAll())
+        {
+            Assert.DoesNotThrow(() => _labyrinth.CreateWall((x, y), direction));
+            Assert.DoesNotThrow(() => _labyrinth.BreakWall((x, y), direction));
+        }
+
+        Assert.DoesNotThrow(() => _labyrinth.CreateWall((x, y), Direction.All));
+        Assert.DoesNotThrow(() => _labyrinth.BreakWall((x, y), Direction.All));
+
+        Assert.DoesNotThrow(() => _labyrinth.CreateWall((x, y), directions: [Direction.Left, Direction.Top, Direction.Right, Direction.Bottom]));
+        Assert.DoesNotThrow(() => _labyrinth.BreakWall((x, y), Direction.Left, Direction.Top, Direction.Right, Direction.Bottom));
     }
 }
