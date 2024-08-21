@@ -1,8 +1,4 @@
-using Labirint.Core.Common;
-using Labirint.Core.Interfaces;
 using Labirint.Core.Items;
-using Labirint.Core.Stacks;
-using Labirint.Core.Tests.Helpers;
 using DirectionExtensions = Labirint.Core.Tests.Helpers.DirectionExtensions;
 
 namespace Labirint.Core.Tests;

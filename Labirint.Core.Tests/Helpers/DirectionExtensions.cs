@@ -1,6 +1,4 @@
-﻿using Labirint.Core.Common;
-
-namespace Labirint.Core.Tests.Helpers;
+﻿namespace Labirint.Core.Tests.Helpers;
 
 internal static class DirectionExtensions
 {
