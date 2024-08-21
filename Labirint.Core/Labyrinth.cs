@@ -6,8 +6,22 @@ namespace Labirint.Core;
 /// <summary>
 ///     Лабиринт.
 /// </summary>
-public class Labyrinth(IRandom seeder)
+public class Labyrinth
 {
+    private readonly IRandom _seeder;
+    private readonly ItemPlacer _itemPlacer;
+
+    public Labyrinth(IRandom seeder)
+    {
+        _seeder = seeder;
+
+        _itemPlacer = new ItemPlacer(_seeder, (x, y, item) =>
+        {
+            this[x, y].WorldItem = item;
+            item.AfterPlace.Invoke((x, y), this);
+        });
+    }
+
     /// <summary>
     ///     Событие, которое вызывается, когда игрок находит выход из лабиринта.
     /// </summary>
@@ -38,7 +52,7 @@ public class Labyrinth(IRandom seeder)
     /// </summary>
     public Position Player { get; private set; }
 
-    private Tile[,] Tiles { get; set; }
+    private Tile[,] Tiles { get; set; } = null!;
 
     /// <summary>
     ///     Клетка лабиринта по координатам.
@@ -89,7 +103,7 @@ public class Labyrinth(IRandom seeder)
         this[width / 2, height - 1].IsExit = true;
         this[width / 2, height - 1].RemoveWall(Direction.Bottom);
 
-        PlaceItems(width, height, density, placeableItems);
+        _itemPlacer.PlaceItems(width, height, density, placeableItems);
     }
 
     /// <summary>
@@ -98,7 +112,7 @@ public class Labyrinth(IRandom seeder)
     /// <param name="direction">Направление перемещения</param>
     public void Move(Direction direction)
     {
-        if (this[Player].ContainsWall(direction))
+        if (direction == Direction.All || this[Player].ContainsWall(direction))
         {
             return;
         }
@@ -148,6 +162,17 @@ public class Labyrinth(IRandom seeder)
     /// <param name="direction">Направление, в котором нужно разрушить стену</param>
     public void BreakWall(Position position, Direction direction)
     {
+        if (direction == Direction.All)
+        {
+            BreakWall(position, Direction.Left, Direction.Top, Direction.Right, Direction.Bottom);
+            return;
+        }
+
+        if (IsCorrectPosition(position) == false)
+        {
+            return;
+        }
+
         if (IsInBound(position, direction) == false)
         {
             return;
@@ -162,12 +187,13 @@ public class Labyrinth(IRandom seeder)
     ///     Создать стену в указанной позиции в указанных направлениях.
     /// </summary>
     /// <param name="position">Позиция, в которой нужно создать стены</param>
+    /// <param name="density">Плотность стены (вероятность ее создания)</param>
     /// <param name="directions">Направления, в которых нужно создать стены</param>
-    public void CreateWall(Position position, params Direction[] directions)
+    public void CreateWall(Position position, int density = 100, params Direction[] directions)
     {
         foreach (Direction direction in directions)
         {
-            CreateWall(position, direction, 100);
+            CreateWall(position, direction, density);
         }
     }
 
@@ -177,9 +203,20 @@ public class Labyrinth(IRandom seeder)
     /// <param name="position">Позиция, в которой нужно создать стену</param>
     /// <param name="wallDirection">Направление, в котором нужно создать стену</param>
     /// <param name="density">Плотность стены (вероятность ее создания)</param>
-    public void CreateWall(Position position, Direction wallDirection, int density)
+    public void CreateWall(Position position, Direction wallDirection, int density = 100)
     {
-        if (seeder.Random.Next(0, 100) >= density)
+        if (wallDirection == Direction.All)
+        {
+            CreateWall(position, density, Direction.Left, Direction.Top, Direction.Right, Direction.Bottom);
+            return;
+        }
+
+        if (IsCorrectPosition(position) == false)
+        {
+            return;
+        }
+
+        if (_seeder.Random.Next(0, 100) >= density)
         {
             return;
         }
@@ -225,65 +262,6 @@ public class Labyrinth(IRandom seeder)
         }
     }
 
-    private void PlaceItems(int width, int height, int density, IEnumerable<Item> placeableItems)
-    {
-        int length = width * height - 1;
-        Dictionary<Item, int> itemCounts = new();
-        Queue<WorldItem> requiredItems = new();
-        int totalItemsCount = 0;
-
-        WorldItemParameters parameters = new(seeder, width, height, density);
-
-        foreach (Item item in placeableItems)
-        {
-            int count = item.GetItemsForPlace(parameters).Count();
-            itemCounts[item] = count;
-            totalItemsCount += count;
-        }
-
-        if (totalItemsCount > length)
-        {
-            double reductionFactor = (double)length / totalItemsCount;
-
-            foreach ((Item? key, int value) in itemCounts)
-            {
-                int reducedCount = (int)Math.Floor(value * reductionFactor);
-                itemCounts[key] = reducedCount;
-            }
-        }
-
-        foreach ((Item? item, int count) in itemCounts)
-        {
-            foreach (WorldItem worldItem in item.GetItemsForPlace(parameters).Take(count))
-            {
-                requiredItems.Enqueue(worldItem);
-            }
-        }
-
-        int placingSandCount = requiredItems.Count;
-
-        int[] indexes = Enumerable.Range(1, length).ToArray();
-
-        for (int i = 0; i < placingSandCount; i++)
-        {
-            int j = seeder.Random.Next(i + 1, length);
-            (indexes[i], indexes[j]) = (indexes[j], indexes[i]);
-        }
-
-        for (int i = 0; i < placingSandCount; i++)
-        {
-            int index = indexes[i];
-            int x = index / width;
-            int y = index % width;
-
-            if (requiredItems.TryDequeue(out WorldItem? placeable))
-            {
-                this[x, y].WorldItem = placeable;
-                placeable.AfterPlace.Invoke((x, y), this);
-            }
-        }
-    }
-
     private void PerformActionForAdjacent(Position position, Direction wallDirection, Action<Tile, Direction> action)
     {
         Position adjacentPosition = wallDirection.GetAdjacentPosition(position);
@@ -301,5 +279,12 @@ public class Labyrinth(IRandom seeder)
             Direction.Bottom => position.Y < Height - 1,
             var _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
         };
+    }
+
+    private bool IsCorrectPosition(Position position)
+    {
+        (int x, int y) = position;
+
+        return x >= 0 && x < Width && y >= 0 && y < Height;
     }
 }

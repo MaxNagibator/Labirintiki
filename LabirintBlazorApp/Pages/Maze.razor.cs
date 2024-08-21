@@ -1,11 +1,10 @@
-﻿using Labirint.Core.Common;
-using LabirintBlazorApp.Components;
+﻿using LabirintBlazorApp.Components;
 using LabirintBlazorApp.Parameters;
 using Microsoft.AspNetCore.Components;
 
 namespace LabirintBlazorApp.Pages;
 
-public partial class Maze
+public partial class Maze : IAsyncDisposable
 {
     private const int MinSize = 1;
     private const int MaxSize = 500;
@@ -43,6 +42,18 @@ public partial class Maze
     // Проверка на null и инициализацию (дополнительная проверка, если флаг выставили в true, а значение у не null полей не выставили)
     private bool IsInit => _isInit && _labyrinth != null && _seeder != null && _vision != null && _renderParameter != null;
 
+    public async ValueTask DisposeAsync()
+    {
+        if (_keyInterceptor != null)
+        {
+            await _keyInterceptor.DisposeAsync();
+            _keyInterceptor.AttackKeyDown -= OnAttackKeyDown;
+            _keyInterceptor.MoveKeyDown -= OnMoveKeyDown;
+        }
+
+        GC.SuppressFinalize(this);
+    }
+
     protected override void OnInitialized()
     {
         _boxSize = 48;
@@ -52,7 +63,7 @@ public partial class Maze
     protected override void OnParametersSet()
     {
         _originalSize = MazeSize ?? 16;
-        _density = MazeDensity ?? 16;
+        _density = MazeDensity ?? 40;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -60,6 +71,12 @@ public partial class Maze
         if (firstRender)
         {
             await GenerateAsync();
+
+            if (_keyInterceptor != null)
+            {
+                _keyInterceptor.AttackKeyDown += OnAttackKeyDown;
+                _keyInterceptor.MoveKeyDown += OnMoveKeyDown;
+            }
         }
     }
 
@@ -79,7 +96,7 @@ public partial class Maze
         await SoundService.PlayAsync(args.PickUpSound);
     }
 
-    private async Task OnMoveKeyDown(MoveEventArgs args)
+    private async void OnMoveKeyDown(object? sender, MoveEventArgs args)
     {
         if (_isExitFound)
         {
@@ -90,9 +107,10 @@ public partial class Maze
         _vision.SetPosition(_labyrinth.Player);
 
         await Task.WhenAll(ForceRenderWalls(), ForceRenderSands());
+        StateHasChanged();
     }
 
-    private async Task OnAttackKeyDown(AttackEventArgs args)
+    private async void OnAttackKeyDown(object? sender, AttackEventArgs args)
     {
         Item? item = args.Item;
 
@@ -100,8 +118,8 @@ public partial class Maze
         {
             await SoundService.PlayAsync(item.SoundSettings.UseSound);
 
-            StateHasChanged();
             await ForceRenderWalls();
+            StateHasChanged();
         }
     }
 

@@ -2,9 +2,8 @@
 
 public class ScoreItemStack(Item item) : ItemStack(item, 0, int.MaxValue)
 {
-    public override bool TryAdd(int count)
+    protected override bool CanAdd(int count)
     {
-        Count += count;
         return true;
     }
 }

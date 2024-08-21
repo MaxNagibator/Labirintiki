@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using Labirint.Core.Common;
 using Labirint.Core.Stacks;
 using LabirintBlazorApp.Common.Control.Schemes;
 using Microsoft.AspNetCore.Components;
@@ -47,8 +46,8 @@ public partial class Inventory : IAsyncDisposable
         StateHasChanged();
     }
 
-    private async Task OnClicked(Key activateKey)
+    private void OnClicked(Key activateKey)
     {
-        await Interceptor.OnKeyDown(activateKey);
+        Interceptor.OnKeyDown(activateKey);
     }
 }
