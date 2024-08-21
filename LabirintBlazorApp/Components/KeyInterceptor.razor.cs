@@ -1,5 +1,4 @@
-﻿using Labirint.Core.Common;
-using LabirintBlazorApp.Common.Control.Schemes;
+﻿using LabirintBlazorApp.Common.Control.Schemes;
 using Microsoft.AspNetCore.Components;
 
 namespace LabirintBlazorApp.Components;
@@ -9,12 +8,14 @@ public partial class KeyInterceptor : IAsyncDisposable
     private bool _isPause = false;
 
     private Dictionary<string, Direction> _moveDirections = new();
-    private Dictionary<string, Item?> _itemUsed = new();
+    private Dictionary<string, Item> _itemUsed = new();
 
     private DotNetObjectReference<KeyInterceptor>? _reference;
     private Item? _waitItem;
 
+    public event EventHandler<AttackEventArgs>? AttackKeyDown;
     public event EventHandler<Item?>? ChangedWaitItem;
+    public event EventHandler<MoveEventArgs>? MoveKeyDown;
 
     [Inject]
     public required IControlSchemeService SchemeService { get; set; }
@@ -24,12 +25,6 @@ public partial class KeyInterceptor : IAsyncDisposable
 
     [Inject]
     public required IJSRuntime JSRuntime { get; set; }
-
-    [Parameter]
-    public EventCallback<MoveEventArgs> OnMoveKeyDown { get; set; }
-
-    [Parameter]
-    public EventCallback<AttackEventArgs> OnAttackKeyDown { get; set; }
 
     private IControlScheme ControlScheme => SchemeService.CurrentScheme;
 
@@ -43,23 +38,23 @@ public partial class KeyInterceptor : IAsyncDisposable
     }
 
     [JSInvokable]
-    public async Task OnKeyDown(string code)
+    public void OnKeyDown(string code)
     {
         if (_isPause)
         {
             return;
         }
 
-        if (PerformItemUse(code, out AttackEventArgs? attack) && _waitItem == null)
+        if (_waitItem == null && PerformItemUse(code, out AttackEventArgs? attack) && attack != null)
         {
-            await OnAttackKeyDown.InvokeAsync(attack);
+            AttackKeyDown?.Invoke(this, attack);
         }
 
-        if (PerformMove(code, out MoveEventArgs? move))
+        if (PerformMove(code, out MoveEventArgs? move) && move != null)
         {
             if (_waitItem != null)
             {
-                await OnAttackKeyDown.InvokeAsync(new AttackEventArgs
+                AttackKeyDown?.Invoke(this, new AttackEventArgs
                 {
                     Item = _waitItem,
                     Direction = move.Direction,
@@ -69,7 +64,7 @@ public partial class KeyInterceptor : IAsyncDisposable
                 ChangeWaitItem(null);
             }
 
-            await OnMoveKeyDown.InvokeAsync(move);
+            MoveKeyDown?.Invoke(this, move);
         }
     }
 
@@ -100,14 +95,14 @@ public partial class KeyInterceptor : IAsyncDisposable
         _itemUsed = InventoryService.Items
             .Where(item => item.ControlSettings != null)
             .Select(item => (ControlScheme.GetActivateKey(item.ControlSettings!).KeyCode, item))
-            .ToDictionary()!;
+            .ToDictionary();
 
         _moveDirections = new Dictionary<string, Direction>
         {
-            { ControlScheme.MoveLeft, Direction.Left },
-            { ControlScheme.MoveUp, Direction.Top },
-            { ControlScheme.MoveRight, Direction.Right },
-            { ControlScheme.MoveDown, Direction.Bottom }
+            [ControlScheme.MoveLeft] = Direction.Left,
+            [ControlScheme.MoveUp] = Direction.Top,
+            [ControlScheme.MoveRight] = Direction.Right,
+            [ControlScheme.MoveDown] = Direction.Bottom
         };
     }
 

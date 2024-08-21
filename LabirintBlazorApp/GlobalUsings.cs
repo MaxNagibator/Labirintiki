@@ -1,4 +1,5 @@
 ﻿global using Labirint.Core;
+global using Labirint.Core.Common;
 global using Labirint.Core.Items;
 global using LabirintBlazorApp.Common.Control;
 global using LabirintBlazorApp.Common.Drawing;

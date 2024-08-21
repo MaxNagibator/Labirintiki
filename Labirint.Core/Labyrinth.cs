@@ -6,8 +6,22 @@ namespace Labirint.Core;
 /// <summary>
 ///     Лабиринт.
 /// </summary>
-public class Labyrinth(IRandom seeder)
+public class Labyrinth
 {
+    private readonly IRandom _seeder;
+    private readonly ItemPlacer _itemPlacer;
+
+    public Labyrinth(IRandom seeder)
+    {
+        _seeder = seeder;
+
+        _itemPlacer = new ItemPlacer(_seeder, (x, y, item) =>
+        {
+            this[x, y].WorldItem = item;
+            item.AfterPlace.Invoke((x, y), this);
+        });
+    }
+
     /// <summary>
     ///     Событие, которое вызывается, когда игрок находит выход из лабиринта.
     /// </summary>
@@ -89,13 +103,7 @@ public class Labyrinth(IRandom seeder)
         this[width / 2, height - 1].IsExit = true;
         this[width / 2, height - 1].RemoveWall(Direction.Bottom);
 
-        ItemPlacer itemPlacer = new(seeder, (x, y, item) =>
-        {
-            this[x, y].WorldItem = item;
-            item.AfterPlace.Invoke((x, y), this);
-        });
-
-        itemPlacer.PlaceItems(width, height, density, placeableItems);
+        _itemPlacer.PlaceItems(width, height, density, placeableItems);
     }
 
     /// <summary>
@@ -208,7 +216,7 @@ public class Labyrinth(IRandom seeder)
             return;
         }
 
-        if (seeder.Random.Next(0, 100) >= density)
+        if (_seeder.Random.Next(0, 100) >= density)
         {
             return;
         }
