@@ -104,7 +104,7 @@ public partial class Maze : IAsyncDisposable
         }
 
         _labyrinth.Move(args.Direction);
-        _vision.SetPosition(_labyrinth.Player);
+        _vision.SetPosition(_labyrinth.Runner.Position);
 
         await Task.WhenAll(ForceRenderWalls(), ForceRenderSands());
         StateHasChanged();
@@ -114,7 +114,7 @@ public partial class Maze : IAsyncDisposable
     {
         Item? item = args.Item;
 
-        if (item != null && item.TryUse(_labyrinth.Player, args.Direction, _labyrinth))
+        if (item != null && item.TryUse(_labyrinth.Runner.Position, args.Direction, _labyrinth))
         {
             await SoundService.PlayAsync(item.SoundSettings.UseSound);
 
@@ -153,7 +153,7 @@ public partial class Maze : IAsyncDisposable
         _labyrinth.ItemPickedUp += OnItemPickedUp;
 
         _vision = new Vision(_originalSize, _originalSize);
-        _vision.SetPosition(_labyrinth.Player);
+        _vision.SetPosition(_labyrinth.Runner.Position);
 
         _renderParameter = new MazeRenderParameters(_labyrinth, _boxSize, _wallWidth, _vision);
 

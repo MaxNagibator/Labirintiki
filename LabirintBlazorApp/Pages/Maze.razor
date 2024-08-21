@@ -40,7 +40,7 @@
                     </CascadingValue>
 
                     @{
-                        Position draw = _vision.GetDraw(_labyrinth.Player) * _boxSize + _wallWidth;
+                        Position draw = _vision.GetDraw(_labyrinth.Runner.Position) * _boxSize + _wallWidth;
                         (int offset, int entitySize) = AlignmentHelper.CalculateOffset(_boxSize, _wallWidth, 0.5);
                         (int left, int top) = AlignmentHelper.CalculatePosition(Alignment.Center, draw, offset);
 
@@ -48,14 +48,14 @@
                                     z-index: 100;
                                     left: @(-30)px;
                                     top: @(top - 4)px;">
-                            <MudText Typo="Typo.h6">@(_labyrinth.Player.Y + 1)</MudText>
+                            <MudText Typo="Typo.h6">@(_labyrinth.Runner.Position.Y + 1)</MudText>
                         </div>
 
                         <div style="position:absolute;
                                     z-index: 100;
                                     left: @(left + 4)px;
                                     top: @(-30)px;">
-                            <MudText Typo="Typo.h6">@(_labyrinth.Player.X + 1)</MudText>
+                            <MudText Typo="Typo.h6">@(_labyrinth.Runner.Position.X + 1)</MudText>
                         </div>
 
                         <img src="/images/runner.png"

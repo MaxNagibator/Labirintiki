@@ -48,9 +48,9 @@ public class Labyrinth
     public int Height { get; private set; }
 
     /// <summary>
-    ///     Текущая позиция игрока.
+    ///     Бегущий.
     /// </summary>
-    public Position Player { get; private set; }
+    public Runner Runner { get; private set; }
 
     private Tile[,] Tiles { get; set; } = null!;
 
@@ -81,7 +81,7 @@ public class Labyrinth
     /// <param name="placeableItems">Список предметов, которые нужно разместить в лабиринте</param>
     public void Init(int width, int height, int density, IEnumerable<Item> placeableItems)
     {
-        Player = (0, 0);
+        Runner = new Runner((0, 0));
         Width = width;
         Height = height;
 
@@ -112,15 +112,15 @@ public class Labyrinth
     /// <param name="direction">Направление перемещения</param>
     public void Move(Direction direction)
     {
-        if (direction == Direction.All || this[Player].ContainsWall(direction))
+        if (direction == Direction.All || this[Runner.Position].ContainsWall(direction))
         {
             return;
         }
 
-        Player += direction.ToPosition();
-        PlayerMoved?.Invoke(this, Player);
+        Runner.Move(direction.ToPosition());
+        PlayerMoved?.Invoke(this, Runner.Position);
 
-        Tile tile = this[Player];
+        Tile tile = this[Runner.Position];
 
         if (tile.IsExit)
         {
@@ -139,7 +139,7 @@ public class Labyrinth
     /// <param name="direction">Направление, в котором нужно разрушить стену</param>
     public void BreakWall(Direction direction)
     {
-        BreakWall(Player, direction);
+        BreakWall(Runner.Position, direction);
     }
 
     /// <summary>
