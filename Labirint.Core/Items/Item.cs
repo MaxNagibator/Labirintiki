@@ -5,7 +5,7 @@ public abstract class Item
     public string Name { get; protected init; } = null!;
     public string DisplayName { get; protected init; } = null!;
 
-    public virtual string Icon => $"/images/items/{Name}.png";
+    public virtual string Icon => $"/images/items/{Name}-icon.png";
 
     public ItemStack Stack { get; protected init; } = null!;
 
@@ -27,7 +27,7 @@ public abstract class Item
     {
         return new WorldItem
         {
-            ImageSource = Icon,
+            ImageSource = $"/images/items/{Name}.png",
             Alignment = Alignment.Center,
             PickUpSound = SoundSettings?.PickUpSound ?? string.Empty,
             Scale = 0.9,

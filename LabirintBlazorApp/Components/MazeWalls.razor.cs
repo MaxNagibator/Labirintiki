@@ -1,6 +1,4 @@
-﻿using Labirint.Core.Common;
-
-namespace LabirintBlazorApp.Components;
+﻿namespace LabirintBlazorApp.Components;
 
 public partial class MazeWalls : MazeComponent
 {
@@ -56,7 +54,7 @@ public partial class MazeWalls : MazeComponent
 
         if (Maze[x, y].TempWoolYarn)
         {
-            sequence.DrawRect(topLeft.X+10, topLeft.Y+10, _height/4, _width*4);
+            sequence.DrawRect(topLeft.X + 10, topLeft.Y + 10, _height / 4, _width * 4);
         }
     }
 }

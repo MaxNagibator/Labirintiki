@@ -1,6 +1,4 @@
-﻿using Labirint.Core.Common;
-
-namespace LabirintBlazorApp.Common.Control.Schemes;
+﻿namespace LabirintBlazorApp.Common.Control.Schemes;
 
 public class ClassicScheme : IControlScheme
 {

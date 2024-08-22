@@ -14,10 +14,10 @@
             <ControlSchemeSwitcher />
 
             <MudStack AlignItems="AlignItems.Center" Row>
-                <MudSwitch @bind-Value="@GlobalParameters.Labyrinth.IsSoundOn" Color="Color.Success" Label="Звук" UncheckedColor="Color.Error"  />
+                <MudSwitch @bind-Value="@GlobalParameters.Labyrinth.IsSoundOn" Color="Color.Success" Label="Звук" UncheckedColor="Color.Error" />
                 @if (GlobalParameters.Labyrinth.IsSoundOn)
                 {
-                    <MudSlider @bind-Value="@GlobalParameters.Labyrinth.SoundVolume" Class="pr-2" Max="1.0f" Min="0f" Size="Size.Medium" Step="0.01f" T="float" ValueLabel="true" ValueLabelFormat="0%"  />
+                    <MudSlider @bind-Value="@GlobalParameters.Labyrinth.SoundVolume" Class="pr-2" Max="1.0f" Min="0f" Size="Size.Medium" Step="0.01f" T="float" ValueLabel="true" ValueLabelFormat="0%" />
                 }
             </MudStack>
             <MudStack>

@@ -6,7 +6,7 @@ namespace LabirintBlazorApp.Components.Base;
 public abstract class MazeComponent : ComponentBase
 {
     protected ElementReference CanvasRef;
-    
+
     private bool _isShouldRender;
     private Canvas2DContext _context = null!;
 

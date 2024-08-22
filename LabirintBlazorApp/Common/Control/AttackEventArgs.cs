@@ -1,6 +1,4 @@
-﻿using Labirint.Core.Common;
-
-namespace LabirintBlazorApp.Common.Control;
+﻿namespace LabirintBlazorApp.Common.Control;
 
 public class AttackEventArgs
 {

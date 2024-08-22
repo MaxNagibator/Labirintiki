@@ -1,6 +1,5 @@
-﻿@using Labirint.Core.Stacks
-<MudStack Row Spacing="3">
-    @foreach (RunnerAbility ability in RunnerAbilities.Where(x => x.Active == true))
+﻿<MudStack Row Spacing="3">
+    @foreach (RunnerAbility ability in RunnerAbilities.Where(x => x.Active))
     {
         <div class="runner-ability-container">
             <div class="runner-ability">
@@ -8,7 +7,6 @@
                 <div class="ability-name">@ability.DisplayName</div>
                 @if (ability.IsUnlimitedMoveCount)
                 {
-
                 }
                 else
                 {
