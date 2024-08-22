@@ -1,30 +1,62 @@
-﻿namespace Labirint.Core.Common;
+﻿using Labirint.Core.Extensions;
+
+namespace Labirint.Core.Common;
 
 public record struct Position(int X, int Y)
 {
-    public static Position operator +(Position a, Position b)
+    public static Position operator +(Position left, Position right)
     {
-        return (a.X + b.X, a.Y + b.Y);
+        return (left.X + right.X, left.Y + right.Y);
     }
 
-    public static Position operator +(Position a, int b)
+    public static Position operator +(Position left, Direction right)
     {
-        return (a.X + b, a.Y + b);
+        return left + right.ToPosition();
     }
 
-    public static Position operator -(Position a, Position b)
+    public static Position operator +(Position left, int right)
     {
-        return (a.X - b.X, a.Y - b.Y);
+        return (left.X + right, left.Y + right);
     }
 
-    public static Position operator -(Position a, int b)
+    public static Position operator -(Position left, Position right)
     {
-        return (a.X - b, a.Y - b);
+        return (left.X - right.X, left.Y - right.Y);
     }
 
-    public static Position operator *(Position a, int b)
+    public static Position operator -(Position left, Direction right)
     {
-        return new Position(a.X * b, a.Y * b);
+        return left - right.ToPosition();
+    }
+
+    public static Position operator -(Position left, int right)
+    {
+        return (left.X - right, left.Y - right);
+    }
+
+    public static Position operator *(Position left, int right)
+    {
+        return new Position(left.X * right, left.Y * right);
+    }
+
+    public static bool operator >(Position left, Position right)
+    {
+        return left.X > right.X && left.Y > right.Y;
+    }
+
+    public static bool operator >=(Position left, Position right)
+    {
+        return left.X >= right.X && left.Y >= right.Y;
+    }
+
+    public static bool operator <(Position left, Position right)
+    {
+        return left.X < right.X && left.Y < right.Y;
+    }
+
+    public static bool operator <=(Position left, Position right)
+    {
+        return left.X <= right.X && left.Y <= right.Y;
     }
 
     public static implicit operator (int X, int Y)(Position position)

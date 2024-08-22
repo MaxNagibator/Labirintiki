@@ -1,25 +1,17 @@
-﻿using Labirint.Core.Abilities;
-
-namespace Labirint.Core;
+﻿namespace Labirint.Core;
 
 /// <summary>
-///    Способность бегуна.
+///     Способность бегуна.
 /// </summary>
-public class RunnerAbility
+public class RunnerAbility(Ability ability)
 {
-    private Ability _ability;
-    private int? _lostCount;
-    public bool Active { get; private set; }
+    private int? _lostCount = ability.MoveCount;
 
-    public RunnerAbility(Ability ability)
-    {
-        _ability = ability;
-        _lostCount = ability.IsUnlimitedMoveCount ? null : ability.MoveCount;
-    }
+    public bool Active => _lostCount is not 0;
 
     public void Hit()
     {
-        if (!Active)
+        if (Active == false)
         {
             return;
         }
@@ -27,12 +19,8 @@ public class RunnerAbility
         if (_lostCount != null)
         {
             _lostCount--;
-            if (_lostCount == 0)
-            {
-                Active = false;
-            }
         }
 
-        _ability.Hit();
+        ability.Hit();
     }
 }

@@ -35,7 +35,7 @@ public class Labyrinth
     /// <summary>
     ///     Событие, которое вызывается, когда игрок успешно перемещается.
     /// </summary>
-    public event EventHandler<Position>? PlayerMoved;
+    public event EventHandler<Position>? RunnerMoved;
 
     /// <summary>
     ///     Ширина лабиринта.
@@ -117,8 +117,8 @@ public class Labyrinth
             return;
         }
 
-        Runner.Move(direction.ToPosition());
-        PlayerMoved?.Invoke(this, Runner.Position);
+        Runner.Move(direction);
+        RunnerMoved?.Invoke(this, Runner.Position);
 
         Tile tile = this[Runner.Position];
 
@@ -231,6 +231,16 @@ public class Labyrinth
         PerformActionForAdjacent(position, wallDirection, (adjacentTile, oppositeDirection) => adjacentTile.AddWall(oppositeDirection));
     }
 
+    /// <summary>
+    ///     Проверяет, является ли указанная позиция корректной внутри лабиринта.
+    /// </summary>
+    /// <param name="position">Позиция для проверки</param>
+    /// <returns>True, если позиция корректна, иначе False</returns>
+    public bool IsCorrectPosition(Position position)
+    {
+        return position >= (0, 0) && position < (Width, Height);
+    }
+
     private Tile AddTile(Position position)
     {
         Tile tile = new();
@@ -279,12 +289,5 @@ public class Labyrinth
             Direction.Bottom => position.Y < Height - 1,
             var _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
         };
-    }
-
-    private bool IsCorrectPosition(Position position)
-    {
-        (int x, int y) = position;
-
-        return x >= 0 && x < Width && y >= 0 && y < Height;
     }
 }

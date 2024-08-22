@@ -1,6 +1,4 @@
-﻿using Labirint.Core.Stacks;
-
-namespace Labirint.Core.Tests;
+﻿namespace Labirint.Core.Tests;
 
 [TestFixture]
 public class InventoryTests

@@ -1,6 +1,4 @@
-﻿using Labirint.Core.Common;
-using Labirint.Core.Items;
-using Labirint.Core.Stacks;
+﻿using Labirint.Core.Items;
 
 namespace Labirint.Core.Tests.Helpers;
 
