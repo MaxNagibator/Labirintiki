@@ -80,10 +80,15 @@ public partial class Maze : IAsyncDisposable
         }
     }
 
-    private async void OnPlayerMoved(object? sender, Position args)
+    private async void OnRunnerMoved(object? sender, Position args)
     {
+        _vision.SetPosition(_labyrinth.Runner.Position);
+
         // TODO подумать как вынести строку
         await SoundService.PlayAsync("step");
+
+        await Task.WhenAll(ForceRenderWalls(), ForceRenderSands());
+        StateHasChanged();
     }
 
     private void OnExitFound(object? sender, EventArgs args)
@@ -96,7 +101,7 @@ public partial class Maze : IAsyncDisposable
         await SoundService.PlayAsync(args.PickUpSound);
     }
 
-    private async void OnMoveKeyDown(object? sender, MoveEventArgs args)
+    private void OnMoveKeyDown(object? sender, MoveEventArgs args)
     {
         if (_isExitFound)
         {
@@ -104,10 +109,6 @@ public partial class Maze : IAsyncDisposable
         }
 
         _labyrinth.Move(args.Direction);
-        _vision.SetPosition(_labyrinth.Runner.Position);
-
-        await Task.WhenAll(ForceRenderWalls(), ForceRenderSands());
-        StateHasChanged();
     }
 
     private async void OnAttackKeyDown(object? sender, AttackEventArgs args)
@@ -116,7 +117,7 @@ public partial class Maze : IAsyncDisposable
 
         if (item != null && item.TryUse(_labyrinth.Runner.Position, args.Direction, _labyrinth))
         {
-            await SoundService.PlayAsync(item.SoundSettings.UseSound);
+            await SoundService.PlayAsync(item.SoundSettings?.UseSound);
 
             await ForceRenderWalls();
             StateHasChanged();
@@ -136,7 +137,7 @@ public partial class Maze : IAsyncDisposable
 
         if (_labyrinth != null)
         {
-            _labyrinth.PlayerMoved -= OnPlayerMoved;
+            _labyrinth.RunnerMoved -= OnRunnerMoved;
             _labyrinth.ExitFound -= OnExitFound;
             _labyrinth.ItemPickedUp -= OnItemPickedUp;
         }
@@ -148,7 +149,7 @@ public partial class Maze : IAsyncDisposable
         _labyrinth = new Labyrinth(_seeder);
         _labyrinth.Init(_originalSize, _originalSize, _density, InventoryService.Items);
 
-        _labyrinth.PlayerMoved += OnPlayerMoved;
+        _labyrinth.RunnerMoved += OnRunnerMoved;
         _labyrinth.ExitFound += OnExitFound;
         _labyrinth.ItemPickedUp += OnItemPickedUp;
 

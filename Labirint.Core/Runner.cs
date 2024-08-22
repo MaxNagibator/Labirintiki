@@ -1,31 +1,32 @@
-﻿using Labirint.Core.Abilities;
-using Labirint.Core.Common;
-
-namespace Labirint.Core;
+﻿namespace Labirint.Core;
 
 /// <summary>
 ///     Бегущий по лабиринту.
 /// </summary>
 public class Runner
 {
+    private readonly List<RunnerAbility> _abilities;
+
     public Runner(Position position)
     {
         Position = position;
+        _abilities = [];
     }
 
-    public Position Position { get; set; }
+    public Position Position { get; private set; }
 
-    public List<RunnerAbility> Abilities { get; set; }
+    public IEnumerable<RunnerAbility> Abilities => _abilities;
 
     public void AddAbility(Ability ability)
     {
-        Abilities.Add(new RunnerAbility(ability));
+        _abilities.Add(new RunnerAbility(ability));
     }
 
-    public void Move(Position position)
+    public void Move(Direction direction)
     {
-        Position += position;
-        foreach (var ability in Abilities)
+        Position += direction;
+
+        foreach (RunnerAbility ability in _abilities)
         {
             ability.Hit();
         }

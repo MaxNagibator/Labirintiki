@@ -4,9 +4,9 @@ namespace LabirintBlazorApp.Services;
 
 public class SoundService(IJSRuntime jsRuntime)
 {
-    public ValueTask PlayAsync(string soundType)
+    public ValueTask PlayAsync(string? soundType)
     {
-        if (GlobalParameters.Labyrinth.IsSoundOn == false)
+        if (string.IsNullOrWhiteSpace(soundType) || GlobalParameters.Labyrinth.IsSoundOn == false)
         {
             return ValueTask.CompletedTask;
         }

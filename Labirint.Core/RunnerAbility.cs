@@ -1,6 +1,4 @@
-﻿using Labirint.Core.Abilities;
-
-namespace Labirint.Core;
+﻿namespace Labirint.Core;
 
 /// <summary>
 ///     Способность бегуна.

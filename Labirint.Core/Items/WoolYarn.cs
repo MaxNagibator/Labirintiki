@@ -1,9 +1,7 @@
-﻿using Labirint.Core.Abilities;
-
-namespace Labirint.Core.Items;
+﻿namespace Labirint.Core.Items;
 
 /// <summary>
-/// Шерстяная нить.
+///     Шерстяная нить.
 /// </summary>
 public class WoolYarn : Item
 {
@@ -14,7 +12,7 @@ public class WoolYarn : Item
 
         Stack = new LimitedItemStack(this, 0, 1);
 
-        ControlSettings = new ControlSettings(Key.KeyB, Key.ControlLeft);
+        ControlSettings = new ControlSettings(Key.KeyY, Key.KeyY);
         SoundSettings = new SoundSettings("bomb", "score");
     }
 

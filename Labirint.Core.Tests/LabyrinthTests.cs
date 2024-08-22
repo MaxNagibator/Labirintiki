@@ -12,7 +12,7 @@ public class LabyrinthTests
         _random = new TestRandom();
         _labyrinth = new Labyrinth(_random);
         _inventory = new Inventory();
-        _labyrinth.Init(16, 16, 40, _inventory.AllItems);
+        _labyrinth.Init(DefaultWidth, DefaultHeight, 40, _inventory.AllItems);
     }
 
     [TearDown]
@@ -21,19 +21,21 @@ public class LabyrinthTests
         _inventory.Clear();
     }
 
+    private const int DefaultWidth = 16;
+    private const int DefaultHeight = 16;
+
     private IRandom _random;
     private Labyrinth _labyrinth;
     private Inventory _inventory;
 
     /// <summary>
-    ///     Тестирует, что класс Labyrinth размещает правильное количество предметов в лабиринте
-    ///     при превышении количества ячеек.
-    ///     Проверяет, что количество размещенных предметов не превышает допустимое количеству.
+    ///     Тестирует правильное распределение остатков предметов в лабиринте.
+    ///     Проверяет, что количество размещенных предметов соответствует ожидаемому количеству,
+    ///     учитывая ограничения по ширине и высоте лабиринта.
     /// </summary>
     /// <param name="width">Ширина лабиринта</param>
     /// <param name="height">Высота лабиринта</param>
-    /// <param name="counts">Массив предметов с их количеством</param>
-    /// <remarks>Была ошибка, что выдавались только песочки.</remarks>
+    /// <param name="counts">Массив количеств предметов для распределения</param>
     [Test]
     [TestCase(2, 2, 1, 2)]
     [TestCase(2, 2, 2, 2)]
@@ -125,5 +127,35 @@ public class LabyrinthTests
 
         Assert.DoesNotThrow(() => _labyrinth.CreateWall((x, y), directions: [Direction.Left, Direction.Top, Direction.Right, Direction.Bottom]));
         Assert.DoesNotThrow(() => _labyrinth.BreakWall((x, y), Direction.Left, Direction.Top, Direction.Right, Direction.Bottom));
+    }
+
+    /// <summary>
+    ///     Тестирует, что класс Labyrinth корректно определяет, является ли позиция корректной внутри лабиринта.
+    ///     Проверяет, что метод IsCorrectPosition возвращает ожидаемый результат для различных координат.
+    /// </summary>
+    /// <param name="x">Позиция X клетки</param>
+    /// <param name="y">Позиция Y клетки</param>
+    /// <param name="expectedResult">Ожидаемый результат проверки корректности позиции</param>
+    [TestCase(5, 5, true)]
+    [TestCase(0, 0, true)]
+    [TestCase(DefaultWidth, DefaultHeight, false)]
+    [TestCase(DefaultWidth + 1, DefaultHeight + 1, false)]
+    [TestCase(-1, -1, false)]
+    [TestCase(9, 9, true)]
+    [TestCase(0, 9, true)]
+    [TestCase(9, 0, true)]
+    [TestCase(DefaultWidth + 1, 0, false)]
+    [TestCase(0, DefaultHeight, false)]
+    [TestCase(5, DefaultHeight + 1, false)]
+    [TestCase(DefaultWidth + 1, 5, false)]
+    [TestCase(-1, 5, false)]
+    [TestCase(5, -1, false)]
+    public void IsCorrectPositionTest(int x, int y, bool expectedResult)
+    {
+        Position position = (x, y);
+
+        bool result = _labyrinth.IsCorrectPosition(position);
+
+        Assert.That(result, Is.EqualTo(expectedResult));
     }
 }
