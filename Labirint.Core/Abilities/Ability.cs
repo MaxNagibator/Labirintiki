@@ -11,6 +11,11 @@ public abstract class Ability
     public abstract string Name { get; }
 
     /// <summary>
+    ///     Описание.
+    /// </summary>
+    public abstract string DisplayName { get; }
+
+    /// <summary>
     ///     Изображение.
     /// </summary>
     public virtual string Icon => $"/images/abilities/{Name}.png";
@@ -28,5 +33,6 @@ public abstract class Ability
     /// <summary>
     ///     Что же делает способность.
     /// </summary>
-    public abstract void Hit();
+    /// <param name="tile">Клетка в которую мы перешли.</param>
+    public abstract void Hit(Tile tile);
 }

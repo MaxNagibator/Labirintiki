@@ -81,7 +81,7 @@ public class Labyrinth
     /// <param name="placeableItems">Список предметов, которые нужно разместить в лабиринте</param>
     public void Init(int width, int height, int density, IEnumerable<Item> placeableItems)
     {
-        Runner = new Runner((0, 0));
+        Runner = new Runner((0, 0), this);
         Width = width;
         Height = height;
 

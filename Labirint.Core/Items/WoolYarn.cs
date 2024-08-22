@@ -23,6 +23,8 @@ public class WoolYarn : Item
 
     protected override void AfterUse(Position position, Direction? direction, Labyrinth labyrinth)
     {
-        labyrinth.Runner.AddAbility(new WoolYarnTrack());
+        var track = new WoolYarnTrack();
+        labyrinth.Runner.AddAbility(track);
+        track.Hit(labyrinth[position]);
     }
 }

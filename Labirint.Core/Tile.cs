@@ -21,6 +21,11 @@ public class Tile
     public bool IsExit { get; set; }
 
     /// <summary>
+    /// Сделать эффекты у клетки.
+    /// </summary>
+    public bool TempWoolYarn { get; set; }
+
+    /// <summary>
     ///     Содержит ли клетка стенку с указанного направления.
     /// </summary>
     /// <param name="direction">Направление проверки.</param>

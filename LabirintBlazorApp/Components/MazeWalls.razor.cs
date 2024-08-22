@@ -53,5 +53,10 @@ public partial class MazeWalls : MazeComponent
                 sequence.DrawRect(topLeft.X, bottomRight.Y, _height, _width);
             }
         }
+
+        if (Maze[x, y].TempWoolYarn)
+        {
+            sequence.DrawRect(topLeft.X+10, topLeft.Y+10, _height/4, _width*4);
+        }
     }
 }

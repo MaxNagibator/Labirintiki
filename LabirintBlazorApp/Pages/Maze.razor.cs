@@ -113,6 +113,11 @@ public partial class Maze : IAsyncDisposable
 
     private async void OnAttackKeyDown(object? sender, AttackEventArgs args)
     {
+        if (_isExitFound)
+        {
+            return;
+        }
+
         Item? item = args.Item;
 
         if (item != null && item.TryUse(_labyrinth.Runner.Position, args.Direction, _labyrinth))

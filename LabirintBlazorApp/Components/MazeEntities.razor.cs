@@ -1,4 +1,5 @@
-﻿using Labirint.Core.Common;
+﻿using Labirint.Core;
+using Labirint.Core.Common;
 
 namespace LabirintBlazorApp.Components;
 

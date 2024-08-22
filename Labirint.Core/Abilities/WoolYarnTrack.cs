@@ -5,12 +5,14 @@
 /// </summary>
 public class WoolYarnTrack : Ability
 {
-    public override string Name => "След нити";
+    public override string Name => "WoolYarnTrack";
+
+    public override string DisplayName => "След нити";
 
     public override int? MoveCount => 100;
 
-    public override void Hit()
+    public override void Hit(Tile tile)
     {
-        throw new NotImplementedException();
+        tile.TempWoolYarn = true;
     }
 }

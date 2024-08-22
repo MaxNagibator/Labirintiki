@@ -23,7 +23,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Labirint.Core\Labirint.Core.csproj"/>
+        <ProjectReference Include="..\Labirint.Core\Labirint.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\images\abilities\" />
     </ItemGroup>
 
 </Project>
