@@ -10,7 +10,7 @@ public class Bomb : Item
         Stack = new LimitedItemStack(this, 2, 2);
 
         ControlSettings = new ControlSettings(Key.KeyB, Key.ControlLeft);
-        SoundSettings = new SoundSettings("bomb", "score");
+        SoundSettings = new SoundSettings("bomb", "/media/bomb.mp3");
     }
 
     public override int CalculateCountInMaze(int width, int height, int density)

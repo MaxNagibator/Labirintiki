@@ -1,8 +1,9 @@
-﻿namespace Labirint.Core.TileFeatures;
+﻿namespace Labirint.Core.TileFeatures.Base;
 
 public abstract class TileFeature
 {
-    public abstract bool TryPickUp();
     public abstract bool RemoveAfterSuccessPickUp { get; }
     public abstract string PickUpSound { get; }
+    public abstract DrawingSettings? DrawingSettings { get; }
+    public abstract bool TryPickUp();
 }

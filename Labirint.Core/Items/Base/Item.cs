@@ -1,6 +1,6 @@
 ﻿using Labirint.Core.TileFeatures;
 
-namespace Labirint.Core.Items;
+namespace Labirint.Core.Items.Base;
 
 public abstract class Item
 {
@@ -8,6 +8,7 @@ public abstract class Item
     public string DisplayName { get; protected init; } = null!;
 
     public virtual string Icon => $"/images/items/{Name}-icon.png";
+    public virtual string Image => $"/images/items/{Name}.png";
 
     public ItemStack Stack { get; protected init; } = null!;
 
@@ -27,11 +28,8 @@ public abstract class Item
 
     public virtual WorldItem GetWorldItem(WorldItemParameters parameters)
     {
-        return new WorldItem
+        return new WorldItem(this, Image, Alignment.Center, 0.9)
         {
-            ImageSource = $"/images/items/{Name}.png",
-            Alignment = Alignment.Center,
-            Scale = 0.9,
             PickUp = TryPickUp,
             AfterPlace = AfterPlace
         };

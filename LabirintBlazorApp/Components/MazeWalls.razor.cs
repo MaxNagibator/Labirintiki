@@ -34,27 +34,14 @@ public partial class MazeWalls : MazeComponent
             sequence.DrawRect(topLeft.X, topLeft.Y, _height, _width);
         }
 
-        // нет смысла рисовать одну и ту же стенку дважды.
-        // Без них улучшается внешний вид и нет необходимости в костыле с областью видимости в MazeComponent
-        // if (x == Maze.Width - 1)
+        if (Maze[x, y].ContainsWall(Direction.Right))
         {
-            if (Maze[x, y].ContainsWall(Direction.Right))
-            {
-                sequence.DrawRect(bottomRight.X, topLeft.Y, _width, _height);
-            }
+            sequence.DrawRect(bottomRight.X, topLeft.Y, _width, _height);
         }
 
-        // if (y == Maze.Height - 1)
+        if (Maze[x, y].ContainsWall(Direction.Bottom))
         {
-            if (Maze[x, y].ContainsWall(Direction.Bottom))
-            {
-                sequence.DrawRect(topLeft.X, bottomRight.Y, _height, _width);
-            }
-        }
-
-        if (Maze[x, y].TempWoolYarn)
-        {
-            sequence.DrawRect(topLeft.X + 10, topLeft.Y + 10, _height / 4, _width * 4);
+            sequence.DrawRect(topLeft.X, bottomRight.Y, _height, _width);
         }
     }
 }

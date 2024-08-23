@@ -10,7 +10,7 @@ public class Hammer : Item
         Stack = new LimitedItemStack(this, 6, 6);
 
         ControlSettings = new ControlSettings(Key.KeyA, Key.Space, true);
-        SoundSettings = new SoundSettings("molot", "score");
+        SoundSettings = new SoundSettings("molot", "/media/hammer.mp3");
     }
 
     public override int CalculateCountInMaze(int width, int height, int density)

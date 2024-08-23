@@ -1,4 +1,4 @@
-﻿namespace Labirint.Core.Abilities;
+﻿namespace Labirint.Core.Abilities.Base;
 
 /// <summary>
 ///     Способность.

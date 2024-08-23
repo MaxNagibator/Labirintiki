@@ -1,4 +1,6 @@
-﻿namespace Labirint.Core.Tests;
+﻿using Labirint.Core.Abilities.Base;
+
+namespace Labirint.Core.Tests;
 
 internal class TestAbility(int? moveCount = null) : Ability
 {

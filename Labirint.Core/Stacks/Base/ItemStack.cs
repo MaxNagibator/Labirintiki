@@ -1,4 +1,4 @@
-﻿namespace Labirint.Core.Stacks;
+﻿namespace Labirint.Core.Stacks.Base;
 
 public abstract class ItemStack(Item item, int defaultCount, int maxCount)
 {

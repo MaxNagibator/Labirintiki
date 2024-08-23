@@ -1,4 +1,4 @@
-﻿using Labirint.Core.TileFeatures;
+﻿using Labirint.Core.TileFeatures.Base;
 using LabirintBlazorApp.Components;
 using LabirintBlazorApp.Parameters;
 using Microsoft.AspNetCore.Components;

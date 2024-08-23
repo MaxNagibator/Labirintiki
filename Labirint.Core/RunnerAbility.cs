@@ -1,19 +1,17 @@
-﻿using System.Xml.Linq;
-
-namespace Labirint.Core;
+﻿namespace Labirint.Core;
 
 /// <summary>
 ///     Способность бегуна.
 /// </summary>
 public class RunnerAbility(Ability ability)
 {
+    private int? _lostCount = ability.MoveCount;
+
     public string DisplayName => ability.DisplayName;
 
     public string Icon => ability.Icon;
 
-    private int? _lostCount = ability.MoveCount;
-
-    public bool IsUnlimitedMoveCount = ability.IsUnlimitedMoveCount;
+    public bool IsUnlimitedMoveCount => ability.IsUnlimitedMoveCount;
 
     public int LostCount => _lostCount ?? 0;
 

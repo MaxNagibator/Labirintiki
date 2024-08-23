@@ -1,6 +1,5 @@
 ﻿using Labirint.Core.Extensions;
 using Labirint.Core.Interfaces;
-using Labirint.Core.TileFeatures;
 
 namespace Labirint.Core;
 
@@ -216,7 +215,7 @@ public class Labyrinth
         {
             return;
         }
-        
+
         if (density != 100)
         {
             if (_seeder.Random.Next(0, 100) >= density)
@@ -261,7 +260,7 @@ public class Labyrinth
 
         Position adjacentPosition = direction.GetAdjacentPosition(position);
         Direction oppositeDirection = direction.GetOppositeDirection();
-        
+
         Tile adjacentTile = this[adjacentPosition];
 
         return adjacentTile.CanAddWall(oppositeDirection);

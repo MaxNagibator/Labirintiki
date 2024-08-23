@@ -14,7 +14,7 @@ public class Sand : ScoreItem
 
         CostPerItem = 100;
 
-        SoundSettings = new SoundSettings("", "score");
+        SoundSettings = new SoundSettings(string.Empty, "score");
     }
 
     public override int CalculateCountInMaze(int width, int height, int density)
@@ -24,15 +24,17 @@ public class Sand : ScoreItem
 
     public override WorldItem GetWorldItem(WorldItemParameters parameters)
     {
-        var asd = base.GetWorldItem(parameters);
-        asd.Alignment = Alignment.BottomCenter;
-        asd.Scale = parameters.Random.Random.Next(MinSize, MaxSize + 1) / 10d;
-        return asd;
+        WorldItem item = base.GetWorldItem(parameters);
 
+        return new WorldItem(this, Image, Alignment.BottomCenter, parameters.Random.Random.Next(MinSize, MaxSize + 1) / 10d)
+        {
+            PickUp = TryPickUp,
+            AfterPlace = item.AfterPlace
+        };
     }
 
     protected override bool TryPickUp(WorldItem worldItem)
     {
-        return Stack.TryAdd((int)Math.Floor(worldItem.Scale * 10 % MinSize + 1));
+        return Stack.TryAdd((int)Math.Floor(worldItem.DrawingSettings!.Scale * 10 % MinSize + 1));
     }
 }

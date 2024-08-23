@@ -3,71 +3,51 @@
 [TestFixture]
 public class TileTests
 {
-    // TODO очень страшно, но работает. Можно было придумать что-нибудь получше или не проверять все варианты, но это перестраховка из-за бинарных операция
-    [TestCase(Direction.None, Direction.Left, true)]
-    [TestCase(Direction.None, Direction.Top, true)]
-    [TestCase(Direction.None, Direction.Right, true)]
-    [TestCase(Direction.None, Direction.Bottom, true)]
-   
-    [TestCase(Direction.Left, Direction.Top, true)]
-    [TestCase(Direction.Left, Direction.Right, true)]
-    [TestCase(Direction.Left, Direction.Bottom, true)]
-    [TestCase(Direction.Left, Direction.Left, false)]
- 
-    [TestCase(Direction.Top, Direction.Left, true)]
-    [TestCase(Direction.Top, Direction.Right, true)]
-    [TestCase(Direction.Top, Direction.Bottom, true)]
-    [TestCase(Direction.Top, Direction.Top, false)]
-   
-    [TestCase(Direction.Right, Direction.Left, true)]
-    [TestCase(Direction.Right, Direction.Top, true)]
-    [TestCase(Direction.Right, Direction.Bottom, true)]
-    [TestCase(Direction.Right, Direction.Right, false)]
-  
-    [TestCase(Direction.Bottom, Direction.Left, true)]
-    [TestCase(Direction.Bottom, Direction.Top, true)]
-    [TestCase(Direction.Bottom, Direction.Right, true)]
-    [TestCase(Direction.Bottom, Direction.Bottom, false)]
-   
-    [TestCase(Direction.Left | Direction.Top, Direction.Right, true)]
-    [TestCase(Direction.Left | Direction.Top, Direction.Bottom, true)]
-    [TestCase(Direction.Left | Direction.Top, Direction.Left, false)]
-    [TestCase(Direction.Left | Direction.Top, Direction.Top, false)]
-  
-    [TestCase(Direction.Left | Direction.Right, Direction.Top, true)]
-    [TestCase(Direction.Left | Direction.Right, Direction.Bottom, true)]
-    [TestCase(Direction.Left | Direction.Right, Direction.Left, false)]
-    [TestCase(Direction.Left | Direction.Right, Direction.Right, false)]
-    
-    [TestCase(Direction.Left | Direction.Bottom, Direction.Top, true)]
-    [TestCase(Direction.Left | Direction.Bottom, Direction.Right, true)]
-    [TestCase(Direction.Left | Direction.Bottom, Direction.Left, false)]
-    [TestCase(Direction.Left | Direction.Bottom, Direction.Bottom, false)]
-    
-    [TestCase(Direction.Top | Direction.Right, Direction.Left, true)]
-    [TestCase(Direction.Top | Direction.Right, Direction.Bottom, true)]
-    [TestCase(Direction.Top | Direction.Right, Direction.Top, false)]
-    [TestCase(Direction.Top | Direction.Right, Direction.Right, false)]
-    
-    [TestCase(Direction.Top | Direction.Bottom, Direction.Left, true)]
-    [TestCase(Direction.Top | Direction.Bottom, Direction.Right, true)]
-    [TestCase(Direction.Top | Direction.Bottom, Direction.Top, false)]
-    [TestCase(Direction.Top | Direction.Bottom, Direction.Bottom, false)]
-    
-    [TestCase(Direction.Right | Direction.Bottom, Direction.Left, true)]
-    [TestCase(Direction.Right | Direction.Bottom, Direction.Top, true)]
-    [TestCase(Direction.Right | Direction.Bottom, Direction.Right, false)]
-    [TestCase(Direction.Right | Direction.Bottom, Direction.Bottom, false)]
-    
-    [TestCase(Direction.Left | Direction.Top | Direction.Right, Direction.Bottom, false)]
-    [TestCase(Direction.Left | Direction.Top | Direction.Bottom, Direction.Right, false)]
-    [TestCase(Direction.Left | Direction.Right | Direction.Bottom, Direction.Top, false)]
-    [TestCase(Direction.Top | Direction.Right | Direction.Bottom, Direction.Left, false)]
-    
-    [TestCase(Direction.Left | Direction.Top | Direction.Right | Direction.Bottom, Direction.Left, false)]
-    [TestCase(Direction.Left | Direction.Top | Direction.Right | Direction.Bottom, Direction.Top, false)]
-    [TestCase(Direction.Left | Direction.Top | Direction.Right | Direction.Bottom, Direction.Right, false)]
-    [TestCase(Direction.Left | Direction.Top | Direction.Right | Direction.Bottom, Direction.Bottom, false)]
+    private static IEnumerable<TestCaseData> TestCases
+    {
+        get
+        {
+            Direction[] directions = [Direction.None, Direction.Left, Direction.Top, Direction.Right, Direction.Bottom];
+
+            IEnumerable<(Direction direction, int count)> combinedDirections = GetCombinedDirections(directions.Where(direction => direction != Direction.None).ToArray());
+
+            foreach ((Direction direction, int count) in combinedDirections)
+            {
+                foreach (Direction directionToAdd in directions)
+                {
+                    bool expected = direction != Direction.All
+                                    && direction != Direction.None
+                                    && direction != directionToAdd
+                                    && direction.HasFlag(directionToAdd) == false
+                                    && count < 3;
+
+                    yield return new TestCaseData(direction, directionToAdd, expected);
+                }
+            }
+        }
+    }
+
+    private static IEnumerable<(Direction direction, int count)> GetCombinedDirections(Direction[] directions)
+    {
+        int totalSubsets = 1 << directions.Length;
+
+        for (int i = 1; i < totalSubsets; i++)
+        {
+            (Direction direction, int count) combination = new();
+
+            for (int j = 0; j < directions.Length; j++)
+            {
+                if ((i & 1 << j) != 0)
+                {
+                    combination = (combination.direction |= directions[j], combination.count + 1);
+                }
+            }
+
+            yield return combination;
+        }
+    }
+
+    [TestCaseSource(nameof(TestCases))]
     public void CanAddWallTest(Direction existingWalls, Direction directionToAdd, bool expectedResult)
     {
         Tile tile = new()

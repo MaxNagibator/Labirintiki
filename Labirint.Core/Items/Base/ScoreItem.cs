@@ -1,4 +1,4 @@
-﻿namespace Labirint.Core.Items;
+﻿namespace Labirint.Core.Items.Base;
 
 public abstract class ScoreItem : Item
 {

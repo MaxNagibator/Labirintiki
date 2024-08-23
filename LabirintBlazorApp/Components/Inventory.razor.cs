@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using Labirint.Core.Stacks;
+using Labirint.Core.Stacks.Base;
 using LabirintBlazorApp.Common.Control.Schemes;
 using Microsoft.AspNetCore.Components;
 

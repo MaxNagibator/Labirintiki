@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using Labirint.Core.Stacks;
+using Labirint.Core.Stacks.Base;
 
 namespace LabirintBlazorApp.Services;
 
