@@ -45,8 +45,8 @@ public class LabyrinthTests
         _inventory.Clear();
     }
 
-    private const int DefaultWidth = 16;
-    private const int DefaultHeight = 16;
+    private const int DefaultWidth = 500;
+    private const int DefaultHeight = 500;
 
     private IRandom _random;
     private Labyrinth _labyrinth;

@@ -21,7 +21,7 @@ public class Tile
     public bool IsExit { get; set; }
 
     /// <summary>
-    /// Сделать эффекты у клетки.
+    ///     Сделать эффекты у клетки.
     /// </summary>
     public bool TempWoolYarn { get; set; }
 
@@ -32,7 +32,7 @@ public class Tile
     /// <returns>True, если стенка присутствует; иначе false.</returns>
     public bool ContainsWall(Direction direction)
     {
-        return Walls.HasFlag(direction);
+        return (Walls & direction) != 0;
     }
 
     /// <summary>
@@ -41,7 +41,7 @@ public class Tile
     /// <param name="direction">Направление добавления стенки.</param>
     public void AddWall(Direction direction)
     {
-        if (Walls.HasFlag(direction))
+        if (ContainsWall(direction))
         {
             return;
         }
@@ -55,7 +55,7 @@ public class Tile
     /// <param name="direction">Направление удаления стенки.</param>
     public void RemoveWall(Direction direction)
     {
-        if (Walls.HasFlag(direction) == false)
+        if (ContainsWall(direction) == false)
         {
             return;
         }
@@ -80,6 +80,16 @@ public class Tile
         item = WorldItem;
         WorldItem = null;
         return true;
+    }
+
+    /// <summary>
+    ///     Приведет ли добавление стены по указанному направлению к созданию ячейки со всеми закрытыми сторонами.
+    /// </summary>
+    /// <param name="direction">Направление стены</param>
+    /// <returns>True, если не приведет, иначе False</returns>
+    public bool CanAddWall(Direction direction)
+    {
+        return (ContainsWall(direction) || (Walls | direction) == Direction.All) == false;
     }
 
     public override string ToString()

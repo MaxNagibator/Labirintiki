@@ -215,10 +215,18 @@ public class Labyrinth
         {
             return;
         }
-
-        if (_seeder.Random.Next(0, 100) >= density)
+        
+        if (density != 100)
         {
-            return;
+            if (_seeder.Random.Next(0, 100) >= density)
+            {
+                return;
+            }
+
+            if (CanAddWithoutLoop(position, wallDirection) == false)
+            {
+                return;
+            }
         }
 
         this[position].AddWall(wallDirection);
@@ -239,6 +247,23 @@ public class Labyrinth
     public bool IsCorrectPosition(Position position)
     {
         return position >= (0, 0) && position < (Width, Height);
+    }
+
+    private bool CanAddWithoutLoop(Position position, Direction direction)
+    {
+        Tile tile = this[position];
+
+        if (tile.CanAddWall(direction) == false)
+        {
+            return false;
+        }
+
+        Position adjacentPosition = direction.GetAdjacentPosition(position);
+        Direction oppositeDirection = direction.GetOppositeDirection();
+        
+        Tile adjacentTile = this[adjacentPosition];
+
+        return adjacentTile.CanAddWall(oppositeDirection);
     }
 
     private Tile AddTile(Position position)
