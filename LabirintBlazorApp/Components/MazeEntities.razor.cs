@@ -1,4 +1,6 @@
-﻿namespace LabirintBlazorApp.Components;
+﻿using Labirint.Core.TileFeatures;
+
+namespace LabirintBlazorApp.Components;
 
 public partial class MazeEntities : MazeComponent
 {
@@ -6,17 +8,13 @@ public partial class MazeEntities : MazeComponent
 
     protected override void DrawInner(int x, int y, DrawSequence sequence)
     {
-        WorldItem? item = Maze[x, y].WorldItem;
-
-        if (item == null)
+        foreach (var feature in Maze[x, y].Features)
         {
-            return;
+            Position draw = Vision.GetDraw((x, y)) * BoxSize + WallWidth;
+            (int offset, int entitySize) = AlignmentHelper.CalculateOffset(BoxSize, WallWidth, feature.Scale);
+            (int left, int top) = AlignmentHelper.CalculatePosition(feature.Alignment, draw, offset);
+
+            sequence.DrawImage(feature.ImageSource, left, top, entitySize, entitySize);
         }
-
-        Position draw = Vision.GetDraw((x, y)) * BoxSize + WallWidth;
-        (int offset, int entitySize) = AlignmentHelper.CalculateOffset(BoxSize, WallWidth, item.Scale);
-        (int left, int top) = AlignmentHelper.CalculatePosition(item.Alignment, draw, offset);
-
-        sequence.DrawImage(item.ImageSource, left, top, entitySize, entitySize);
     }
 }

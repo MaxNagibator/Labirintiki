@@ -1,9 +1,11 @@
-﻿namespace Labirint.Core.Abilities;
+﻿using Labirint.Core.TileFeatures;
+
+namespace Labirint.Core.Abilities;
 
 /// <summary>
 ///     След шерстяной нитки.
 /// </summary>
-public class WoolYarnTrack : Ability
+public class WoolYarnAbility : Ability
 {
     public override string Name => "WoolYarnTrack";
 
@@ -13,6 +15,6 @@ public class WoolYarnTrack : Ability
 
     public override void Hit(Tile tile)
     {
-        tile.TempWoolYarn = true;
+        tile.AddFeature(new WoolYarnFeature());
     }
 }

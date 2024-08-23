@@ -1,4 +1,5 @@
 ﻿using Labirint.Core.Interfaces;
+using Labirint.Core.TileFeatures;
 
 namespace Labirint.Core;
 

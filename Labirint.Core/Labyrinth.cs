@@ -1,5 +1,6 @@
 ﻿using Labirint.Core.Extensions;
 using Labirint.Core.Interfaces;
+using Labirint.Core.TileFeatures;
 
 namespace Labirint.Core;
 
@@ -17,7 +18,7 @@ public class Labyrinth
 
         _itemPlacer = new ItemPlacer(_seeder, (x, y, item) =>
         {
-            this[x, y].WorldItem = item;
+            this[x, y].AddFeature(item);
             item.AfterPlace.Invoke((x, y), this);
         });
     }
@@ -30,7 +31,7 @@ public class Labyrinth
     /// <summary>
     ///     Событие, которое вызывается, когда игрок подбирает предмет.
     /// </summary>
-    public event EventHandler<WorldItem>? ItemPickedUp;
+    public event EventHandler<TileFeature>? ItemPickedUp;
 
     /// <summary>
     ///     Событие, которое вызывается, когда игрок успешно перемещается.
@@ -127,7 +128,7 @@ public class Labyrinth
             ExitFound?.Invoke(this, EventArgs.Empty);
         }
 
-        if (tile.TryPickUp(out WorldItem? item))
+        if (tile.TryPickUp(out TileFeature? item))
         {
             ItemPickedUp?.Invoke(this, item!);
         }

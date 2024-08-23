@@ -1,4 +1,6 @@
-﻿namespace Labirint.Core.Items;
+﻿using Labirint.Core.TileFeatures;
+
+namespace Labirint.Core.Items;
 
 public class Sand : ScoreItem
 {
@@ -22,11 +24,11 @@ public class Sand : ScoreItem
 
     public override WorldItem GetWorldItem(WorldItemParameters parameters)
     {
-        return base.GetWorldItem(parameters) with
-        {
-            Alignment = Alignment.BottomCenter,
-            Scale = parameters.Random.Random.Next(MinSize, MaxSize + 1) / 10d
-        };
+        var asd = base.GetWorldItem(parameters);
+        asd.Alignment = Alignment.BottomCenter;
+        asd.Scale = parameters.Random.Random.Next(MinSize, MaxSize + 1) / 10d;
+        return asd;
+
     }
 
     protected override bool TryPickUp(WorldItem worldItem)

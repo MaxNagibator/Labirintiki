@@ -1,4 +1,5 @@
-﻿using LabirintBlazorApp.Components;
+﻿using Labirint.Core.TileFeatures;
+using LabirintBlazorApp.Components;
 using LabirintBlazorApp.Parameters;
 using Microsoft.AspNetCore.Components;
 
@@ -96,7 +97,7 @@ public partial class Maze : IAsyncDisposable
         _isExitFound = true;
     }
 
-    private async void OnItemPickedUp(object? sender, WorldItem args)
+    private async void OnItemPickedUp(object? sender, TileFeature args)
     {
         await SoundService.PlayAsync(args.PickUpSound);
     }

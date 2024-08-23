@@ -1,4 +1,6 @@
-﻿namespace Labirint.Core;
+﻿using Labirint.Core.TileFeatures;
+
+namespace Labirint.Core;
 
 /// <summary>
 ///     Клетка лабиринта.
@@ -6,9 +8,9 @@
 public class Tile
 {
     /// <summary>
-    ///     Предмет в клетке.
+    ///     Особенности клетки.
     /// </summary>
-    public WorldItem? WorldItem { get; set; }
+    public List<TileFeature> Features { get; set; }
 
     /// <summary>
     ///     Направления стенок клетки.
@@ -19,11 +21,6 @@ public class Tile
     ///     Является ли клетка выходом.
     /// </summary>
     public bool IsExit { get; set; }
-
-    /// <summary>
-    ///     Сделать эффекты у клетки.
-    /// </summary>
-    public bool TempWoolYarn { get; set; }
 
     /// <summary>
     ///     Содержит ли клетка стенку с указанного направления.
@@ -63,23 +60,50 @@ public class Tile
         Walls &= ~direction;
     }
 
+    public void AddFeature(TileFeature feature)
+    {
+        if (Features == null)
+        {
+            Features = new List<TileFeature>();
+        }
+        Features.Add(feature);
+    }
+
     /// <summary>
     ///     Попробовать подобрать предмет, находящийся в клетке.
     /// </summary>
     /// <param name="item">Подобранный предмет, если операция успешна; иначе null.</param>
     /// <returns>True, если предмет был успешно подобран; иначе false.</returns>
-    public bool TryPickUp(out WorldItem? item)
+    public bool TryPickUp(out TileFeature? item)
     {
         item = null;
 
-        if (WorldItem == null || WorldItem.TryPickUp() == false)
+        if (Features != null)
         {
-            return false;
+            var newFeatures = new List<TileFeature>();
+            foreach (var feature in Features)
+            {
+                if (feature.TryPickUp())
+                {
+                    item = feature;
+                    if (feature.RemoveAfterSuccessPickUp)
+                    {
+
+                    }
+                    else
+                    {
+                        newFeatures.Add(feature);
+                    }
+                }
+                else
+                {
+                    newFeatures.Add(feature);
+                }
+            }
+            Features = newFeatures;
         }
 
-        item = WorldItem;
-        WorldItem = null;
-        return true;
+        return item != null;
     }
 
     /// <summary>
@@ -94,6 +118,6 @@ public class Tile
 
     public override string ToString()
     {
-        return $"{nameof(Walls)}: {Walls}, {nameof(WorldItem)}: {WorldItem}, {nameof(IsExit)}: {IsExit}";
+        return $"{nameof(Walls)}: {Walls}, {nameof(Features)}: {Features?.Count}, {nameof(IsExit)}: {IsExit}";
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Labirint.Core.Items;
+﻿using Labirint.Core.TileFeatures;
+
+namespace Labirint.Core.Items;
 
 public abstract class Item
 {
@@ -29,7 +31,6 @@ public abstract class Item
         {
             ImageSource = $"/images/items/{Name}.png",
             Alignment = Alignment.Center,
-            PickUpSound = SoundSettings?.PickUpSound ?? string.Empty,
             Scale = 0.9,
             PickUp = TryPickUp,
             AfterPlace = AfterPlace

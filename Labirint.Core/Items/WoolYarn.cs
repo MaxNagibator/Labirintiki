@@ -18,12 +18,12 @@ public class WoolYarn : Item
 
     public override int CalculateCountInMaze(int width, int height, int density)
     {
-        return (width + height) / (32 + 32);
+        return 10;// (width + height) / (32 + 32);
     }
 
     protected override void AfterUse(Position position, Direction? direction, Labyrinth labyrinth)
     {
-        WoolYarnTrack track = new();
+        WoolYarnAbility track = new();
         labyrinth.Runner.AddAbility(track);
         track.Hit(labyrinth[position]);
     }
