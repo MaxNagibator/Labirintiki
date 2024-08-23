@@ -50,7 +50,7 @@ public class Labyrinth
     /// <summary>
     ///     Бегущий.
     /// </summary>
-    public Runner Runner { get; private set; }
+    public Runner Runner { get; private set; } = null!;
 
     private Tile[,] Tiles { get; set; } = null!;
 

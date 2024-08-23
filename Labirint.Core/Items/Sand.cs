@@ -2,6 +2,9 @@
 
 public class Sand : ScoreItem
 {
+    private const int MinSize = 6;
+    private const int MaxSize = 9;
+
     public Sand()
     {
         Name = "sand";
@@ -22,12 +25,12 @@ public class Sand : ScoreItem
         return base.GetWorldItem(parameters) with
         {
             Alignment = Alignment.BottomCenter,
-            Scale = parameters.Random.Random.Next(4, 7) / 10d
+            Scale = parameters.Random.Random.Next(MinSize, MaxSize + 1) / 10d
         };
     }
 
     protected override bool TryPickUp(WorldItem worldItem)
     {
-        return Stack.TryAdd((int)Math.Floor(worldItem.Scale * 10 % 4 + 1));
+        return Stack.TryAdd((int)Math.Floor(worldItem.Scale * 10 % MinSize + 1));
     }
 }

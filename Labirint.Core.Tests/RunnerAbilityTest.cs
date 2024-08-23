@@ -1,5 +1,19 @@
 ﻿namespace Labirint.Core.Tests;
 
+internal class TestAbility(int? moveCount = null) : Ability
+{
+    public override string Name => "TestAbility";
+    public override string DisplayName => "TestAbility";
+
+    public override int? MoveCount { get; } = moveCount;
+    public int HitCount { get; private set; }
+
+    public override void Hit(Tile tile)
+    {
+        HitCount++;
+    }
+}
+
 [TestFixture]
 public class RunnerAbilityTest
 {
@@ -8,23 +22,20 @@ public class RunnerAbilityTest
     [TestCase(10)]
     public void AbilityActiveCorrectWorkTest(int? count)
     {
+        Tile tile = new();
         TestAbility testAbility = new(count);
-
         RunnerAbility ability = new(testAbility);
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(ability.Active, Is.True);
-        });
+        Assert.That(ability.Active, Is.True);
 
         for (int i = 0; i < testAbility.MoveCount; i++)
         {
-            ability.Hit();
+            ability.Hit(tile);
         }
 
         Assert.That(ability.Active, Is.EqualTo(testAbility.IsUnlimitedMoveCount));
 
-        ability.Hit();
+        ability.Hit(tile);
 
         Assert.That(testAbility.HitCount, Is.EqualTo(testAbility.IsUnlimitedMoveCount ? testAbility.HitCount : testAbility.MoveCount));
     }

@@ -5,5 +5,5 @@ namespace LabirintBlazorApp.Components;
 public partial class Abilities
 {
     [Parameter]
-    public required List<RunnerAbility> RunnerAbilities { get; set; }
+    public required IReadOnlyList<RunnerAbility> RunnerAbilities { get; set; }
 }
