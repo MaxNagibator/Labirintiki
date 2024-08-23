@@ -17,7 +17,7 @@ public class Runner
 
     public Position Position { get; private set; }
 
-    public List<RunnerAbility> Abilities => _abilities;
+    public IReadOnlyList<RunnerAbility> Abilities => _abilities;
 
     public void AddAbility(Ability ability)
     {

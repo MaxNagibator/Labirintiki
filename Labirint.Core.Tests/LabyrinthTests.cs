@@ -3,6 +3,30 @@ using DirectionExtensions = Labirint.Core.Tests.Helpers.DirectionExtensions;
 
 namespace Labirint.Core.Tests;
 
+internal class TestItem : Item
+{
+    private static int _id;
+
+    public TestItem(int count)
+    {
+        Count = count;
+        Name = "test " + _id++;
+        DisplayName = "Test " + count;
+
+        Stack = new LimitedItemStack(this, 2, 2);
+
+        ControlSettings = new ControlSettings(Key.KeyB, Key.ControlLeft);
+        SoundSettings = new SoundSettings("bomb", "score");
+    }
+
+    public int Count { get; }
+
+    public override int CalculateCountInMaze(int width, int height, int density)
+    {
+        return Count;
+    }
+}
+
 [TestFixture]
 public class LabyrinthTests
 {
@@ -21,8 +45,8 @@ public class LabyrinthTests
         _inventory.Clear();
     }
 
-    private const int DefaultWidth = 16;
-    private const int DefaultHeight = 16;
+    private const int DefaultWidth = 500;
+    private const int DefaultHeight = 500;
 
     private IRandom _random;
     private Labyrinth _labyrinth;

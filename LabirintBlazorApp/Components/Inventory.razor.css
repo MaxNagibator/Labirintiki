@@ -7,10 +7,9 @@
 .inventory-item {
     position: relative;
     overflow: hidden;
-    width: 80px;
-    height: 96px;
+    width: 100px;
+    height: 100px;
     border-radius: 4px;
-    background-color: #ccc;
 }
 
 .inventory-item.score {
@@ -24,11 +23,11 @@
 }
 
 .inventory-item.animate {
-    animation: pulse 0.8s infinite;
+    animation: pulse 0.6s infinite;
 }
 
 .inventory-item .count {
-    font-size: 14px;
+    font-size: 18px;
     font-weight: bold;
     position: absolute;
     right: 0;

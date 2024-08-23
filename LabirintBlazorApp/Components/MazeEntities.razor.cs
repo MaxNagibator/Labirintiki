@@ -1,7 +1,4 @@
-﻿using Labirint.Core;
-using Labirint.Core.Common;
-
-namespace LabirintBlazorApp.Components;
+﻿namespace LabirintBlazorApp.Components;
 
 public partial class MazeEntities : MazeComponent
 {

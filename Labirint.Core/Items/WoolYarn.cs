@@ -7,13 +7,13 @@ public class WoolYarn : Item
 {
     public WoolYarn()
     {
-        Name = "WoolYarn";
+        Name = "wool-yarn";
         DisplayName = "Нить";
 
         Stack = new LimitedItemStack(this, 0, 1);
 
-        ControlSettings = new ControlSettings(Key.KeyY, Key.KeyY);
-        SoundSettings = new SoundSettings("bomb", "score");
+        ControlSettings = new ControlSettings(Key.KeyY);
+        SoundSettings = new SoundSettings("/media/wool-yarn.mp3", "/media/yarn.mp3");
     }
 
     public override int CalculateCountInMaze(int width, int height, int density)
@@ -23,7 +23,7 @@ public class WoolYarn : Item
 
     protected override void AfterUse(Position position, Direction? direction, Labyrinth labyrinth)
     {
-        var track = new WoolYarnTrack();
+        WoolYarnTrack track = new();
         labyrinth.Runner.AddAbility(track);
         track.Hit(labyrinth[position]);
     }

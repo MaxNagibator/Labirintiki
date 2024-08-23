@@ -56,7 +56,7 @@ public partial class Maze : IAsyncDisposable
 
     protected override void OnInitialized()
     {
-        _boxSize = 48;
+        _boxSize = 64;
         _wallWidth = Math.Max(1, _boxSize / 10);
     }
 

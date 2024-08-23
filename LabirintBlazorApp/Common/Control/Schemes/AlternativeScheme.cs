@@ -1,6 +1,4 @@
-﻿using Labirint.Core.Common;
-
-namespace LabirintBlazorApp.Common.Control.Schemes;
+﻿namespace LabirintBlazorApp.Common.Control.Schemes;
 
 public class AlternativeScheme : IControlScheme
 {
@@ -13,6 +11,6 @@ public class AlternativeScheme : IControlScheme
 
     public Key GetActivateKey(ControlSettings settings)
     {
-        return settings.AlternativeActivateKey;
+        return settings.AlternativeActivateKey ?? settings.ActivateKey;
     }
 }
