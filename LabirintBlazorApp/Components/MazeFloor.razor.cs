@@ -9,47 +9,124 @@ public partial class MazeFloor : MazeComponent
     protected override void DrawInner(int x, int y, DrawSequence sequence)
     {
         Position topLeft = Vision.GetDraw((x, y)) * BoxSize;
-        int id = DetermineTileId(x, y, Vision.Start, Vision.Finish);
-
-        // Альтернативный вариант для отображение реальных границ лабиринта, а не границ области видимости
-        // int id = DetermineTileId(x, y, (0, 0), (Position)(Maze.Width, Maze.Height) - 1);
 
         sequence.DrawRect(topLeft.X, topLeft.Y, BoxSize + WallWidth, BoxSize + WallWidth);
-        sequence.DrawImage($"/images/tiles/tile00{id}.png", topLeft.X, topLeft.Y, BoxSize, BoxSize);
+
+        int tileSize = BoxSize / 2;
+
+        int?[,] tile = GetTile(x, y);
+
+        for (int i = 0; i < 2; i++)
+        {
+            for (int j = 0; j < 2; j++)
+            {
+                int left = topLeft.X + i * tileSize;
+                int top = topLeft.Y + j * tileSize;
+
+                sequence.DrawImage($"/images/tiles/tile{tile[i, j]:000}.png", left, top, tileSize, tileSize);
+                // sequence.DrawImage($"/images/tiles/test/tile{tile[i, j]:000}.png", left, top, tileSize, tileSize);
+            }
+        }
     }
 
-    private int DetermineTileId(int x, int y, Position start, Position finish)
+    // https://i.imgur.com/WL6Nt13.png
+    private int?[,] GetTile(int x, int y)
     {
-        if (x == start.X && y == start.Y)
+        int? topLeft = null;
+        int? bottomLeft = null;
+        int? topRight = null;
+        int? bottomRight = null;
+
+        if (Maze[x, y].ContainsWall(Direction.Left))
         {
-            return 0;
+            topLeft = 12;
+            bottomLeft = 18;
         }
 
-        if (x == finish.X && y == finish.Y)
+        if (Maze[x, y].ContainsWall(Direction.Top))
         {
-            return 8;
+            if (topLeft == null)
+            {
+                topLeft = 2;
+            }
+            else
+            {
+                topLeft = 0;
+                bottomLeft = 6;
+            }
+
+            topRight = topLeft + 1;
         }
 
-        if (y == start.Y)
+        if (Maze[x, y].ContainsWall(Direction.Right))
         {
-            return x == finish.X ? 2 : 1;
+            if (topRight == null)
+            {
+                topRight = 17;
+            }
+            else
+            {
+                topRight = 5;
+
+                if (topLeft != 0)
+                {
+                    topLeft = 4;
+                }
+            }
+
+            bottomRight = topRight + 6;
         }
 
-        if (x == start.X)
+        if (Maze[x, y].ContainsWall(Direction.Bottom))
         {
-            return y == finish.Y ? 6 : 3;
+            bottomLeft = bottomLeft == null ? 32 : 30;
+
+            if (bottomRight == null)
+            {
+                bottomRight = bottomLeft + 1;
+            }
+            else
+            {
+                bottomRight = 35;
+
+                if (topRight != 5)
+                {
+                    topRight = 29;
+                }
+            }
         }
 
-        if (x == finish.X)
+        if (topLeft != null)
         {
-            return 5;
+            topRight ??= topLeft + 1;
+            bottomLeft ??= topLeft + 6;
         }
 
-        if (y == finish.Y)
+        if (topRight != null)
         {
-            return 7;
+            bottomRight ??= topRight + 6;
+            topLeft ??= topRight - 1;
         }
 
-        return 4;
+        if (bottomLeft != null)
+        {
+            bottomRight ??= bottomLeft + 1;
+            topLeft ??= bottomLeft - 6;
+        }
+
+        if (bottomRight != null)
+        {
+            topRight ??= bottomRight - 6;
+            bottomLeft ??= bottomRight - 1;
+        }
+
+        int?[,] tile = new int?[2, 2];
+
+        tile[0, 0] = topLeft ?? 14;
+        tile[1, 0] = topRight ?? 15;
+        tile[0, 1] = bottomLeft ?? 20;
+        tile[1, 1] = bottomRight ?? 21;
+
+        return tile;
     }
 }
