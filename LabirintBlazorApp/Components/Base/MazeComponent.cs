@@ -19,6 +19,8 @@ public abstract class MazeComponent : ComponentBase
     [CascadingParameter]
     public required MazeRenderParameters RenderParameters { get; set; }
 
+    protected virtual string StrokeStyle => GlobalParameters.Labyrinth.Color;
+
     protected int BoxSize { get; private set; }
     protected int WallWidth { get; private set; }
     protected Labyrinth Maze { get; private set; } = null!;
@@ -87,7 +89,7 @@ public abstract class MazeComponent : ComponentBase
     {
         DrawSequence drawSequence = new();
         drawSequence.ClearRect(0, 0, CanvasWidth, CanvasHeight);
-        drawSequence.StrokeStyle(GlobalParameters.Labyrinth.Color);
+        drawSequence.StrokeStyle(StrokeStyle);
 
         for (int x = Vision.Start.X; x <= Vision.Finish.X; x++)
         {

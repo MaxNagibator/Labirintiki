@@ -19,8 +19,9 @@ public partial class Maze : IAsyncDisposable
     private int _boxSize;
     private int _wallWidth;
 
+    private MazeFloor? _mazeFloor;
     private MazeWalls? _mazeWalls;
-    private MazeEntities? _mazeSands;
+    private MazeEntities? _mazeEntities;
     private MazeRenderParameters? _renderParameter;
     private KeyInterceptor? _keyInterceptor;
 
@@ -88,7 +89,7 @@ public partial class Maze : IAsyncDisposable
         // TODO подумать как вынести строку
         await SoundService.PlayAsync("step");
 
-        await Task.WhenAll(ForceRenderWalls(), ForceRenderSands());
+        await ForceRender();
         StateHasChanged();
     }
 
@@ -125,7 +126,7 @@ public partial class Maze : IAsyncDisposable
         {
             await SoundService.PlayAsync(item.SoundSettings?.UseSound);
 
-            await ForceRenderWalls();
+            await ForceRender();
             StateHasChanged();
         }
     }
@@ -166,19 +167,16 @@ public partial class Maze : IAsyncDisposable
 
         StateHasChanged();
 
-        await Task.WhenAll(ForceRenderWalls(), ForceRenderSands());
+        await ForceRender();
 
         _isInit = true;
         StateHasChanged();
     }
 
-    private Task ForceRenderSands()
+    private async Task ForceRender()
     {
-        return _mazeSands?.ForceRender() ?? Task.CompletedTask;
-    }
-
-    private Task ForceRenderWalls()
-    {
-        return _mazeWalls?.ForceRender() ?? Task.CompletedTask;
+        await (_mazeFloor?.ForceRender() ?? Task.CompletedTask);
+        await (_mazeWalls?.ForceRender() ?? Task.CompletedTask);
+        await (_mazeEntities?.ForceRender() ?? Task.CompletedTask);
     }
 }

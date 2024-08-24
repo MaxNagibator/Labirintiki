@@ -36,8 +36,9 @@
             <div class="field">
                 <Animation Effect="AnimationService.AnimationEffect" Speed="TimeSpan.FromMilliseconds(200.0)" Delay="@Delay.None" IterationCount="1">
                     <CascadingValue Value="_renderParameter">
+                        <MazeFloor @ref="_mazeFloor" />
                         <MazeWalls @ref="_mazeWalls" />
-                        <MazeEntities @ref="_mazeSands" />
+                        <MazeEntities @ref="_mazeEntities" />
                     </CascadingValue>
 
                     @{
