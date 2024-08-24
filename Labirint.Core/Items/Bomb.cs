@@ -4,14 +4,13 @@ public class Bomb : Item
 {
     public Bomb()
     {
-        Name = "bomb";
-        DisplayName = "Бомба";
-
         Stack = new LimitedItemStack(this, 2, 2);
-
-        ControlSettings = new ControlSettings(Key.KeyB, Key.ControlLeft);
-        SoundSettings = new SoundSettings("bomb", "/media/bomb.mp3");
     }
+
+    public override string Name => "bomb";
+    public override string DisplayName => "Бомба";
+    public override ControlSettings? ControlSettings { get; } = new(Key.KeyB, Key.ControlLeft);
+    public override SoundSettings? SoundSettings { get; } = new("/media/bomb.mp3", "bomb");
 
     public override int CalculateCountInMaze(int width, int height, int density)
     {

@@ -7,6 +7,6 @@ public abstract class ScoreItem : Item
         Stack = new ScoreItemStack(this);
     }
 
-    public int CostPerItem { get; protected init; }
+    public abstract int CostPerItem { get;  }
     public int Score => Stack.Count * CostPerItem;
 }

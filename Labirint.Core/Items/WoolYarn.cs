@@ -9,14 +9,13 @@ public class WoolYarn : Item
 {
     public WoolYarn()
     {
-        Name = "wool-yarn";
-        DisplayName = "Нить";
-
         Stack = new LimitedItemStack(this, 0, 1);
-
-        ControlSettings = new ControlSettings(Key.KeyY);
-        SoundSettings = new SoundSettings("/media/wool-yarn.mp3", "/media/yarn.mp3");
     }
+
+    public override string Name => "wool-yarn";
+    public override string DisplayName => "Нить";
+    public override ControlSettings? ControlSettings { get; } = new(Key.KeyY);
+    public override SoundSettings? SoundSettings { get; } = new("/media/yarn.mp3", "/media/wool-yarn.mp3");
 
     public override int CalculateCountInMaze(int width, int height, int density)
     {

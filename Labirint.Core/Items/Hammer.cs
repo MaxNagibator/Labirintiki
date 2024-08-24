@@ -4,14 +4,13 @@ public class Hammer : Item
 {
     public Hammer()
     {
-        Name = "hammer";
-        DisplayName = "Молоток";
-
         Stack = new LimitedItemStack(this, 6, 6);
-
-        ControlSettings = new ControlSettings(Key.KeyA, Key.Space, true);
-        SoundSettings = new SoundSettings("molot", "/media/hammer.mp3");
     }
+
+    public override string Name => "hammer";
+    public override string DisplayName => "Молоток";
+    public override ControlSettings? ControlSettings { get; } = new(Key.KeyA, Key.Space, true);
+    public override SoundSettings? SoundSettings { get; } = new("/media/hammer.mp3", "molot");
 
     public override int CalculateCountInMaze(int width, int height, int density)
     {

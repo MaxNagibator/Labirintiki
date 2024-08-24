@@ -7,15 +7,10 @@ public class Sand : ScoreItem
     private const int MinSize = 6;
     private const int MaxSize = 9;
 
-    public Sand()
-    {
-        Name = "sand";
-        DisplayName = "Песочек";
-
-        CostPerItem = 100;
-
-        SoundSettings = new SoundSettings(string.Empty, "score");
-    }
+    public override string Name => "sand";
+    public override string DisplayName => "Песочек";
+    public override int CostPerItem => 100;
+    public override SoundSettings? SoundSettings { get; } = new("score");
 
     public override int CalculateCountInMaze(int width, int height, int density)
     {
