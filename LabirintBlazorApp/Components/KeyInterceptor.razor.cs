@@ -17,11 +17,11 @@ public partial class KeyInterceptor : IAsyncDisposable
     public event EventHandler<Item?>? ChangedWaitItem;
     public event EventHandler<MoveEventArgs>? MoveKeyDown;
 
-    [Inject]
-    public required IControlSchemeService SchemeService { get; set; }
+    [Parameter]
+    public required Inventory? Inventory { get; set; }
 
     [Inject]
-    public required InventoryService InventoryService { get; set; }
+    public required IControlSchemeService SchemeService { get; set; }
 
     [Inject]
     public required IJSRuntime JSRuntime { get; set; }
@@ -68,6 +68,22 @@ public partial class KeyInterceptor : IAsyncDisposable
         }
     }
 
+    public void InitializeItems()
+    {
+        if (Inventory != null)
+        {
+            _itemUsed = Inventory.AllItems
+                .Where(item => item.ControlSettings != null)
+                .Select(item => (ControlScheme.GetActivateKey(item.ControlSettings!).KeyCode, item))
+                .ToDictionary();
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        InitializeItems();
+    }
+
     protected override void OnInitialized()
     {
         _reference = DotNetObjectReference.Create(this);
@@ -92,10 +108,7 @@ public partial class KeyInterceptor : IAsyncDisposable
 
     private void Initialize()
     {
-        _itemUsed = InventoryService.Items
-            .Where(item => item.ControlSettings != null)
-            .Select(item => (ControlScheme.GetActivateKey(item.ControlSettings!).KeyCode, item))
-            .ToDictionary();
+        InitializeItems();
 
         _moveDirections = new Dictionary<string, Direction>
         {

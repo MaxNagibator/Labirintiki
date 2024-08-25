@@ -14,7 +14,6 @@ builder.Services.AddMudServices();
 
 builder.Services.AddSingleton<SoundService>();
 builder.Services.AddSingleton<AnimationService>();
-builder.Services.AddSingleton<InventoryService>();
 builder.Services.AddSingleton<IControlSchemeService, ControlSchemeService>();
 builder.Services.AddScoped<IClipboardService, ClipboardService>();
 

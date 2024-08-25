@@ -11,11 +11,19 @@ public class Runner
     public Runner(Position position, Labyrinth labyrinth)
     {
         Position = position;
-        _abilities = [];
         _labyrinth = labyrinth;
+
+        _abilities = [];
+        Inventory = new Inventory();
+
+        // TODO Подумать над отпиской
+        Inventory.ScoreIncrease += (_, amount) => Score += amount;
     }
 
     public Position Position { get; private set; }
+    public int Score { get; private set; }
+
+    public Inventory Inventory { get; }
 
     public IReadOnlyList<RunnerAbility> Abilities => _abilities;
 
@@ -32,5 +40,10 @@ public class Runner
         {
             ability.Hit(_labyrinth[Position]);
         }
+    }
+
+    public void UseItem(Item item, Direction? direction)
+    {
+        Inventory.Use(item, Position, direction, _labyrinth);
     }
 }

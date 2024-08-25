@@ -19,7 +19,7 @@ public partial class MazeSeed : IRandom
     private Random? _random;
     private string? _userSeed;
 
-    public Random Random => _random ?? Random.Shared;
+    public Random Generator => _random ?? Random.Shared;
 
     [Parameter]
     public string? Seed { get; set; }

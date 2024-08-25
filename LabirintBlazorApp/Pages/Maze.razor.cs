@@ -29,9 +29,6 @@ public partial class Maze : IAsyncDisposable
     private MazeSeed _seeder = null!;
     private Vision _vision = null!;
 
-    [Inject]
-    public required InventoryService InventoryService { get; set; }
-
     [Parameter]
     public string? Seed { get; set; }
 
@@ -113,7 +110,7 @@ public partial class Maze : IAsyncDisposable
         _labyrinth.Move(args.Direction);
     }
 
-    private async void OnAttackKeyDown(object? sender, AttackEventArgs args)
+    private void OnAttackKeyDown(object? sender, AttackEventArgs args)
     {
         if (_isExitFound)
         {
@@ -122,13 +119,18 @@ public partial class Maze : IAsyncDisposable
 
         Item? item = args.Item;
 
-        if (item != null && item.TryUse(_labyrinth.Runner.Position, args.Direction, _labyrinth))
+        if (item != null)
         {
-            await SoundService.PlayAsync(item.SoundSettings?.UseSound);
-
-            await ForceRender();
-            StateHasChanged();
+            _labyrinth.Runner.UseItem(item, args.Direction);
         }
+    }
+
+    private async void OnItemUsed(object? sender, Item item)
+    {
+        await SoundService.PlayAsync(item.SoundSettings?.UseSound);
+
+        await ForceRender();
+        StateHasChanged();
     }
 
     private async Task GenerateAsync()
@@ -139,7 +141,6 @@ public partial class Maze : IAsyncDisposable
         // Но в принципе то работает)))))) 
         await Task.Delay(1);
 
-        InventoryService.Clear();
         _seeder.Reload();
 
         if (_labyrinth != null)
@@ -147,6 +148,7 @@ public partial class Maze : IAsyncDisposable
             _labyrinth.RunnerMoved -= OnRunnerMoved;
             _labyrinth.ExitFound -= OnExitFound;
             _labyrinth.ItemPickedUp -= OnItemPickedUp;
+            _labyrinth.Runner.Inventory.ItemUsed -= OnItemUsed;
         }
 
         _isExitFound = false;
@@ -154,11 +156,14 @@ public partial class Maze : IAsyncDisposable
         _originalSize = Math.Max(MinSize, Math.Min(MaxSize, _originalSize));
 
         _labyrinth = new Labyrinth(_seeder);
-        _labyrinth.Init(_originalSize, _originalSize, _density, InventoryService.Items);
+        _labyrinth.Init(_originalSize, _originalSize, _density);
 
         _labyrinth.RunnerMoved += OnRunnerMoved;
         _labyrinth.ExitFound += OnExitFound;
         _labyrinth.ItemPickedUp += OnItemPickedUp;
+        _labyrinth.Runner.Inventory.ItemUsed += OnItemUsed;
+
+        _keyInterceptor?.InitializeItems();
 
         _vision = new Vision(_originalSize, _originalSize);
         _vision.SetPosition(_labyrinth.Runner.Position);

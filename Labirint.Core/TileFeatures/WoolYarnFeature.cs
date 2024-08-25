@@ -6,7 +6,7 @@ public class WoolYarnFeature : TileFeature
     public override string PickUpSound => string.Empty;
     public override DrawingSettings? DrawingSettings => null;
 
-    public override bool TryPickUp()
+    public override bool TryPickUp(Labyrinth labyrinth)
     {
         return false;
     }

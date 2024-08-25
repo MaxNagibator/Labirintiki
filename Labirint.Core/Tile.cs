@@ -3,7 +3,7 @@
 /// <summary>
 ///     Клетка лабиринта.
 /// </summary>
-public class Tile
+public class Tile(Labyrinth labyrinth)
 {
     /// <summary>
     ///     Особенности клетки.
@@ -83,7 +83,8 @@ public class Tile
 
         foreach (TileFeature feature in Features)
         {
-            if (feature.TryPickUp())
+            // TODO Возможно костыль с передачей лабиринта
+            if (feature.TryPickUp(labyrinth))
             {
                 item = feature;
 

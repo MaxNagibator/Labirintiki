@@ -1,7 +1,6 @@
 ﻿@using Labirint.Core.Items.Common
-@using Labirint.Core.Stacks.Base
 <MudStack Row Spacing="3">
-    @foreach (ItemStack stack in Stacks)
+    @foreach (ItemStack stack in Inventory.Stacks)
     {
         Item item = stack.Item;
 

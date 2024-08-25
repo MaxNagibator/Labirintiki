@@ -2,13 +2,12 @@
 
 public class Bomb : Item
 {
-    public Bomb()
-    {
-        Stack = new LimitedItemStack(this, 2, 2);
-    }
-
     public override string Name => "bomb";
     public override string DisplayName => "Бомба";
+
+    public override int DefaultCount => 2;
+    public override int MaxCount => 2;
+
     public override ControlSettings? ControlSettings { get; } = new(Key.KeyB, Key.ControlLeft);
     public override SoundSettings? SoundSettings { get; } = new("/media/bomb.mp3", "bomb");
 

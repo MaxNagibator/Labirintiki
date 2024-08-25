@@ -79,9 +79,12 @@ public class Labyrinth
     /// <param name="height">Высота лабиринта</param>
     /// <param name="density">Плотность стен в лабиринте</param>
     /// <param name="placeableItems">Список предметов, которые нужно разместить в лабиринте</param>
-    public void Init(int width, int height, int density, IEnumerable<Item> placeableItems)
+    public void Init(int width, int height, int density, IEnumerable<Item>? placeableItems = null)
     {
         Runner = new Runner((0, 0), this);
+
+        placeableItems ??= Runner.Inventory.AllItems;
+
         Width = width;
         Height = height;
 
@@ -218,7 +221,7 @@ public class Labyrinth
 
         if (density != 100)
         {
-            if (_seeder.Random.Next(0, 100) >= density)
+            if (_seeder.Generator.Next(0, 100) >= density)
             {
                 return;
             }
@@ -268,7 +271,7 @@ public class Labyrinth
 
     private Tile AddTile(Position position)
     {
-        Tile tile = new();
+        Tile tile = new(this);
 
         this[position] = tile;
         return tile;

@@ -2,5 +2,5 @@
 
 public interface IRandom
 {
-    Random Random { get; }
+    Random Generator { get; }
 }

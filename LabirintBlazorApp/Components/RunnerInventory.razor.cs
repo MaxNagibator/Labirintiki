@@ -1,14 +1,12 @@
-﻿using System.Collections.ObjectModel;
-using Labirint.Core.Stacks.Base;
-using LabirintBlazorApp.Common.Control.Schemes;
+﻿using LabirintBlazorApp.Common.Control.Schemes;
 using Microsoft.AspNetCore.Components;
 
 namespace LabirintBlazorApp.Components;
 
-public partial class Inventory : IAsyncDisposable
+public partial class RunnerInventory : IAsyncDisposable
 {
     [Parameter]
-    public required ObservableCollection<ItemStack> Stacks { get; set; }
+    public required Inventory Inventory { get; set; }
 
     [Parameter]
     public required KeyInterceptor Interceptor { get; set; }

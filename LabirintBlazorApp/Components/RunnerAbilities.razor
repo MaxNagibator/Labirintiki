@@ -1,5 +1,5 @@
 ﻿<MudStack Row Spacing="3">
-    @foreach (RunnerAbility ability in RunnerAbilities.Where(x => x.Active))
+    @foreach (RunnerAbility ability in Abilities.Where(x => x.Active))
     {
         <div class="runner-ability-container">
             <div class="runner-ability">

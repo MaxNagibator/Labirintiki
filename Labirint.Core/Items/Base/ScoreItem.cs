@@ -2,11 +2,8 @@
 
 public abstract class ScoreItem : Item
 {
-    protected ScoreItem()
-    {
-        Stack = new ScoreItemStack(this);
-    }
+    public override int DefaultCount => 0;
+    public override int MaxCount => int.MaxValue;
 
-    public abstract int CostPerItem { get;  }
-    public int Score => Stack.Count * CostPerItem;
+    public abstract int CostPerItem { get; }
 }

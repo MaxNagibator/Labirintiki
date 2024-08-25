@@ -7,13 +7,12 @@ namespace Labirint.Core.Items;
 /// </summary>
 public class WoolYarn : Item
 {
-    public WoolYarn()
-    {
-        Stack = new LimitedItemStack(this, 0, 1);
-    }
-
     public override string Name => "wool-yarn";
     public override string DisplayName => "Нить";
+
+    public override int DefaultCount => 0;
+    public override int MaxCount => 1;
+
     public override ControlSettings? ControlSettings { get; } = new(Key.KeyY);
     public override SoundSettings? SoundSettings { get; } = new("/media/yarn.mp3", "/media/wool-yarn.mp3");
 
