@@ -24,7 +24,7 @@ public class RunnerAbilityTest
     [TestCase(10)]
     public void AbilityActiveCorrectWorkTest(int? count)
     {
-        Tile tile = new();
+        Tile tile = new(default);
         TestAbility testAbility = new(count);
         RunnerAbility ability = new(testAbility);
 

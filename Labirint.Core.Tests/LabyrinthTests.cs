@@ -2,21 +2,17 @@ using DirectionExtensions = Labirint.Core.Tests.Helpers.DirectionExtensions;
 
 namespace Labirint.Core.Tests;
 
-internal class TestItem : Item
+internal class TestItem(int count) : Item
 {
     private static int _id;
 
-    public TestItem(int count)
-    {
-        Count = count;
-        DisplayName = "Test " + count;
-
-        Stack = new LimitedItemStack(this, 2, 2);
-    }
-
     public override string Name { get; } = "test " + _id++;
-    public override string DisplayName { get; }
-    public int Count { get; }
+    public override string DisplayName { get; } = "Test " + count;
+
+    public override int DefaultCount => 0;
+    public override int MaxCount => 0;
+
+    public int Count { get; } = count;
 
     public override int CalculateCountInMaze(int width, int height, int density)
     {

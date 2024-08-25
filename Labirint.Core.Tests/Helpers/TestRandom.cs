@@ -2,5 +2,5 @@
 
 internal class TestRandom : IRandom
 {
-    public Random Random => new(1);
+    public Random Generator { get; } = new(1);
 }

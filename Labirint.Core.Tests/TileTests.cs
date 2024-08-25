@@ -50,7 +50,7 @@ public class TileTests
     [TestCaseSource(nameof(TestCases))]
     public void CanAddWallTest(Direction existingWalls, Direction directionToAdd, bool expectedResult)
     {
-        Tile tile = new()
+        Tile tile = new(default)
         {
             Walls = existingWalls
         };
