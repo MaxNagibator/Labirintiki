@@ -6,7 +6,7 @@ using MudBlazor;
 
 namespace LabirintBlazorApp.Components;
 
-public partial class MazeSeed : IRandom
+public partial class RandomGenerator : IRandom
 {
     public const string SizeQueryName = "s";
     public const string DensityQueryName = "d";

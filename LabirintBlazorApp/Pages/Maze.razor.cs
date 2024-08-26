@@ -26,16 +26,16 @@ public partial class Maze : IAsyncDisposable
     private KeyInterceptor? _keyInterceptor;
 
     private Labyrinth _labyrinth = null!;
-    private MazeSeed _seeder = null!;
+    private RandomGenerator _seeder = null!;
     private Vision _vision = null!;
 
     [Parameter]
     public string? Seed { get; set; }
 
-    [SupplyParameterFromQuery(Name = MazeSeed.SizeQueryName)]
+    [SupplyParameterFromQuery(Name = RandomGenerator.SizeQueryName)]
     public int? MazeSize { get; set; }
 
-    [SupplyParameterFromQuery(Name = MazeSeed.DensityQueryName)]
+    [SupplyParameterFromQuery(Name = RandomGenerator.DensityQueryName)]
     public int? MazeDensity { get; set; }
 
     // Проверка на null и инициализацию (дополнительная проверка, если флаг выставили в true, а значение у не null полей не выставили)
@@ -180,8 +180,8 @@ public partial class Maze : IAsyncDisposable
 
     private async Task ForceRender()
     {
-        await (_mazeFloor?.ForceRender() ?? Task.CompletedTask);
-        await (_mazeWalls?.ForceRender() ?? Task.CompletedTask);
-        await (_mazeEntities?.ForceRender() ?? Task.CompletedTask);
+        await (_mazeFloor?.ForceRenderAsync() ?? Task.CompletedTask);
+        await (_mazeWalls?.ForceRenderAsync() ?? Task.CompletedTask);
+        await (_mazeEntities?.ForceRenderAsync() ?? Task.CompletedTask);
     }
 }

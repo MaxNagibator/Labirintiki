@@ -11,6 +11,8 @@ public class Inventory
     }
 
     public event EventHandler<Item>? ItemAdded;
+    public event EventHandler<Item>? ItemCantAdded;
+    public event EventHandler<Item>? ItemCantUsed;
     public event EventHandler<Item>? ItemUsed;
     public event EventHandler<int>? ScoreIncrease;
 
@@ -35,12 +37,22 @@ public class Inventory
         {
             ItemUsed?.Invoke(this, stack.Item);
         }
+        else
+        {
+            ItemCantUsed?.Invoke(this, stack.Item);
+        }
     }
 
     public bool TryAdd(Item item, int count = 1)
     {
-        if ((_items.TryGetValue(item, out ItemStack? stack) && stack.TryAdd(count)) == false)
+        if (_items.TryGetValue(item, out ItemStack? stack) == false)
         {
+            return false;
+        }
+
+        if (stack.TryAdd(count) == false)
+        {
+            ItemCantAdded?.Invoke(this, stack.Item);
             return false;
         }
 
