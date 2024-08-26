@@ -50,6 +50,11 @@ public partial class Maze : IAsyncDisposable
             _keyInterceptor.MoveKeyDown -= OnMoveKeyDown;
         }
 
+        _labyrinth.RunnerMoved -= OnRunnerMoved;
+        _labyrinth.ExitFound -= OnExitFound;
+        _labyrinth.ItemPickedUp -= OnItemPickedUp;
+        _labyrinth.Runner.Inventory.ItemUsed -= OnItemUsed;
+
         GC.SuppressFinalize(this);
     }
 
@@ -67,16 +72,25 @@ public partial class Maze : IAsyncDisposable
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender == false)
         {
-            await GenerateAsync();
-
-            if (_keyInterceptor != null)
-            {
-                _keyInterceptor.AttackKeyDown += OnAttackKeyDown;
-                _keyInterceptor.MoveKeyDown += OnMoveKeyDown;
-            }
+            return;
         }
+
+        _labyrinth = new Labyrinth(_seeder);
+        _labyrinth.RunnerMoved += OnRunnerMoved;
+        _labyrinth.ExitFound += OnExitFound;
+        _labyrinth.ItemPickedUp += OnItemPickedUp;
+        _labyrinth.Runner.Inventory.ItemUsed += OnItemUsed;
+
+        if (_keyInterceptor != null)
+        {
+            _keyInterceptor.AttackKeyDown += OnAttackKeyDown;
+            _keyInterceptor.MoveKeyDown += OnMoveKeyDown;
+            _keyInterceptor.InitializeItems();
+        }
+
+        await GenerateAsync();
     }
 
     private async void OnRunnerMoved(object? sender, Position args)
@@ -143,27 +157,11 @@ public partial class Maze : IAsyncDisposable
 
         _seeder.Reload();
 
-        if (_labyrinth != null)
-        {
-            _labyrinth.RunnerMoved -= OnRunnerMoved;
-            _labyrinth.ExitFound -= OnExitFound;
-            _labyrinth.ItemPickedUp -= OnItemPickedUp;
-            _labyrinth.Runner.Inventory.ItemUsed -= OnItemUsed;
-        }
-
         _isExitFound = false;
 
         _originalSize = Math.Max(MinSize, Math.Min(MaxSize, _originalSize));
 
-        _labyrinth = new Labyrinth(_seeder);
         _labyrinth.Init(_originalSize, _originalSize, _density);
-
-        _labyrinth.RunnerMoved += OnRunnerMoved;
-        _labyrinth.ExitFound += OnExitFound;
-        _labyrinth.ItemPickedUp += OnItemPickedUp;
-        _labyrinth.Runner.Inventory.ItemUsed += OnItemUsed;
-
-        _keyInterceptor?.InitializeItems();
 
         _vision = new Vision(_originalSize, _originalSize);
         _vision.SetPosition(_labyrinth.Runner.Position);

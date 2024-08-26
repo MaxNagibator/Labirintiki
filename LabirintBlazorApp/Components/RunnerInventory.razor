@@ -1,44 +1,42 @@
 ﻿@using Labirint.Core.Items.Common
+@using LabirintBlazorApp.Common.Animation
 @inherits RenderComponent
 
 <MudStack Row Spacing="3">
-    @if (_items != null)
+    @foreach (AnimatedStack animatedStack in _stackCache.Values)
     {
-        foreach (ShowingStack showingStack in _items)
+        ItemStack stack = animatedStack.Stack;
+        Item item = stack.Item;
+
+        if (stack.Count <= 0 && string.IsNullOrWhiteSpace(animatedStack.GetAnimations()))
         {
-            ItemStack stack = showingStack.Stack;
-            Item item = stack.Item;
-
-            if (stack.Count <= 0 && string.IsNullOrWhiteSpace(showingStack.GetAnimations()))
-            {
-                continue;
-            }
-
-            <div class="inventory-item-container">
-                <div class="inventory-item
-                            @(stack.IsInfinite ? " score" : string.Empty)
-                            @(showingStack.GetAnimations())"
-                     @onanimationend="() => Added(showingStack)">
-
-                    <img src="@item.Icon" alt="@item.DisplayName">
-                    <div class="item-name">@item.DisplayName</div>
-                    <div class="count">@stack.Count</div>
-                    <div class="max-count" title="@stack.InMazeCount">@(stack.IsInfinite ? "∞" : stack.MaxCount)</div>
-                </div>
-
-                @{
-                    ControlSettings? control = item.ControlSettings;
-
-                    if (control != null)
-                    {
-                        <div class="keyboard-button" @onclick="() => OnClicked(control.ActivateKey)">
-                            <span>
-                                @ControlScheme.GetActivateKey(control).DisplaySymbol
-                            </span>
-                        </div>
-                    }
-                }
-            </div>
+            continue;
         }
+
+        <div class="inventory-item-container">
+            <div class="inventory-item
+                            @(stack.IsInfinite ? " score" : string.Empty)
+                            @(animatedStack.GetAnimations())"
+                 @onanimationend="() => AnimationCompleted(animatedStack)">
+
+                <img src="@item.Icon" alt="@item.DisplayName">
+                <div class="item-name">@item.DisplayName</div>
+                <div class="count">@stack.Count</div>
+                <div class="max-count" title="@stack.InMazeCount">@(stack.IsInfinite ? "∞" : stack.MaxCount)</div>
+            </div>
+
+            @{
+                ControlSettings? control = item.ControlSettings;
+
+                if (control != null)
+                {
+                    <div class="keyboard-button" @onclick="() => OnClicked(control.ActivateKey)">
+                        <span>
+                            @ControlScheme.GetActivateKey(control).DisplaySymbol
+                        </span>
+                    </div>
+                }
+            }
+        </div>
     }
 </MudStack>

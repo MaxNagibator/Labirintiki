@@ -20,6 +20,8 @@ public class Labyrinth
             this[x, y].AddFeature(item);
             item.AfterPlace.Invoke((x, y), this);
         });
+
+        Runner = new Runner((0, 0), this, new Inventory());
     }
 
     /// <summary>
@@ -50,7 +52,7 @@ public class Labyrinth
     /// <summary>
     ///     Бегущий.
     /// </summary>
-    public Runner Runner { get; private set; } = null!;
+    public Runner Runner { get; }
 
     private Tile[,] Tiles { get; set; } = null!;
 
@@ -81,7 +83,7 @@ public class Labyrinth
     /// <param name="placeableItems">Список предметов, которые нужно разместить в лабиринте</param>
     public void Init(int width, int height, int density, IEnumerable<Item>? placeableItems = null)
     {
-        Runner = new Runner((0, 0), this);
+        Runner.Reset();
 
         placeableItems ??= Runner.Inventory.AllItems;
 

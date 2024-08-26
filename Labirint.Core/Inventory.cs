@@ -10,11 +10,14 @@ public class Inventory
         _items = GetAllDerivedItems().ToDictionary(item => item, item => new ItemStack(item));
     }
 
+    public event EventHandler? InventoryCleared;
+
     public event EventHandler<Item>? ItemAdded;
     public event EventHandler<Item>? ItemCantAdded;
     public event EventHandler<Item>? ItemCantUsed;
     public event EventHandler<Item>? ItemUsed;
-    public event EventHandler<int>? ScoreIncrease;
+
+    public event EventHandler<int>? ScoreIncreased;
 
     /// <summary>
     ///     Все доступные предметы.
@@ -59,7 +62,7 @@ public class Inventory
         // TODO Убрать проверку на основе типа
         if (item is ScoreItem scoreItem)
         {
-            ScoreIncrease?.Invoke(this, scoreItem.CostPerItem * count);
+            ScoreIncreased?.Invoke(this, scoreItem.CostPerItem * count);
         }
 
         ItemAdded?.Invoke(this, item);
@@ -76,6 +79,8 @@ public class Inventory
         {
             stack.Reset();
         }
+
+        InventoryCleared?.Invoke(this, EventArgs.Empty);
     }
 
     private IEnumerable<Item> GetAllDerivedItems()

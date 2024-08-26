@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using LabirintBlazorApp.Common.Animation;
 using LabirintBlazorApp.Common.Control.Schemes;
 using Microsoft.AspNetCore.Components;
 
@@ -6,60 +6,41 @@ namespace LabirintBlazorApp.Components;
 
 public partial class RunnerInventory : RenderComponent, IAsyncDisposable
 {
-    private ObservableCollection<ShowingStack>? _items;
+    private Dictionary<Item, AnimatedStack> _stackCache = new();
 
     [Parameter]
+    [EditorRequired]
     public required Inventory Inventory { get; set; }
 
     [Parameter]
+    [EditorRequired]
     public required KeyInterceptor Interceptor { get; set; }
 
     [Inject]
     public required IControlSchemeService SchemeService { get; set; }
 
-    private ShowingStack WaitItem { get; set; }
+    private AnimatedStack? WaitItem { get; set; }
 
     private IControlScheme ControlScheme => SchemeService.CurrentScheme;
 
     public async ValueTask DisposeAsync()
     {
-        Interceptor.ChangedWaitItem -= OnChangedWaitItem;
-        SchemeService.ControlSchemeChanged -= OnSchemeChanged;
+        UnsubscribeEvents();
         await Interceptor.DisposeAsync();
 
         GC.SuppressFinalize(this);
     }
 
-    protected override Task OnRenderAsyncInner()
+    protected override Task OnFirstRenderAsyncInner()
     {
+        InitializeItems();
+        SubscribeEvents();
+
         return Task.CompletedTask;
     }
 
-    protected override Task OnFirstRenderAsyncInner()
+    protected override Task OnRenderAsyncInner()
     {
-        _items = new ObservableCollection<ShowingStack>(Inventory.Stacks.Select(x => new ShowingStack(x)));
-
-        Interceptor.ChangedWaitItem += OnChangedWaitItem;
-        SchemeService.ControlSchemeChanged += OnSchemeChanged;
-
-        Inventory.ItemAdded += async (_, item) =>
-        {
-            _items.FirstOrDefault(x => x.Stack.Item.Name == item.Name).Add();
-            await ForceRenderAsync();
-        };
-
-        Inventory.ItemCantAdded += async (_, item) =>
-        {
-            _items.FirstOrDefault(x => x.Stack.Item.Name == item.Name).CantAdd();
-            await ForceRenderAsync();
-        };
-
-        Inventory.ItemUsed += async (_, item) =>
-        {
-            _items.FirstOrDefault(x => x.Stack.Item.Name == item.Name).Use();
-            await ForceRenderAsync();
-        };
-
         return Task.CompletedTask;
     }
 
@@ -68,23 +49,42 @@ public partial class RunnerInventory : RenderComponent, IAsyncDisposable
         await ForceRenderAsync();
     }
 
-    private async void OnChangedWaitItem(object? sender, Item? args)
+    private async void OnChangedWaitItem(object? sender, Item? item)
     {
-        if (args == null)
+        if (item == null)
         {
-            WaitItem.IsWaiting = false;
+            WaitItem?.RemoveState();
         }
         else
         {
-            ShowingStack? showingStack = _items?.FirstOrDefault(x => x.Stack.Item.Name == args.Name);
-
-            if (showingStack != null)
+            if (_stackCache.TryGetValue(item, out AnimatedStack? showingStack))
             {
-                showingStack.Wait();
+                showingStack.AddState(AnimatedStack.State.Waiting);
                 WaitItem = showingStack;
             }
         }
 
+        await ForceRenderAsync();
+    }
+
+    private async void OnItemAdded(object? sender, Item item)
+    {
+        await AddStackAnimation(item, AnimatedStack.State.Added);
+    }
+
+    private async void OnItemCantAdded(object? sender, Item item)
+    {
+        await AddStackAnimation(item, AnimatedStack.State.CantAdd);
+    }
+
+    private async void OnItemUsed(object? sender, Item item)
+    {
+        await AddStackAnimation(item, AnimatedStack.State.Used);
+    }
+
+    private async void OnInventoryCleared(object? sender, EventArgs e)
+    {
+        InitializeItems();
         await ForceRenderAsync();
     }
 
@@ -93,72 +93,47 @@ public partial class RunnerInventory : RenderComponent, IAsyncDisposable
         Interceptor.OnKeyDown(activateKey);
     }
 
-    private async Task Added(ShowingStack showingStack)
+    private void InitializeItems()
     {
-        showingStack.Clear();
+        _stackCache = Inventory.Stacks.ToDictionary(stack => stack.Item, stack => new AnimatedStack(stack));
+    }
+
+    private void SubscribeEvents()
+    {
+        Interceptor.ChangedWaitItem += OnChangedWaitItem;
+        SchemeService.ControlSchemeChanged += OnSchemeChanged;
+
+        Inventory.ItemAdded += OnItemAdded;
+        Inventory.ItemCantAdded += OnItemCantAdded;
+        Inventory.ItemUsed += OnItemUsed;
+        Inventory.InventoryCleared += OnInventoryCleared;
+    }
+
+    private void UnsubscribeEvents()
+    {
+        Interceptor.ChangedWaitItem -= OnChangedWaitItem;
+        SchemeService.ControlSchemeChanged -= OnSchemeChanged;
+
+        Inventory.ItemAdded -= OnItemAdded;
+        Inventory.ItemCantAdded -= OnItemCantAdded;
+        Inventory.ItemUsed -= OnItemUsed;
+        Inventory.InventoryCleared -= OnInventoryCleared;
+    }
+
+    private async Task AddStackAnimation(Item item, AnimatedStack.State animation)
+    {
+        if (_stackCache.TryGetValue(item, out AnimatedStack? stack) == false)
+        {
+            return;
+        }
+
+        stack.AddState(animation);
         await ForceRenderAsync();
     }
 
-    private class ShowingStack(ItemStack stack)
+    private async Task AnimationCompleted(AnimatedStack animatedStack)
     {
-        public ItemStack Stack { get; } = stack;
-        public bool IsAdded { get; set; }
-        public bool IsUsed { get; set; }
-        public bool IsCantAdded { get; set; }
-        public bool IsWaiting { get; set; }
-
-        public string GetAnimations()
-        {
-            string result = "";
-
-            if (IsAdded)
-            {
-                result += " added-animate";
-            }
-
-            if (IsUsed)
-            {
-                result += " used-animate";
-            }
-
-            if (IsCantAdded)
-            {
-                result += " max-count-animate";
-            }
-
-            if (IsWaiting)
-            {
-                result += " waiting-animate";
-            }
-
-            return result;
-        }
-
-        public void Add()
-        {
-            IsAdded = true;
-        }
-
-        public void Wait()
-        {
-            IsWaiting = true;
-        }
-
-        public void Use()
-        {
-            IsUsed = true;
-        }
-
-        public void CantAdd()
-        {
-            IsCantAdded = true;
-        }
-
-        public void Clear()
-        {
-            IsAdded = false;
-            IsUsed = false;
-            IsCantAdded = false;
-        }
+        animatedStack.RemoveState();
+        await ForceRenderAsync();
     }
 }
