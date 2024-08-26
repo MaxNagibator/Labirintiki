@@ -102,7 +102,7 @@ public class ItemPlacer(IRandom seeder, Action<int, int, WorldItem> placeItemAct
 
         for (int i = 0; i < _requiredItems.Count - 1; i++)
         {
-            int j = seeder.Random.Next(i + 1, length);
+            int j = seeder.Generator.Next(i + 1, length);
             (indexes[i], indexes[j]) = (indexes[j], indexes[i]);
         }
 

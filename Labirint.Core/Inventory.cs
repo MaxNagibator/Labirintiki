@@ -2,30 +2,73 @@
 
 public class Inventory
 {
-    private readonly List<Item> _allItems;
-
-    private List<ScoreItem>? _scoreItems;
-    private List<ItemStack>? _stacks;
+    private static Item[]? _allItems;
+    private readonly Dictionary<Item, ItemStack> _items;
 
     public Inventory()
     {
-        _allItems = GetAllDerivedItems().ToList();
+        _items = GetAllDerivedItems().ToDictionary(item => item, item => new ItemStack(item));
     }
+
+    public event EventHandler? InventoryCleared;
+
+    public event EventHandler<Item>? ItemAdded;
+    public event EventHandler<Item>? ItemCantAdded;
+    public event EventHandler<Item>? ItemCantUsed;
+    public event EventHandler<Item>? ItemUsed;
+
+    public event EventHandler<int>? ScoreIncreased;
 
     /// <summary>
     ///     Все доступные предметы.
     /// </summary>
-    public IEnumerable<Item> AllItems => _allItems;
+    public IEnumerable<Item> AllItems => _items.Keys;
 
     /// <summary>
     ///     Все стеки предметов в инвентаре.
     /// </summary>
-    public IEnumerable<ItemStack> Stacks => _stacks ??= GetStacks();
+    public IEnumerable<ItemStack> Stacks => _items.Values;
 
-    /// <summary>
-    ///     Все ценные предметы в инвентаре, отсортированных по убыванию стоимости.
-    /// </summary>
-    public IEnumerable<ScoreItem> ScoreItems => _scoreItems ??= GetScoreItems();
+    public void Use(Item item, Position position, Direction? direction, Labyrinth labyrinth)
+    {
+        if (_items.TryGetValue(item, out ItemStack? stack) == false)
+        {
+            return;
+        }
+
+        if (stack.TryUseItem(position, direction, labyrinth))
+        {
+            ItemUsed?.Invoke(this, stack.Item);
+        }
+        else
+        {
+            ItemCantUsed?.Invoke(this, stack.Item);
+        }
+    }
+
+    public bool TryAdd(Item item, int count = 1)
+    {
+        if (_items.TryGetValue(item, out ItemStack? stack) == false)
+        {
+            return false;
+        }
+
+        if (stack.TryAdd(count) == false)
+        {
+            ItemCantAdded?.Invoke(this, stack.Item);
+            return false;
+        }
+
+        // TODO Убрать проверку на основе типа
+        if (item is ScoreItem scoreItem)
+        {
+            ScoreIncreased?.Invoke(this, scoreItem.CostPerItem * count);
+        }
+
+        ItemAdded?.Invoke(this, item);
+
+        return true;
+    }
 
     /// <summary>
     ///     Сбросить количество всех предметов в инвентаре к значению по умолчанию.
@@ -36,30 +79,17 @@ public class Inventory
         {
             stack.Reset();
         }
-    }
 
-    private List<ItemStack> GetStacks()
-    {
-        return _allItems
-            .Select(item => item.Stack)
-            .ToList();
-    }
-
-    private List<ScoreItem> GetScoreItems()
-    {
-        return _allItems
-            .Where(item => item.GetType().IsSubclassOf(typeof(ScoreItem)))
-            .Select(item => (ScoreItem)item)
-            .OrderByDescending(item => item.CostPerItem)
-            .ToList();
+        InventoryCleared?.Invoke(this, EventArgs.Empty);
     }
 
     private IEnumerable<Item> GetAllDerivedItems()
     {
-        return typeof(Item).Assembly
+        return _allItems ??= typeof(Item).Assembly
             .GetTypes()
             .Where(type => type.IsSubclassOf(typeof(Item)) && type.IsAbstract == false)
             .Select(type => (Item)Activator.CreateInstance(type)!)
-            .OrderByDescending(item => item.Stack.MaxCount);
+            .OrderByDescending(item => item.MaxCount)
+            .ToArray();
     }
 }

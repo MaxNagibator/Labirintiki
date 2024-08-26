@@ -1,0 +1,18 @@
+﻿<MudStack Row Spacing="3">
+    @foreach (RunnerAbility ability in Abilities.Where(x => x.Active))
+    {
+        <div class="runner-ability-container">
+            <div class="runner-ability">
+                <img src="@ability.Icon" alt="@ability.DisplayName">
+                <div class="ability-name">@ability.DisplayName</div>
+                @if (ability.IsUnlimitedMoveCount)
+                {
+                }
+                else
+                {
+                    <div class="ability-lost-count">@ability.LostCount</div>
+                }
+            </div>
+        </div>
+    }
+</MudStack>

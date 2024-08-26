@@ -1,4 +1,6 @@
-﻿namespace Labirint.Core.Tests;
+﻿using Labirint.Core.Abilities.Base;
+
+namespace Labirint.Core.Tests;
 
 internal class TestAbility(int? moveCount = null) : Ability
 {
@@ -22,7 +24,7 @@ public class RunnerAbilityTest
     [TestCase(10)]
     public void AbilityActiveCorrectWorkTest(int? count)
     {
-        Tile tile = new();
+        Tile tile = new(default);
         TestAbility testAbility = new(count);
         RunnerAbility ability = new(testAbility);
 

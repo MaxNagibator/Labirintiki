@@ -19,25 +19,22 @@
         {
             <div class="info-panel">
                 <MudStack Spacing="3">
-                    @{
-                        int score = InventoryService.ScoreItems.Sum(scoreItem => scoreItem.Score);
+                    <MudStack Row>
+                        <MudIcon Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.Bitcoin" Size="Size.Large" />
+                        <MudText Color="Color.Warning" Typo="Typo.h6">@_labyrinth.Runner.Score</MudText>
+                    </MudStack>
 
-                        <MudStack Row>
-                            <MudIcon Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.Bitcoin" Size="Size.Large" />
-                            <MudText Color="Color.Warning" Typo="Typo.h6">@score</MudText>
-                        </MudStack>
-                    }
-
-                    <Inventory Interceptor="_keyInterceptor" Stacks="@InventoryService.Stacks" />
-                    <Abilities RunnerAbilities="@_labyrinth.Runner.Abilities" />
+                    <RunnerInventory Interceptor="_keyInterceptor" Inventory="_labyrinth.Runner.Inventory" />
+                    <RunnerAbilities Abilities="@_labyrinth.Runner.Abilities" />
                 </MudStack>
             </div>
 
             <div class="field">
                 <Animation Effect="AnimationService.AnimationEffect" Speed="TimeSpan.FromMilliseconds(200.0)" Delay="@Delay.None" IterationCount="1">
                     <CascadingValue Value="_renderParameter">
+                        <MazeFloor @ref="_mazeFloor" />
                         <MazeWalls @ref="_mazeWalls" />
-                        <MazeEntities @ref="_mazeSands" />
+                        <MazeEntities @ref="_mazeEntities" />
                     </CascadingValue>
 
                     @{
@@ -74,8 +71,8 @@
 
         <div class="control-panel">
             <MudStack Spacing="3">
-                <MudText title="@(string.Join(" | ", InventoryService.Stacks))" Typo="Typo.h5">Параметры: </MudText>
-                <MazeSeed @ref="_seeder" Seed="@Seed" Size="@_originalSize" Density="@_density" IsExitFound="@_isExitFound" />
+                <MudText title="@(string.Join(" | ", _labyrinth?.Runner.Inventory.Stacks ?? []))" Typo="Typo.h5">Параметры: </MudText>
+                <RandomGenerator @ref="_seeder" Seed="@Seed" Size="@_originalSize" Density="@_density" IsExitFound="@_isExitFound" />
                 <MudStack>
                     <MudNumericField Label="Размер" Min="@MinSize" Max="@MaxSize" DebounceInterval="300" @bind-Value="_originalSize" />
                     <MudSlider @bind-Value="_originalSize" Min="@MinSize" Max="@MaxSize" Color="Color.Info" Size="Size.Medium" />
@@ -86,7 +83,7 @@
                 </MudStack>
 
                 <MudButton OnClick="GenerateAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Генерировать</MudButton>
-                <KeyInterceptor @ref="_keyInterceptor" />
+                <KeyInterceptor @ref="_keyInterceptor" Inventory="_labyrinth?.Runner.Inventory" />
             </MudStack>
         </div>
     </div>

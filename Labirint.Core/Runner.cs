@@ -3,19 +3,25 @@
 /// <summary>
 ///     Бегущий по лабиринту.
 /// </summary>
-public class Runner
+public class Runner : IDisposable
 {
     private readonly List<RunnerAbility> _abilities;
     private readonly Labyrinth _labyrinth;
 
-    public Runner(Position position, Labyrinth labyrinth)
+    public Runner(Position position, Labyrinth labyrinth, Inventory inventory)
     {
         Position = position;
-        _abilities = [];
         _labyrinth = labyrinth;
+        Inventory = inventory;
+
+        _abilities = [];
+        Inventory.ScoreIncreased += OnScoreIncreased;
     }
 
     public Position Position { get; private set; }
+    public int Score { get; private set; }
+
+    public Inventory Inventory { get; }
 
     public IReadOnlyList<RunnerAbility> Abilities => _abilities;
 
@@ -32,5 +38,30 @@ public class Runner
         {
             ability.Hit(_labyrinth[Position]);
         }
+    }
+
+    public void UseItem(Item item, Direction? direction)
+    {
+        Inventory.Use(item, Position, direction, _labyrinth);
+    }
+
+    public void Dispose()
+    {
+        Inventory.ScoreIncreased -= OnScoreIncreased;
+
+        GC.SuppressFinalize(this);
+    }
+
+    public void Reset()
+    {
+        Position = (0, 0);
+        Score = 0;
+        Inventory.Clear();
+        _abilities.Clear();
+    }
+
+    private void OnScoreIncreased(object? sender, int amount)
+    {
+        Score += amount;
     }
 }

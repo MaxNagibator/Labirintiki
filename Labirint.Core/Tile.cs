@@ -1,16 +1,14 @@
-﻿using Labirint.Core.TileFeatures;
-
-namespace Labirint.Core;
+﻿namespace Labirint.Core;
 
 /// <summary>
 ///     Клетка лабиринта.
 /// </summary>
-public class Tile
+public class Tile(Labyrinth labyrinth)
 {
     /// <summary>
     ///     Особенности клетки.
     /// </summary>
-    public List<TileFeature> Features { get; set; }
+    public List<TileFeature>? Features { get; set; }
 
     /// <summary>
     ///     Направления стенок клетки.
@@ -62,10 +60,8 @@ public class Tile
 
     public void AddFeature(TileFeature feature)
     {
-        if (Features == null)
-        {
-            Features = new List<TileFeature>();
-        }
+        Features ??= [];
+
         Features.Add(feature);
     }
 
@@ -78,30 +74,35 @@ public class Tile
     {
         item = null;
 
-        if (Features != null)
+        if (Features == null)
         {
-            var newFeatures = new List<TileFeature>();
-            foreach (var feature in Features)
-            {
-                if (feature.TryPickUp())
-                {
-                    item = feature;
-                    if (feature.RemoveAfterSuccessPickUp)
-                    {
+            return false;
+        }
 
-                    }
-                    else
-                    {
-                        newFeatures.Add(feature);
-                    }
+        List<TileFeature> newFeatures = [];
+
+        foreach (TileFeature feature in Features)
+        {
+            // TODO Возможно костыль с передачей лабиринта
+            if (feature.TryPickUp(labyrinth))
+            {
+                item = feature;
+
+                if (feature.RemoveAfterSuccessPickUp)
+                {
                 }
                 else
                 {
                     newFeatures.Add(feature);
                 }
             }
-            Features = newFeatures;
+            else
+            {
+                newFeatures.Add(feature);
+            }
         }
+
+        Features = newFeatures;
 
         return item != null;
     }
@@ -113,7 +114,7 @@ public class Tile
     /// <returns>True, если не приведет, иначе False</returns>
     public bool CanAddWall(Direction direction)
     {
-        return (ContainsWall(direction) || (Walls | direction) == Direction.All) == false;
+        return direction != Direction.None && (ContainsWall(direction) || (Walls | direction) == Direction.All) == false;
     }
 
     public override string ToString()

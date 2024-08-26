@@ -26,22 +26,6 @@ public class InventoryTests
     }
 
     /// <summary>
-    ///     Тестирует, что класс Inventory правильно загружает оцениваемые предметы.
-    ///     Проверяет, что список загруженных оцениваемых предметов не пуст.
-    /// </summary>
-    [Test]
-    public void CorrectLoadScoredItemsTest()
-    {
-        List<string> inventoryAvailableItems = _inventory.ScoreItems
-            .Select(scoreItem => $"{scoreItem.Name} ({scoreItem.CostPerItem})")
-            .ToList();
-
-        Console.WriteLine($"Загруженные предметы: {string.Join(", ", inventoryAvailableItems)}");
-
-        Assert.That(inventoryAvailableItems, Is.Not.Empty);
-    }
-
-    /// <summary>
     ///     Тестирует, что класс Inventory правильно устанавливает значение по умолчанию для каждого стека предметов.
     ///     Проверяет, что количество каждого стека предметов равно его значению по умолчанию.
     /// </summary>

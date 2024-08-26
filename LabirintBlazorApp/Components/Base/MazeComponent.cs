@@ -3,11 +3,10 @@ using Microsoft.AspNetCore.Components;
 
 namespace LabirintBlazorApp.Components.Base;
 
-public abstract class MazeComponent : ComponentBase
+public abstract class MazeComponent : RenderComponent
 {
     protected ElementReference CanvasRef;
 
-    private bool _isShouldRender;
     private Canvas2DContext _context = null!;
 
     [Inject]
@@ -19,6 +18,8 @@ public abstract class MazeComponent : ComponentBase
     [CascadingParameter]
     public required MazeRenderParameters RenderParameters { get; set; }
 
+    protected virtual string StrokeStyle => GlobalParameters.Labyrinth.Color;
+
     protected int BoxSize { get; private set; }
     protected int WallWidth { get; private set; }
     protected Labyrinth Maze { get; private set; } = null!;
@@ -28,16 +29,6 @@ public abstract class MazeComponent : ComponentBase
     protected int CanvasHeight { get; private set; }
 
     protected abstract string CanvasId { get; }
-
-    public async Task ForceRender()
-    {
-        _isShouldRender = true;
-
-        await DrawAsync();
-        StateHasChanged();
-
-        _isShouldRender = false;
-    }
 
     protected virtual void OnParametersSetInner()
     {
@@ -67,27 +58,11 @@ public abstract class MazeComponent : ComponentBase
         OnParametersSetInner();
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await InitAsync();
-            await ForceRender();
-        }
-    }
-
-    protected override bool ShouldRender()
-    {
-        return _isShouldRender;
-    }
-
-    protected abstract void DrawInner(int x, int y, DrawSequence sequence);
-
-    private async Task DrawAsync()
+    protected override async Task OnRenderAsyncInner()
     {
         DrawSequence drawSequence = new();
         drawSequence.ClearRect(0, 0, CanvasWidth, CanvasHeight);
-        drawSequence.StrokeStyle(GlobalParameters.Labyrinth.Color);
+        drawSequence.StrokeStyle(StrokeStyle);
 
         for (int x = Vision.Start.X; x <= Vision.Finish.X; x++)
         {
@@ -100,9 +75,11 @@ public abstract class MazeComponent : ComponentBase
         await _context.DrawSequenceAsync(drawSequence);
     }
 
-    private async Task InitAsync()
+    protected override async Task OnFirstRenderAsyncInner()
     {
         IJSObjectReference contextRef = await JSRuntime.InvokeAsync<IJSObjectReference>("canvasHelper.getContext2D", CanvasRef);
         _context = new Canvas2DContext(contextRef, JSRuntime);
     }
+
+    protected abstract void DrawInner(int x, int y, DrawSequence sequence);
 }

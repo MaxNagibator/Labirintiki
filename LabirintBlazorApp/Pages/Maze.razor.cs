@@ -1,4 +1,4 @@
-﻿using Labirint.Core.TileFeatures;
+﻿using Labirint.Core.TileFeatures.Base;
 using LabirintBlazorApp.Components;
 using LabirintBlazorApp.Parameters;
 using Microsoft.AspNetCore.Components;
@@ -19,25 +19,23 @@ public partial class Maze : IAsyncDisposable
     private int _boxSize;
     private int _wallWidth;
 
+    private MazeFloor? _mazeFloor;
     private MazeWalls? _mazeWalls;
-    private MazeEntities? _mazeSands;
+    private MazeEntities? _mazeEntities;
     private MazeRenderParameters? _renderParameter;
     private KeyInterceptor? _keyInterceptor;
 
     private Labyrinth _labyrinth = null!;
-    private MazeSeed _seeder = null!;
+    private RandomGenerator _seeder = null!;
     private Vision _vision = null!;
-
-    [Inject]
-    public required InventoryService InventoryService { get; set; }
 
     [Parameter]
     public string? Seed { get; set; }
 
-    [SupplyParameterFromQuery(Name = MazeSeed.SizeQueryName)]
+    [SupplyParameterFromQuery(Name = RandomGenerator.SizeQueryName)]
     public int? MazeSize { get; set; }
 
-    [SupplyParameterFromQuery(Name = MazeSeed.DensityQueryName)]
+    [SupplyParameterFromQuery(Name = RandomGenerator.DensityQueryName)]
     public int? MazeDensity { get; set; }
 
     // Проверка на null и инициализацию (дополнительная проверка, если флаг выставили в true, а значение у не null полей не выставили)
@@ -51,6 +49,11 @@ public partial class Maze : IAsyncDisposable
             _keyInterceptor.AttackKeyDown -= OnAttackKeyDown;
             _keyInterceptor.MoveKeyDown -= OnMoveKeyDown;
         }
+
+        _labyrinth.RunnerMoved -= OnRunnerMoved;
+        _labyrinth.ExitFound -= OnExitFound;
+        _labyrinth.ItemPickedUp -= OnItemPickedUp;
+        _labyrinth.Runner.Inventory.ItemUsed -= OnItemUsed;
 
         GC.SuppressFinalize(this);
     }
@@ -69,16 +72,25 @@ public partial class Maze : IAsyncDisposable
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender == false)
         {
-            await GenerateAsync();
-
-            if (_keyInterceptor != null)
-            {
-                _keyInterceptor.AttackKeyDown += OnAttackKeyDown;
-                _keyInterceptor.MoveKeyDown += OnMoveKeyDown;
-            }
+            return;
         }
+
+        _labyrinth = new Labyrinth(_seeder);
+        _labyrinth.RunnerMoved += OnRunnerMoved;
+        _labyrinth.ExitFound += OnExitFound;
+        _labyrinth.ItemPickedUp += OnItemPickedUp;
+        _labyrinth.Runner.Inventory.ItemUsed += OnItemUsed;
+
+        if (_keyInterceptor != null)
+        {
+            _keyInterceptor.AttackKeyDown += OnAttackKeyDown;
+            _keyInterceptor.MoveKeyDown += OnMoveKeyDown;
+            _keyInterceptor.InitializeItems();
+        }
+
+        await GenerateAsync();
     }
 
     private async void OnRunnerMoved(object? sender, Position args)
@@ -88,7 +100,7 @@ public partial class Maze : IAsyncDisposable
         // TODO подумать как вынести строку
         await SoundService.PlayAsync("step");
 
-        await Task.WhenAll(ForceRenderWalls(), ForceRenderSands());
+        await ForceRender();
         StateHasChanged();
     }
 
@@ -112,7 +124,7 @@ public partial class Maze : IAsyncDisposable
         _labyrinth.Move(args.Direction);
     }
 
-    private async void OnAttackKeyDown(object? sender, AttackEventArgs args)
+    private void OnAttackKeyDown(object? sender, AttackEventArgs args)
     {
         if (_isExitFound)
         {
@@ -121,13 +133,18 @@ public partial class Maze : IAsyncDisposable
 
         Item? item = args.Item;
 
-        if (item != null && item.TryUse(_labyrinth.Runner.Position, args.Direction, _labyrinth))
+        if (item != null)
         {
-            await SoundService.PlayAsync(item.SoundSettings?.UseSound);
-
-            await ForceRenderWalls();
-            StateHasChanged();
+            _labyrinth.Runner.UseItem(item, args.Direction);
         }
+    }
+
+    private async void OnItemUsed(object? sender, Item item)
+    {
+        await SoundService.PlayAsync(item.SoundSettings?.UseSound);
+
+        await ForceRender();
+        StateHasChanged();
     }
 
     private async Task GenerateAsync()
@@ -138,26 +155,13 @@ public partial class Maze : IAsyncDisposable
         // Но в принципе то работает)))))) 
         await Task.Delay(1);
 
-        InventoryService.Clear();
         _seeder.Reload();
-
-        if (_labyrinth != null)
-        {
-            _labyrinth.RunnerMoved -= OnRunnerMoved;
-            _labyrinth.ExitFound -= OnExitFound;
-            _labyrinth.ItemPickedUp -= OnItemPickedUp;
-        }
 
         _isExitFound = false;
 
         _originalSize = Math.Max(MinSize, Math.Min(MaxSize, _originalSize));
 
-        _labyrinth = new Labyrinth(_seeder);
-        _labyrinth.Init(_originalSize, _originalSize, _density, InventoryService.Items);
-
-        _labyrinth.RunnerMoved += OnRunnerMoved;
-        _labyrinth.ExitFound += OnExitFound;
-        _labyrinth.ItemPickedUp += OnItemPickedUp;
+        _labyrinth.Init(_originalSize, _originalSize, _density);
 
         _vision = new Vision(_originalSize, _originalSize);
         _vision.SetPosition(_labyrinth.Runner.Position);
@@ -166,19 +170,16 @@ public partial class Maze : IAsyncDisposable
 
         StateHasChanged();
 
-        await Task.WhenAll(ForceRenderWalls(), ForceRenderSands());
+        await ForceRender();
 
         _isInit = true;
         StateHasChanged();
     }
 
-    private Task ForceRenderSands()
+    private async Task ForceRender()
     {
-        return _mazeSands?.ForceRender() ?? Task.CompletedTask;
-    }
-
-    private Task ForceRenderWalls()
-    {
-        return _mazeWalls?.ForceRender() ?? Task.CompletedTask;
+        await (_mazeFloor?.ForceRenderAsync() ?? Task.CompletedTask);
+        await (_mazeWalls?.ForceRenderAsync() ?? Task.CompletedTask);
+        await (_mazeEntities?.ForceRenderAsync() ?? Task.CompletedTask);
     }
 }

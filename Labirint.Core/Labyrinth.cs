@@ -1,6 +1,5 @@
 ﻿using Labirint.Core.Extensions;
 using Labirint.Core.Interfaces;
-using Labirint.Core.TileFeatures;
 
 namespace Labirint.Core;
 
@@ -21,6 +20,8 @@ public class Labyrinth
             this[x, y].AddFeature(item);
             item.AfterPlace.Invoke((x, y), this);
         });
+
+        Runner = new Runner((0, 0), this, new Inventory());
     }
 
     /// <summary>
@@ -51,7 +52,7 @@ public class Labyrinth
     /// <summary>
     ///     Бегущий.
     /// </summary>
-    public Runner Runner { get; private set; } = null!;
+    public Runner Runner { get; }
 
     private Tile[,] Tiles { get; set; } = null!;
 
@@ -80,9 +81,12 @@ public class Labyrinth
     /// <param name="height">Высота лабиринта</param>
     /// <param name="density">Плотность стен в лабиринте</param>
     /// <param name="placeableItems">Список предметов, которые нужно разместить в лабиринте</param>
-    public void Init(int width, int height, int density, IEnumerable<Item> placeableItems)
+    public void Init(int width, int height, int density, IEnumerable<Item>? placeableItems = null)
     {
-        Runner = new Runner((0, 0), this);
+        Runner.Reset();
+
+        placeableItems ??= Runner.Inventory.AllItems;
+
         Width = width;
         Height = height;
 
@@ -216,10 +220,10 @@ public class Labyrinth
         {
             return;
         }
-        
+
         if (density != 100)
         {
-            if (_seeder.Random.Next(0, 100) >= density)
+            if (_seeder.Generator.Next(0, 100) >= density)
             {
                 return;
             }
@@ -261,7 +265,7 @@ public class Labyrinth
 
         Position adjacentPosition = direction.GetAdjacentPosition(position);
         Direction oppositeDirection = direction.GetOppositeDirection();
-        
+
         Tile adjacentTile = this[adjacentPosition];
 
         return adjacentTile.CanAddWall(oppositeDirection);
@@ -269,7 +273,7 @@ public class Labyrinth
 
     private Tile AddTile(Position position)
     {
-        Tile tile = new();
+        Tile tile = new(this);
 
         this[position] = tile;
         return tile;

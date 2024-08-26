@@ -3,8 +3,10 @@
 public class WoolYarnFeature : TileFeature
 {
     public override bool RemoveAfterSuccessPickUp => false;
+    public override string PickUpSound => string.Empty;
+    public override DrawingSettings? DrawingSettings => null;
 
-    public override bool TryPickUp()
+    public override bool TryPickUp(Labyrinth labyrinth)
     {
         return false;
     }
