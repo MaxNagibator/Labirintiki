@@ -3,96 +3,103 @@
 @inject AnimationService AnimationService
 
 <PageTitle>Labirint</PageTitle>
-<MudStack Spacing="3">
-    <MudText Typo="Typo.h4">Labirint!</MudText>
 
-    @if (IsInit == false)
+@if (IsInit == false)
+{
+    <MudStack AlignItems="AlignItems.Center" Row>
+        <MudProgressCircular Indeterminate />
+        <MudText Typo="Typo.body1">Загрузка..</MudText>
+    </MudStack>
+}
+
+<div class="workspace" hidden="@(!IsInit)">
+    <div class="header-panel">
+        <MudText Typo="Typo.h4">Labirint!</MudText>
+        <MudButton OnClick="() => _isSettingsHidden = !_isSettingsHidden"
+                   Size="Size.Large"
+                   StartIcon="@MaterialDesignIcons.Normal.Cog"
+                   EndIcon="@(_isSettingsHidden ? MaterialDesignIcons.Normal.ArrowExpandDown : MaterialDesignIcons.Normal.ArrowExpandUp)"
+                   Variant="Variant.Outlined">
+            Параметры
+        </MudButton>
+    </div>
+
+    @if (IsInit)
     {
-        <MudStack AlignItems="AlignItems.Center" Row>
-            <MudProgressCircular Indeterminate />
-            <MudText Typo="Typo.body1">Загрузка..</MudText>
-        </MudStack>
-    }
+        <div class="score-panel">
+            <MudStack Row AlignItems="AlignItems.Center">
+                <MudIcon Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.Bitcoin" Size="Size.Large" />
+                <MudText Color="Color.Warning" Typo="Typo.h4">@_labyrinth.Runner.Score.ToString("N0")</MudText>
+            </MudStack>
+        </div>
 
-    <div class="workspace" hidden="@(!IsInit)">
-        @if (IsInit)
-        {
-            <div class="score">
-                <MudStack Row AlignItems="AlignItems.Center">
-                    <MudIcon Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.Bitcoin" Size="Size.Large" />
-                    <MudText Color="Color.Warning" Typo="Typo.h4">@_labyrinth.Runner.Score</MudText>
-                </MudStack>
-            </div>
+        <div class="game">
+            <div class="main-panel">
+                <div class="ability-panel">
+                    <RunnerAbilities Abilities="@_labyrinth.Runner.Abilities" />
+                </div>
 
-            <div class="game">
-                <div class="main-panel">
-                    <div class="ability-panel">
-                        <RunnerAbilities Abilities="@_labyrinth.Runner.Abilities" />
-                    </div>
+                <div class="field">
+                    <Animation Effect="AnimationService.AnimationEffect" Speed="TimeSpan.FromMilliseconds(200.0)" Delay="@Delay.None" IterationCount="1">
+                        <CascadingValue Value="_renderParameter">
+                            <MazeFloor @ref="_mazeFloor" />
+                            <MazeWalls @ref="_mazeWalls" />
+                            <MazeEntities @ref="_mazeEntities" />
+                        </CascadingValue>
 
-                    <div class="field">
-                        <Animation Effect="AnimationService.AnimationEffect" Speed="TimeSpan.FromMilliseconds(200.0)" Delay="@Delay.None" IterationCount="1">
-                            <CascadingValue Value="_renderParameter">
-                                <MazeFloor @ref="_mazeFloor" />
-                                <MazeWalls @ref="_mazeWalls" />
-                                <MazeEntities @ref="_mazeEntities" />
-                            </CascadingValue>
+                        @{
+                            Position draw = _vision.GetDraw(_labyrinth.Runner.Position) * _boxSize + _wallWidth;
+                            (int offset, int entitySize) = AlignmentHelper.CalculateOffset(_boxSize, _wallWidth, 0.5);
+                            (int left, int top) = AlignmentHelper.CalculatePosition(Alignment.Center, draw, offset);
 
-                            @{
-                                Position draw = _vision.GetDraw(_labyrinth.Runner.Position) * _boxSize + _wallWidth;
-                                (int offset, int entitySize) = AlignmentHelper.CalculateOffset(_boxSize, _wallWidth, 0.5);
-                                (int left, int top) = AlignmentHelper.CalculatePosition(Alignment.Center, draw, offset);
-
-                                <div style="position:absolute;
+                            <div style="position:absolute;
                                 z-index: 100;
                                 left: @(-30)px;
                                 top: @(top - 4)px;">
-                                    <MudText Typo="Typo.h6">@(_labyrinth.Runner.Position.Y + 1)</MudText>
-                                </div>
+                                <MudText Typo="Typo.h6">@(_labyrinth.Runner.Position.Y + 1)</MudText>
+                            </div>
 
-                                <div style="position:absolute;
+                            <div style="position:absolute;
                                 z-index: 100;
                                 left: @(left + 4)px;
                                 top: @(-30)px;">
-                                    <MudText Typo="Typo.h6">@(_labyrinth.Runner.Position.X + 1)</MudText>
-                                </div>
+                                <MudText Typo="Typo.h6">@(_labyrinth.Runner.Position.X + 1)</MudText>
+                            </div>
 
-                                <img src="/images/runner.png"
-                                     style="position:absolute;
+                            <img src="/images/runner.png"
+                                 style="position:absolute;
                                      z-index: 100;
                                      left: @(left)px;
                                      top: @(top)px;
                                      width: @(entitySize)px;
                                      height: @(entitySize)px;"
-                                     alt="Бегун" />
-                            }
-                        </Animation>
-                    </div>
+                                 alt="Бегун" />
+                        }
+                    </Animation>
+                </div>
 
-                    <div class="inventory-panel">
-                        <RunnerInventory Interceptor="_keyInterceptor" Inventory="_labyrinth.Runner.Inventory" />
-                    </div>
+                <div class="inventory-panel">
+                    <RunnerInventory Interceptor="_keyInterceptor" Inventory="_labyrinth.Runner.Inventory" />
                 </div>
             </div>
-        }
-
-        <div class="control-panel">
-            <MudStack Spacing="3">
-                <MudText Typo="Typo.h5">Параметры: </MudText>
-                <RandomGenerator @ref="_seeder" Seed="@Seed" Size="@_originalSize" Density="@_density" IsExitFound="@_isExitFound" />
-                <MudStack>
-                    <MudNumericField Label="Размер" Min="@MinSize" Max="@MaxSize" DebounceInterval="300" @bind-Value="_originalSize" />
-                    <MudSlider @bind-Value="_originalSize" Min="@MinSize" Max="@MaxSize" Color="Color.Info" Size="Size.Medium" />
-                </MudStack>
-                <MudStack>
-                    <MudNumericField Label="Плотность" Min="0" Max="100" DebounceInterval="300" @bind-Value="_density" />
-                    <MudSlider @bind-Value="_density" Min="0" Max="100" Color="Color.Info" Size="Size.Medium" />
-                </MudStack>
-
-                <MudButton OnClick="GenerateAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Генерировать</MudButton>
-                <KeyInterceptor @ref="_keyInterceptor" Inventory="_labyrinth?.Runner.Inventory" />
-            </MudStack>
         </div>
-    </div>
+    }
 
-</MudStack>
+    <div hidden="@_isSettingsHidden" class="control-panel">
+        <MudStack Spacing="3">
+            <MudText Typo="Typo.h5">Параметры: </MudText>
+            <RandomGenerator @ref="_seeder" Seed="@Seed" Size="@_originalSize" Density="@_density" IsExitFound="@_isExitFound" />
+            <MudStack>
+                <MudNumericField Label="Размер" Min="@MinSize" Max="@MaxSize" DebounceInterval="300" @bind-Value="_originalSize" />
+                <MudSlider @bind-Value="_originalSize" Min="@MinSize" Max="@MaxSize" Color="Color.Info" Size="Size.Medium" />
+            </MudStack>
+            <MudStack>
+                <MudNumericField Label="Плотность" Min="0" Max="100" DebounceInterval="300" @bind-Value="_density" />
+                <MudSlider @bind-Value="_density" Min="0" Max="100" Color="Color.Info" Size="Size.Medium" />
+            </MudStack>
+
+            <MudButton OnClick="GenerateAsync" Variant="Variant.Outlined" Color="Color.Info" FullWidth>Генерировать</MudButton>
+            <KeyInterceptor @ref="_keyInterceptor" Inventory="_labyrinth?.Runner.Inventory" />
+        </MudStack>
+    </div>
+</div>

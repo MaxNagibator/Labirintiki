@@ -3,11 +3,17 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-between;
+    align-items: center;
+    margin: auto;
+    padding: 40px;
+    max-width: 1200px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 890px) {
     .workspace {
         flex-direction: column;
+        align-items: stretch;
+        justify-content: stretch;
     }
 }
 
@@ -32,7 +38,7 @@
     min-height: 100px;
 }
 
-.score {
+.score-panel {
    width: 100%;
 }
 
@@ -48,4 +54,12 @@
 }
 
 .control-panel {
+    margin: 40px 0;
+}
+
+.header-panel{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
