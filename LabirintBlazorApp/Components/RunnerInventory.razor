@@ -20,7 +20,11 @@
                  @onanimationend="() => AnimationCompleted(animatedStack)">
 
                 <img src="@item.Icon" alt="@item.DisplayName">
-                <div class="item-name">@item.DisplayName</div>
+                <div class="item-name"
+                     @onmouseout="HideDescription"
+                     @onmouseover="() => ShowDescription(item)">
+                    @item.DisplayName
+                </div>
                 <div class="count">@stack.Count</div>
                 <div class="max-count">@(stack.IsInfinite ? "∞" : stack.MaxCount)</div>
             </div>
@@ -40,3 +44,17 @@
         </div>
     }
 </MudStack>
+
+@if (_showDescription && _currentItem != null)
+{
+    <MudPopover Style="max-width: 600px" Open="@_showDescription" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+        <MudCard>
+            <MudCardContent>
+                @foreach (string paragraph in _currentItem.Description.Split("\n"))
+                {
+                    <MudText >@paragraph</MudText>
+                }
+            </MudCardContent>
+        </MudCard>
+    </MudPopover>
+}

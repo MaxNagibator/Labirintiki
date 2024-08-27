@@ -1,4 +1,5 @@
-﻿using LabirintBlazorApp.Common.Animation;
+﻿using Labirint.Core.Items.Common;
+using LabirintBlazorApp.Common.Animation;
 using LabirintBlazorApp.Common.Control.Schemes;
 using Microsoft.AspNetCore.Components;
 
@@ -7,6 +8,8 @@ namespace LabirintBlazorApp.Components;
 public partial class RunnerInventory : RenderComponent, IAsyncDisposable
 {
     private Dictionary<Item, AnimatedStack> _stackCache = new();
+    private bool _showDescription;
+    private Item? _currentItem;
 
     [Parameter]
     [EditorRequired]
@@ -93,6 +96,33 @@ public partial class RunnerInventory : RenderComponent, IAsyncDisposable
         await ForceRenderAsync();
     }
 
+    private void OnDigitKeyDown(object? sender, DigitEventArgs args)
+    {
+        ControlSettings? control = Inventory.Stacks
+            .Where(stack => stack.Count > 0)
+            .ElementAtOrDefault(args.Digit - 1)
+            ?.Item.ControlSettings;
+
+        if (control != null)
+        {
+            Interceptor.OnKeyDown(control.ActivateKey);
+        }
+    }
+
+    private async Task ShowDescription(Item item)
+    {
+        _showDescription = true;
+        _currentItem = item;
+        await ForceRenderAsync();
+    }
+
+    private async Task HideDescription()
+    {
+        _showDescription = false;
+        _currentItem = null;
+        await ForceRenderAsync();
+    }
+
     private void OnClicked(Key activateKey)
     {
         Interceptor.OnKeyDown(activateKey);
@@ -106,6 +136,7 @@ public partial class RunnerInventory : RenderComponent, IAsyncDisposable
     private void SubscribeEvents()
     {
         Interceptor.ChangedWaitItem += OnChangedWaitItem;
+        Interceptor.DigitKeyDown += OnDigitKeyDown;
         SchemeService.ControlSchemeChanged += OnSchemeChanged;
         AnimatedStack.StateChanged += OnAnimateStateChanged;
 
@@ -118,6 +149,7 @@ public partial class RunnerInventory : RenderComponent, IAsyncDisposable
     private void UnsubscribeEvents()
     {
         Interceptor.ChangedWaitItem -= OnChangedWaitItem;
+        Interceptor.DigitKeyDown -= OnDigitKeyDown;
         SchemeService.ControlSchemeChanged -= OnSchemeChanged;
         AnimatedStack.StateChanged -= OnAnimateStateChanged;
 

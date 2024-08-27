@@ -8,6 +8,7 @@ internal class TestItem(int count) : Item
 
     public override string Name { get; } = "test " + _id++;
     public override string DisplayName { get; } = "Test " + count;
+    public override string Description => string.Empty;
 
     public override int DefaultCount => 0;
     public override int MaxCount => 0;

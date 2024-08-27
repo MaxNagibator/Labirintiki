@@ -94,7 +94,8 @@ public class Inventory
             .GetTypes()
             .Where(type => type.IsSubclassOf(typeof(Item)) && type.IsAbstract == false)
             .Select(type => (Item)Activator.CreateInstance(type)!)
-            .OrderByDescending(item => item.MaxCount)
+            .OrderByDescending(item => item.ControlSettings != null)
+            .ThenByDescending(item => item.MaxCount)
             .ToArray();
     }
 }

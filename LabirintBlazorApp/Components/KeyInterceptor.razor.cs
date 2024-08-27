@@ -15,6 +15,7 @@ public partial class KeyInterceptor : IAsyncDisposable
 
     public event EventHandler<AttackEventArgs>? AttackKeyDown;
     public event EventHandler<Item?>? ChangedWaitItem;
+    public event EventHandler<DigitEventArgs>? DigitKeyDown;
     public event EventHandler<MoveEventArgs>? MoveKeyDown;
 
     [Parameter]
@@ -37,9 +38,22 @@ public partial class KeyInterceptor : IAsyncDisposable
         GC.SuppressFinalize(this);
     }
 
+    public void InitializeItems()
+    {
+        if (Inventory != null)
+        {
+            _itemUsed = Inventory.AllItems
+                .Where(item => item.ControlSettings != null)
+                .Select(item => (ControlScheme.GetActivateKey(item.ControlSettings!).KeyCode, item))
+                .ToDictionary();
+        }
+    }
+
     [JSInvokable]
     public void OnKeyDown(string code)
     {
+        Console.WriteLine(code);
+
         if (_isPause)
         {
             return;
@@ -66,16 +80,10 @@ public partial class KeyInterceptor : IAsyncDisposable
 
             MoveKeyDown?.Invoke(this, move);
         }
-    }
 
-    public void InitializeItems()
-    {
-        if (Inventory != null)
+        if (PerformDigitKey(code, out DigitEventArgs? digit) && digit != null)
         {
-            _itemUsed = Inventory.AllItems
-                .Where(item => item.ControlSettings != null)
-                .Select(item => (ControlScheme.GetActivateKey(item.ControlSettings!).KeyCode, item))
-                .ToDictionary();
+            DigitKeyDown?.Invoke(this, digit);
         }
     }
 
@@ -119,6 +127,12 @@ public partial class KeyInterceptor : IAsyncDisposable
         };
     }
 
+    private void ChangeWaitItem(Item? item)
+    {
+        _waitItem = item;
+        ChangedWaitItem?.Invoke(this, item);
+    }
+
     private bool PerformItemUse(string code, out AttackEventArgs? args)
     {
         args = null;
@@ -143,12 +157,6 @@ public partial class KeyInterceptor : IAsyncDisposable
         return true;
     }
 
-    private void ChangeWaitItem(Item? item)
-    {
-        _waitItem = item;
-        ChangedWaitItem?.Invoke(this, item);
-    }
-
     private bool PerformMove(string code, out MoveEventArgs? args)
     {
         args = null;
@@ -162,6 +170,23 @@ public partial class KeyInterceptor : IAsyncDisposable
         {
             Direction = direction,
             KeyCode = Key.Create(code)
+        };
+
+        return true;
+    }
+
+    private bool PerformDigitKey(string code, out DigitEventArgs? args)
+    {
+        args = null;
+
+        if ((code.StartsWith("Digit") && char.IsDigit(code[^1])) == false)
+        {
+            return false;
+        }
+
+        args = new DigitEventArgs
+        {
+            Digit = code[^1] - '0'
         };
 
         return true;
