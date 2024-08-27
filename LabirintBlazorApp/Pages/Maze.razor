@@ -71,7 +71,7 @@
 
         <div class="control-panel">
             <MudStack Spacing="3">
-                <MudText title="@(string.Join(" | ", _labyrinth?.Runner.Inventory.Stacks ?? []))" Typo="Typo.h5">Параметры: </MudText>
+                <MudText Typo="Typo.h5">Параметры: </MudText>
                 <RandomGenerator @ref="_seeder" Seed="@Seed" Size="@_originalSize" Density="@_density" IsExitFound="@_isExitFound" />
                 <MudStack>
                     <MudNumericField Label="Размер" Min="@MinSize" Max="@MaxSize" DebounceInterval="300" @bind-Value="_originalSize" />

@@ -1,36 +1,66 @@
-﻿namespace LabirintBlazorApp.Common.Animation;
+﻿using System.Collections.Concurrent;
+
+namespace LabirintBlazorApp.Common.Animation;
 
 public class AnimatedStack(ItemStack stack)
 {
-    private readonly List<State> _states = [];
+    private readonly ConcurrentQueue<State> _stateQueue = new();
+    private State _executedState = State.Removed;
+
+    public static event Action<State>? StateChanged;
 
     public enum State
     {
-        None,
-        Added,
-        Used,
-        CantAdd,
-        Waiting
+        None = 0,
+        Added = 1,
+        Used = 2,
+        CantAdd = 3,
+        Waiting = 4,
+        Removed = 5
     }
 
     public ItemStack Stack { get; } = stack;
 
-    public string GetAnimations()
+    public bool IsEmpty => _stateQueue.IsEmpty;
+
+    private State ExecutedState
     {
-        return string.Join(" ", _states.Select(state => state.ToAnimation()));
+        get => _executedState;
+        set
+        {
+            if (_executedState == value)
+            {
+                return;
+            }
+
+            _executedState = value;
+            StateChanged?.Invoke(_executedState);
+        }
+    }
+
+    public string GetAnimation()
+    {
+        if (ExecutedState is State.Removed && _stateQueue.TryDequeue(out State state))
+        {
+            ExecutedState = state;
+        }
+
+        return ExecutedState.ToAnimation();
     }
 
     public void AddState(State state)
     {
-        _states.Add(state);
+        if (_stateQueue.Contains(state) || ExecutedState == state)
+        {
+            return;
+        }
+
+        _stateQueue.Enqueue(state);
+        StateChanged?.Invoke(_executedState);
     }
 
-    // TODO Проблемы при завершении нескольких анимаций одновременно
     public void RemoveState()
     {
-        if (_states.Count > 0)
-        {
-            _states.RemoveAt(0);
-        }
+        ExecutedState = State.Removed;
     }
 }

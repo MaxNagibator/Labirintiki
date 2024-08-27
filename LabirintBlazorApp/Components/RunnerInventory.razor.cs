@@ -49,42 +49,47 @@ public partial class RunnerInventory : RenderComponent, IAsyncDisposable
         await ForceRenderAsync();
     }
 
-    private async void OnChangedWaitItem(object? sender, Item? item)
+    private void OnChangedWaitItem(object? sender, Item? item)
     {
         if (item == null)
         {
             WaitItem?.RemoveState();
+            WaitItem = null;
+            return;
         }
-        else
+
+        if (_stackCache.TryGetValue(item, out AnimatedStack? stack) == false)
         {
-            if (_stackCache.TryGetValue(item, out AnimatedStack? showingStack))
-            {
-                showingStack.AddState(AnimatedStack.State.Waiting);
-                WaitItem = showingStack;
-            }
+            return;
         }
 
-        await ForceRenderAsync();
+        stack.AddState(AnimatedStack.State.Waiting);
+        WaitItem = stack;
     }
 
-    private async void OnItemAdded(object? sender, Item item)
+    private void OnItemAdded(object? sender, Item item)
     {
-        await AddStackAnimation(item, AnimatedStack.State.Added);
+        AddStackAnimation(item, AnimatedStack.State.Added);
     }
 
-    private async void OnItemCantAdded(object? sender, Item item)
+    private void OnItemCantAdded(object? sender, Item item)
     {
-        await AddStackAnimation(item, AnimatedStack.State.CantAdd);
+        AddStackAnimation(item, AnimatedStack.State.CantAdd);
     }
 
-    private async void OnItemUsed(object? sender, Item item)
+    private void OnItemUsed(object? sender, Item item)
     {
-        await AddStackAnimation(item, AnimatedStack.State.Used);
+        AddStackAnimation(item, AnimatedStack.State.Used);
     }
 
     private async void OnInventoryCleared(object? sender, EventArgs e)
     {
         InitializeItems();
+        await ForceRenderAsync();
+    }
+
+    private async void OnAnimateStateChanged(AnimatedStack.State state)
+    {
         await ForceRenderAsync();
     }
 
@@ -102,6 +107,7 @@ public partial class RunnerInventory : RenderComponent, IAsyncDisposable
     {
         Interceptor.ChangedWaitItem += OnChangedWaitItem;
         SchemeService.ControlSchemeChanged += OnSchemeChanged;
+        AnimatedStack.StateChanged += OnAnimateStateChanged;
 
         Inventory.ItemAdded += OnItemAdded;
         Inventory.ItemCantAdded += OnItemCantAdded;
@@ -113,6 +119,7 @@ public partial class RunnerInventory : RenderComponent, IAsyncDisposable
     {
         Interceptor.ChangedWaitItem -= OnChangedWaitItem;
         SchemeService.ControlSchemeChanged -= OnSchemeChanged;
+        AnimatedStack.StateChanged -= OnAnimateStateChanged;
 
         Inventory.ItemAdded -= OnItemAdded;
         Inventory.ItemCantAdded -= OnItemCantAdded;
@@ -120,7 +127,7 @@ public partial class RunnerInventory : RenderComponent, IAsyncDisposable
         Inventory.InventoryCleared -= OnInventoryCleared;
     }
 
-    private async Task AddStackAnimation(Item item, AnimatedStack.State animation)
+    private void AddStackAnimation(Item item, AnimatedStack.State animation)
     {
         if (_stackCache.TryGetValue(item, out AnimatedStack? stack) == false)
         {
@@ -128,12 +135,10 @@ public partial class RunnerInventory : RenderComponent, IAsyncDisposable
         }
 
         stack.AddState(animation);
-        await ForceRenderAsync();
     }
 
-    private async Task AnimationCompleted(AnimatedStack animatedStack)
+    private void AnimationCompleted(AnimatedStack animatedStack)
     {
         animatedStack.RemoveState();
-        await ForceRenderAsync();
     }
 }

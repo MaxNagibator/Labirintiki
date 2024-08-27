@@ -123,7 +123,7 @@ public partial class KeyInterceptor : IAsyncDisposable
     {
         args = null;
 
-        if (_itemUsed.TryGetValue(code, out Item? item) == false)
+        if ((_itemUsed.TryGetValue(code, out Item? item) && (Inventory?.CanUse(item) ?? false)) == false)
         {
             return false;
         }

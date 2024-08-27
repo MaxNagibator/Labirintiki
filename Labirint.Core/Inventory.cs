@@ -29,6 +29,11 @@ public class Inventory
     /// </summary>
     public IEnumerable<ItemStack> Stacks => _items.Values;
 
+    public bool CanUse(Item item)
+    {
+        return _items.TryGetValue(item, out ItemStack? stack) && stack.CanUse();
+    }
+
     public void Use(Item item, Position position, Direction? direction, Labyrinth labyrinth)
     {
         if (_items.TryGetValue(item, out ItemStack? stack) == false)

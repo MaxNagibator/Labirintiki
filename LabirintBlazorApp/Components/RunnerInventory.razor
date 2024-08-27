@@ -8,7 +8,7 @@
         ItemStack stack = animatedStack.Stack;
         Item item = stack.Item;
 
-        if (stack.Count <= 0 && string.IsNullOrWhiteSpace(animatedStack.GetAnimations()))
+        if (stack.Count <= 0 && animatedStack.IsEmpty)
         {
             continue;
         }
@@ -16,13 +16,13 @@
         <div class="inventory-item-container">
             <div class="inventory-item
                             @(stack.IsInfinite ? " score" : string.Empty)
-                            @(animatedStack.GetAnimations())"
+                            @(animatedStack.GetAnimation())"
                  @onanimationend="() => AnimationCompleted(animatedStack)">
 
                 <img src="@item.Icon" alt="@item.DisplayName">
                 <div class="item-name">@item.DisplayName</div>
                 <div class="count">@stack.Count</div>
-                <div class="max-count" title="@stack.InMazeCount">@(stack.IsInfinite ? "∞" : stack.MaxCount)</div>
+                <div class="max-count">@(stack.IsInfinite ? "∞" : stack.MaxCount)</div>
             </div>
 
             @{
