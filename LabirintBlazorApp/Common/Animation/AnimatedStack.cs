@@ -21,7 +21,7 @@ public class AnimatedStack(ItemStack stack)
 
     public ItemStack Stack { get; } = stack;
 
-    public bool IsEmpty => _stateQueue.IsEmpty;
+    public bool IsIdle => _stateQueue.IsEmpty && ExecutedState == State.Removed;
 
     private State ExecutedState
     {
