@@ -47,12 +47,19 @@
 
 @if (_showDescription && _currentItem != null)
 {
-    <MudPopover Style="max-width: 600px" Open="@_showDescription" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
-        <MudCard>
+    <MudPopover AnchorOrigin="Origin.BottomCenter" Open="@_showDescription" Paper Style="max-width: 600px" TransformOrigin="Origin.TopCenter">
+        <MudCard Outlined>
             <MudCardContent>
                 @foreach (string paragraph in _currentItem.Description.Split("\n"))
                 {
-                    <MudText >@paragraph</MudText>
+                    if (paragraph.StartsWith("---", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        <MudDivider Class="my-2" DividerType="DividerType.FullWidth" Light Style="height: 2px;" />
+                    }
+                    else
+                    {
+                        <MudText Align="Align.Justify">@paragraph</MudText>
+                    }
                 }
             </MudCardContent>
         </MudCard>
