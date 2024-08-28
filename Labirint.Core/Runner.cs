@@ -36,7 +36,7 @@ public class Runner : IDisposable
 
         foreach (RunnerAbility ability in _abilities)
         {
-            ability.Hit(_labyrinth[Position]);
+            ability.Hit(_labyrinth[Position], direction);
         }
     }
 

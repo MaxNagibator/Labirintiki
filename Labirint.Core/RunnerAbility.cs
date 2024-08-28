@@ -17,7 +17,7 @@ public class RunnerAbility(Ability ability)
 
     public bool Active => _lostCount is not 0;
 
-    public void Hit(Tile tile)
+    public void Hit(Tile tile, Direction direction)
     {
         if (Active == false)
         {
@@ -29,6 +29,6 @@ public class RunnerAbility(Ability ability)
             _lostCount--;
         }
 
-        ability.Hit(tile);
+        ability.Hit(tile, direction);
     }
 }

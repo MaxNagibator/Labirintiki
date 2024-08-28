@@ -26,7 +26,7 @@ public partial class MazeEntities : MazeComponent
             }
 
             Position draw = Vision.GetDraw((x, y)) * BoxSize + WallWidth;
-            (int offset, int entitySize) = AlignmentHelper.CalculateOffset(BoxSize, WallWidth, settings.Scale);
+            (int offset, int entitySize) = AlignmentHelper.CalculateOffset(BoxSize, 0, settings.Scale);
             (int left, int top) = AlignmentHelper.CalculatePosition(settings.Alignment, draw, offset);
 
             sequence.DrawImage(settings.ImageSource, left, top, entitySize, entitySize);

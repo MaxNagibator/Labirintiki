@@ -6,6 +6,11 @@
 public class Tile(Labyrinth labyrinth)
 {
     /// <summary>
+    ///     Лабиринт.
+    /// </summary>
+    public Labyrinth Labyrinth => labyrinth;
+
+    /// <summary>
     ///     Особенности клетки.
     /// </summary>
     public List<TileFeature>? Features { get; set; }

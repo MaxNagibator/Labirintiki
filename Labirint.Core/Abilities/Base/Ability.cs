@@ -34,5 +34,6 @@ public abstract class Ability
     ///     Что же делает способность.
     /// </summary>
     /// <param name="tile">Клетка в которую мы перешли.</param>
-    public abstract void Hit(Tile tile);
+    /// <param name="direction">Направление, по которому мы двигались.</param>
+    public abstract void Hit(Tile tile, Direction direction);
 }

@@ -1,4 +1,7 @@
-﻿using Labirint.Core.TileFeatures;
+﻿using Labirint.Core.Common;
+using Labirint.Core.Extensions;
+using Labirint.Core.TileFeatures;
+using System.Net;
 
 namespace Labirint.Core.Abilities;
 
@@ -13,8 +16,12 @@ public class WoolYarnAbility : Ability
 
     public override int? MoveCount => 100;
 
-    public override void Hit(Tile tile)
+    public override void Hit(Tile tile, Direction direction)
     {
-        tile.AddFeature(new WoolYarnFeature());
+        Position prevTilePostion = tile.Labyrinth.Runner.Position - direction;
+        Tile prevTile = tile.Labyrinth[prevTilePostion];
+
+        prevTile.AddFeature(new WoolYarnFeature(direction));
+        tile.AddFeature(new WoolYarnFeature(direction.GetOppositeDirection()));
     }
 }
