@@ -17,14 +17,14 @@ internal class TestAbility(int? moveCount = null) : Ability
 }
 
 [TestFixture]
-public class RunnerAbilityTest
+public class RunnerAbilityTest : BaseLabyrinthTests
 {
     [Test]
     [TestCase(null)]
     [TestCase(10)]
     public void AbilityActiveCorrectWorkTest(int? count)
     {
-        Tile tile = new(default);
+        Tile tile = new(Labyrinth);
         TestAbility testAbility = new(count);
         RunnerAbility ability = new(testAbility);
 

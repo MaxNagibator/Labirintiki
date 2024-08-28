@@ -92,6 +92,67 @@ public class DrawSequence
         });
     }
 
+    /// <summary>
+    ///     Нарисовать спрайт на экране.
+    /// </summary>
+    /// <param name="source">Путь к файлу изображения, содержащего спрайт.</param>
+    /// <param name="sX">Координата X спрайта в файле изображения.</param>
+    /// <param name="sY">Координата Y спрайта в файле изображения.</param>
+    /// <param name="sWidth">Ширина спрайта в файле изображения.</param>
+    /// <param name="sHeight">Высота спрайта в файле изображения.</param>
+    /// <param name="dX">Координата X, где будет отображен спрайт.</param>
+    /// <param name="dY">Координата Y, где будет отображен спрайт.</param>
+    /// <param name="dWidth">Ширина, в которую будет отображен спрайт.</param>
+    /// <param name="dHeight">Высота, в которую будет отображен спрайт.</param>
+    public void DrawSprite(string source, double sX, double sY, double sWidth, double sHeight, double dX, double dY, double dWidth, double dHeight)
+    {
+        _commands.Add(new Command(Command.DrawSprite)
+        {
+            Source = source,
+            SourceX = sX,
+            SourceY = sY,
+            SourceWidth = sWidth,
+            SourceHeight = sHeight,
+            X = dX,
+            Y = dY,
+            Width = dWidth,
+            Height = dHeight
+        });
+    }
+
+    /// <summary>
+    ///     Нарисовать спрайт на экране.
+    /// </summary>
+    /// <param name="source">Путь к файлу изображения, содержащего спрайт.</param>
+    /// <param name="row">Номер строки спрайта в файле изображения.</param>
+    /// <param name="column">Номер столбца спрайта в файле изображения.</param>
+    /// <param name="sWidth">Ширина спрайта в файле изображения.</param>
+    /// <param name="sHeight">Высота спрайта в файле изображения.</param>
+    /// <param name="dX">Координата X, где будет отображен спрайт.</param>
+    /// <param name="dY">Координата Y, где будет отображен спрайт.</param>
+    /// <param name="dWidth">Ширина, в которую будет отображен спрайт.</param>
+    /// <param name="dHeight">Высота, в которую будет отображен спрайт.</param>
+    public void DrawSprite(string source, int row, int column, double sWidth, double sHeight, double dX, double dY, double dWidth, double dHeight)
+    {
+        DrawSprite(source, column * sWidth, row * sHeight, sWidth, sHeight,
+            dX, dY, dWidth, dHeight);
+    }
+
+    /// <summary>
+    ///     Нарисовать спрайт на экране с одинаковыми размерами источника и назначения.
+    /// </summary>
+    /// <param name="source">Путь к файлу изображения, содержащего спрайт.</param>
+    /// <param name="row">Номер строки спрайта в файле изображения.</param>
+    /// <param name="column">Номер столбца спрайта в файле изображения.</param>
+    /// <param name="dX">Координата X, где будет отображен спрайт.</param>
+    /// <param name="dY">Координата Y, где будет отображен спрайт.</param>
+    /// <param name="size">Размер, в который будет отображен спрайт.</param>
+    public void DrawSprite(string source, int row, int column, double dX, double dY, double size)
+    {
+        DrawSprite(source, row, column, size, size,
+            dX, dY, size, size);
+    }
+
     public List<Command> ToList()
     {
         return [.._commands];
@@ -109,6 +170,7 @@ public class DrawSequence
         public const int LineWidth = 6;
         public const int ClearRect = 7;
         public const int StrokeRect = 8;
+        public const int DrawSprite = 9;
 
         public required int Type { get; init; } = type;
         public double X { get; init; }
@@ -117,6 +179,11 @@ public class DrawSequence
         public string Color { get; init; } = string.Empty;
         public double Width { get; init; }
         public double Height { get; init; }
+
+        public double SourceX { get; init; }
+        public double SourceY { get; init; }
+        public double SourceWidth { get; init; }
+        public double SourceHeight { get; init; }
 
         public override string ToString()
         {

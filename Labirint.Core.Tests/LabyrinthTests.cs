@@ -8,6 +8,7 @@ internal class TestItem(int count) : Item
 
     public override string Name { get; } = "test " + _id++;
     public override string DisplayName { get; } = "Test " + count;
+    public override string Description => string.Empty;
 
     public override int DefaultCount => 0;
     public override int MaxCount => 0;
@@ -21,30 +22,8 @@ internal class TestItem(int count) : Item
 }
 
 [TestFixture]
-public class LabyrinthTests
+public class LabyrinthTests : BaseLabyrinthTests
 {
-    [SetUp]
-    public void SetUp()
-    {
-        _random = new TestRandom();
-        _labyrinth = new Labyrinth(_random);
-        _inventory = new Inventory();
-        _labyrinth.Init(DefaultWidth, DefaultHeight, 40, _inventory.AllItems);
-    }
-
-    [TearDown]
-    public void TearDown()
-    {
-        _inventory.Clear();
-    }
-
-    private const int DefaultWidth = 16;
-    private const int DefaultHeight = 16;
-
-    private IRandom _random;
-    private Labyrinth _labyrinth;
-    private Inventory _inventory;
-
     /// <summary>
     ///     Тестирует правильное распределение остатков предметов в лабиринте.
     ///     Проверяет, что количество размещенных предметов соответствует ожидаемому количеству,
@@ -66,7 +45,7 @@ public class LabyrinthTests
         int placedCount = 0;
 
         List<TestItem> items = counts.Select(x => new TestItem(x)).ToList();
-        _labyrinth.Init(width, height, 40, items);
+        Labyrinth.Init(width, height, 40, items);
 
         foreach (TestItem item in items)
         {
@@ -100,9 +79,9 @@ public class LabyrinthTests
     [TestCase(128, 128, 10)]
     public void PlacedCorrectCountOfItemsTest(int width, int height, int density)
     {
-        _labyrinth.Init(width, height, density, _inventory.AllItems);
+        Labyrinth.Init(width, height, density, Inventory.AllItems);
 
-        foreach (ItemStack itemStack in _inventory.Stacks)
+        foreach (ItemStack itemStack in Inventory.Stacks)
         {
             Item item = itemStack.Item;
             int expectedCount = itemStack.Item.CalculateCountInMaze(width, height, density);
@@ -135,15 +114,15 @@ public class LabyrinthTests
     {
         foreach (Direction direction in DirectionExtensions.GetAll())
         {
-            Assert.DoesNotThrow(() => _labyrinth.CreateWall((x, y), direction));
-            Assert.DoesNotThrow(() => _labyrinth.BreakWall((x, y), direction));
+            Assert.DoesNotThrow(() => Labyrinth.CreateWall((x, y), direction));
+            Assert.DoesNotThrow(() => Labyrinth.BreakWall((x, y), direction));
         }
 
-        Assert.DoesNotThrow(() => _labyrinth.CreateWall((x, y), Direction.All));
-        Assert.DoesNotThrow(() => _labyrinth.BreakWall((x, y), Direction.All));
+        Assert.DoesNotThrow(() => Labyrinth.CreateWall((x, y), Direction.All));
+        Assert.DoesNotThrow(() => Labyrinth.BreakWall((x, y), Direction.All));
 
-        Assert.DoesNotThrow(() => _labyrinth.CreateWall((x, y), directions: [Direction.Left, Direction.Top, Direction.Right, Direction.Bottom]));
-        Assert.DoesNotThrow(() => _labyrinth.BreakWall((x, y), Direction.Left, Direction.Top, Direction.Right, Direction.Bottom));
+        Assert.DoesNotThrow(() => Labyrinth.CreateWall((x, y), directions: [Direction.Left, Direction.Top, Direction.Right, Direction.Bottom]));
+        Assert.DoesNotThrow(() => Labyrinth.BreakWall((x, y), Direction.Left, Direction.Top, Direction.Right, Direction.Bottom));
     }
 
     /// <summary>
@@ -171,7 +150,7 @@ public class LabyrinthTests
     {
         Position position = (x, y);
 
-        bool result = _labyrinth.IsCorrectPosition(position);
+        bool result = Labyrinth.IsCorrectPosition(position);
 
         Assert.That(result, Is.EqualTo(expectedResult));
     }

@@ -12,6 +12,7 @@ public partial class Maze : IAsyncDisposable
 
     private bool _isExitFound;
     private bool _isInit;
+    private bool _isSettingsHidden = true;
 
     private int _originalSize;
     private int _density;

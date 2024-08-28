@@ -14,7 +14,7 @@ public partial class MazeFloor : MazeComponent
 
         int tileSize = BoxSize / 2;
 
-        int?[,] tile = GetTile(x, y);
+        int[,] tile = GetTile(x, y);
 
         for (int i = 0; i < 2; i++)
         {
@@ -23,14 +23,13 @@ public partial class MazeFloor : MazeComponent
                 int left = topLeft.X + i * tileSize;
                 int top = topLeft.Y + j * tileSize;
 
-                sequence.DrawImage($"/images/tiles/tile{tile[i, j]:000}.png", left, top, tileSize, tileSize);
-                // sequence.DrawImage($"/images/tiles/test/tile{tile[i, j]:000}.png", left, top, tileSize, tileSize);
+                sequence.DrawSprite("/images/tiles/floor.png", tile[i, j] / 6, tile[i, j] % 6, left, top, tileSize);
             }
         }
     }
 
     // https://i.imgur.com/WL6Nt13.png
-    private int?[,] GetTile(int x, int y)
+    private int[,] GetTile(int x, int y)
     {
         int? topLeft = null;
         int? bottomLeft = null;
@@ -120,7 +119,7 @@ public partial class MazeFloor : MazeComponent
             bottomLeft ??= bottomRight - 1;
         }
 
-        int?[,] tile = new int?[2, 2];
+        int[,] tile = new int[2, 2];
 
         tile[0, 0] = topLeft ?? 14;
         tile[1, 0] = topRight ?? 15;

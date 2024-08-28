@@ -6,6 +6,7 @@ public abstract class Item
 {
     public abstract string Name { get; }
     public abstract string DisplayName { get; }
+    public abstract string Description { get; }
 
     public abstract int DefaultCount { get; }
     public abstract int MaxCount { get; }
