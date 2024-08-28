@@ -8,6 +8,7 @@ const commandTypes = {
     6: 'lineWidth',
     7: 'clearRect',
     8: 'strokeRect',
+    9: 'drawSprite',
 };
 
 const commandHandlers = {
@@ -27,14 +28,28 @@ const commandHandlers = {
     drawImage: async (context, command) => {
         const img = await loadImage(command.source);
         context.drawImage(img, command.x, command.y, command.width, command.height);
+    },
+    drawSprite: async (context, command) => {
+        const img = await loadImage(command.source);
+        context.drawImage(img, command.sourceX, command.sourceY, command.sourceWidth, command.sourceHeight, command.x, command.y, command.width, command.height);
     }
 };
 
+const imageCache = {};
+
 const loadImage = source =>
-    new Promise(resolve => {
-        const image = new Image();
-        image.src = source;
-        image.onload = () => resolve(image);
+    new Promise((resolve, reject) => {
+        if (imageCache[source]) {
+            resolve(imageCache[source]);
+        } else {
+            const image = new Image();
+            image.src = source;
+            image.onload = () => {
+                imageCache[source] = image;
+                resolve(image);
+            };
+            image.onerror = reject;
+        }
     });
 
 window.canvasHelper = {
@@ -64,5 +79,3 @@ window.canvasHelper = {
         requestAnimationFrame(draw);
     }
 };
-
-

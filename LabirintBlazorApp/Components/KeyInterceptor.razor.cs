@@ -52,8 +52,6 @@ public partial class KeyInterceptor : IAsyncDisposable
     [JSInvokable]
     public void OnKeyDown(string code)
     {
-        Console.WriteLine(code);
-
         if (_isPause)
         {
             return;
