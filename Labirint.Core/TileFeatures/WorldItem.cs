@@ -8,7 +8,7 @@ public class WorldItem(Item item, string imageSource, Alignment alignment, doubl
 
     public override bool RemoveAfterSuccessPickUp => true;
     public override string PickUpSound => item.SoundSettings?.PickUpSound ?? string.Empty;
-    public override DrawingSettings? DrawingSettings { get; } = new(imageSource, alignment, scale);
+    public override DrawingSettings? DrawingSettings { get; } = new(imageSource, alignment, scale, 1);
 
     public override bool TryPickUp(Labyrinth labyrinth)
     {
