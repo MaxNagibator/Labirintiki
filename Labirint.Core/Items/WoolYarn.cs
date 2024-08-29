@@ -40,6 +40,5 @@ public class WoolYarn : Item
     {
         WoolYarnAbility track = new();
         labyrinth.Runner.AddAbility(track);
-        track.Hit(labyrinth[position], direction.Value);
     }
 }

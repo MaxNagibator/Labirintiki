@@ -121,7 +121,12 @@ public partial class Maze : IAsyncDisposable
 
     private void OnMoveKeyDown(object? sender, MoveEventArgs args)
     {
-        Move(args.Direction);
+        if (_isExitFound)
+        {
+            return;
+        }
+
+        _labyrinth.Move(args.Direction);
     }
 
     private void OnAttackKeyDown(object? sender, AttackEventArgs args)
@@ -147,23 +152,13 @@ public partial class Maze : IAsyncDisposable
         StateHasChanged();
     }
 
-    private void Move(Direction direction)
-    {
-        if (_isExitFound)
-        {
-            return;
-        }
-
-        _labyrinth.Move(direction);
-    }
-
     private void OnFieldClicked(MouseEventArgs args)
     {
         Direction direction = _mazeClickHandler.GetDirection((int)args.OffsetX, (int)args.OffsetY);
 
         if (direction != Direction.None)
         {
-            Move(direction);
+            _keyInterceptor?.OnKeyDown(direction);
         }
     }
 

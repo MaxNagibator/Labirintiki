@@ -97,7 +97,7 @@ a, .btn-link {
 }
 
 .loading-progress-text:after {
-    content: var(--blazor-load-percentage-text, "Loading");
+    content: var(--blazor-load-percentage-text, "Ожидайте");
 }
 
 code {
@@ -135,4 +135,33 @@ code {
 .mud-theme-transparent {
     color: inherit !important;
     background-color: transparent !important;
+}
+
+.loading-bg {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background-color: #1a1a27;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.rotating-image {
+    position: absolute;
+    top: 50vh;
+    left: 50vw;
+    width: 30%;
+    height: auto;
+    transform: translate(-50%, -50%);
+    animation: rotate 10s linear infinite;
+}
+
+@keyframes rotate {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
 }

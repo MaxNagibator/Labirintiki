@@ -27,3 +27,4 @@ jobs:
         with:
           folder: 'dist/Web/wwwroot'
           branch: 'gh-pages'
+          clean: true
