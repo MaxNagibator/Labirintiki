@@ -18,15 +18,15 @@ public abstract class MazeComponent : RenderComponent
     [CascadingParameter]
     public required MazeRenderParameters RenderParameters { get; set; }
 
+    public int CanvasWidth { get; private set; }
+    public int CanvasHeight { get; private set; }
+
     protected virtual string StrokeStyle => GlobalParameters.Labyrinth.Color;
 
     protected int BoxSize { get; private set; }
     protected int WallWidth { get; private set; }
     protected Labyrinth Maze { get; private set; } = null!;
     protected Vision Vision { get; private set; } = null!;
-
-    protected int CanvasWidth { get; private set; }
-    protected int CanvasHeight { get; private set; }
 
     protected abstract string CanvasId { get; }
 

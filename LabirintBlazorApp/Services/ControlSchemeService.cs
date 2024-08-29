@@ -5,7 +5,7 @@ namespace LabirintBlazorApp.Services;
 
 public class ControlSchemeService : IControlSchemeService
 {
-    private const string CurrentSchemeKey = "CurrentScheme";
+    private const string LocalStorageKey = nameof(ControlSchemeService);
 
     private readonly List<IControlScheme> _controlSchemes;
     private readonly ILocalStorageService _localStorage;
@@ -40,7 +40,7 @@ public class ControlSchemeService : IControlSchemeService
             }
             else
             {
-                throw new ArgumentException($"Предоставленная схема управления «{value.GetType().Name}» не зарегистрирована.");
+                throw new ArgumentException($"Предоставленная схема управления «{value.Name}» не зарегистрирована.");
             }
         }
     }
@@ -78,22 +78,26 @@ public class ControlSchemeService : IControlSchemeService
 
     private async Task LoadCurrentSchemeAsync()
     {
-        string? schemeName = await _localStorage.GetItemAsync<string>(CurrentSchemeKey);
+        string? schemeName = await _localStorage.GetItemAsync<string>(LocalStorageKey);
 
-        if (schemeName != null)
+        if (schemeName == null)
         {
-            IControlScheme? scheme = _controlSchemes.FirstOrDefault(controlScheme => controlScheme.Name == schemeName);
-
-            if (scheme != null)
-            {
-                _currentScheme = scheme;
-                NotifySchemeChanged();
-            }
+            return;
         }
+
+        IControlScheme? scheme = _controlSchemes.FirstOrDefault(controlScheme => controlScheme.Name == schemeName);
+
+        if (scheme == null)
+        {
+            return;
+        }
+
+        _currentScheme = scheme;
+        NotifySchemeChanged();
     }
 
     private async Task SaveCurrentSchemeAsync()
     {
-        await _localStorage.SetItemAsync(CurrentSchemeKey, _currentScheme.Name);
+        await _localStorage.SetItemAsync(LocalStorageKey, _currentScheme.Name);
     }
 }

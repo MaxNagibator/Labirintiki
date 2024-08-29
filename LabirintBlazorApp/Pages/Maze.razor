@@ -1,4 +1,5 @@
 @page "/labirint/{seed?}"
+
 @inject SoundService SoundService
 @inject AnimationService AnimationService
 
@@ -39,8 +40,8 @@
                     <RunnerAbilities Abilities="@_labyrinth.Runner.Abilities" />
                 </div>
 
-                <div class="field">
-                    <Animation Effect="AnimationService.AnimationEffect" Speed="TimeSpan.FromMilliseconds(200.0)" Delay="@Delay.None" IterationCount="1">
+                <div class="field" @onclick="OnFieldClicked">
+                    <Animation Delay="@Delay.None" Effect="AnimationService.AnimationEffect" IterationCount="1" Speed="TimeSpan.FromMilliseconds(200.0)">
                         <CascadingValue Value="_renderParameter">
                             <MazeFloor @ref="_mazeFloor" />
                             <MazeWalls @ref="_mazeWalls" />

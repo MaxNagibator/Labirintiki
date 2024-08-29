@@ -17,15 +17,45 @@
     <link href="manifest.webmanifest" rel="manifest" />
     <link href="icon-512.png" rel="apple-touch-icon" sizes="512x512" />
     <link href="icon-192.png" rel="apple-touch-icon" sizes="192x192" />
+    <style>
+        .loading-bg {
+            position: absolute;
+            width: 100vh;
+            height: 100vh;
+            background-color: #1a1a27;
+
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+        }
+
+        .rotating-image {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: auto;
+            transform: translate(-50%, -50%);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+    </style>
 </head>
 
 <body>
 <div id="app">
-    <svg class="loading-progress">
-        <circle cx="50%" cy="50%" r="40%" />
-        <circle cx="50%" cy="50%" r="40%" />
-    </svg>
-    <div class="loading-progress-text"></div>
+    <div class="loading-bg">
+        <img alt="Rotating Image" class="rotating-image" src="images/runner.png">
+        <div class="loading-progress-text"></div>
+    </div>
 </div>
 
 <div id="blazor-error-ui">

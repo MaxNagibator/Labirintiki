@@ -70,7 +70,7 @@ a, .btn-link {
     display: block;
     width: 8rem;
     height: 8rem;
-    margin: 20vh auto 1rem auto;
+    margin: 50vh auto 1rem auto;
 }
 
 .loading-progress circle {
@@ -88,9 +88,11 @@ a, .btn-link {
 }
 
 .loading-progress-text {
+    font-size: 4rem;
     font-weight: bold;
     position: absolute;
     text-align: center;
+    color: #bababe;
     inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
 }
 
@@ -134,4 +136,3 @@ code {
     color: inherit !important;
     background-color: transparent !important;
 }
-
