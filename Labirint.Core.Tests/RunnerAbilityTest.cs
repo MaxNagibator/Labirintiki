@@ -10,7 +10,7 @@ internal class TestAbility(int? moveCount = null) : Ability
     public override int? MoveCount { get; } = moveCount;
     public int HitCount { get; private set; }
 
-    public override void Hit(Tile tile)
+    public override void Hit(Tile tile, Direction direction)
     {
         HitCount++;
     }
@@ -32,12 +32,12 @@ public class RunnerAbilityTest : BaseLabyrinthTests
 
         for (int i = 0; i < testAbility.MoveCount; i++)
         {
-            ability.Hit(tile);
+            ability.Hit(tile, Direction.None);
         }
 
         Assert.That(ability.Active, Is.EqualTo(testAbility.IsUnlimitedMoveCount));
 
-        ability.Hit(tile);
+        ability.Hit(tile, Direction.None);
 
         Assert.That(testAbility.HitCount, Is.EqualTo(testAbility.IsUnlimitedMoveCount ? testAbility.HitCount : testAbility.MoveCount));
     }

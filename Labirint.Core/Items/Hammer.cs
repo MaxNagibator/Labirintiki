@@ -24,7 +24,7 @@ public class Hammer : Item
     public override int MaxCount => 6;
 
     public override ControlSettings? ControlSettings { get; } = new(Key.KeyA, Key.Space, true);
-    public override SoundSettings? SoundSettings { get; } = new("/media/hammer.mp3", "molot");
+    public override SoundSettings? SoundSettings { get; } = new("media/hammer.mp3", "molot");
 
     public override int CalculateCountInMaze(int width, int height, int density)
     {

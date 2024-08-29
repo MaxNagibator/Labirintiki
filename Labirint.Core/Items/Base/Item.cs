@@ -11,8 +11,8 @@ public abstract class Item
     public abstract int DefaultCount { get; }
     public abstract int MaxCount { get; }
 
-    public string Icon => $"/images/items/{Name}-icon.png";
-    public string Image => $"/images/items/{Name}.png";
+    public string Icon => $"images/items/{Name}-icon.png";
+    public string Image => $"images/items/{Name}.png";
 
     public virtual ControlSettings? ControlSettings => null;
     public virtual SoundSettings? SoundSettings => null;

@@ -29,7 +29,7 @@ public class WoolYarn : Item
     public override int MaxCount => 1;
 
     public override ControlSettings? ControlSettings { get; } = new(Key.KeyY);
-    public override SoundSettings? SoundSettings { get; } = new("/media/yarn.mp3", "/media/wool-yarn.mp3");
+    public override SoundSettings? SoundSettings { get; } = new("media/yarn.mp3", "media/wool-yarn.mp3");
 
     public override int CalculateCountInMaze(int width, int height, int density)
     {
