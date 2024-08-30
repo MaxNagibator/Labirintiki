@@ -1,9 +1,5 @@
-﻿@using Blazored.LocalStorage
-@using LabirintBlazorApp.Parameters
-@inject ISnackbar SnackbarService
-@inject ILocalStorageService LocalStorage
-
-<MudDialog>
+﻿@using LabirintBlazorApp.Parameters
+<MudDialog OnBackdropClick="UpdateAsync">
     <TitleContent>
         <MudText Typo="Typo.h6">
             Параметры
@@ -11,13 +7,21 @@
     </TitleContent>
     <DialogContent>
         <MudStack Spacing="2">
-            <ControlSchemeSwitcher />
+            <ControlSchemeSwitcher @ref="_controlScheme" />
 
             <MudStack AlignItems="AlignItems.Center" Row>
                 <MudSwitch @bind-Value="@GlobalParameters.Labyrinth.IsSoundOn" Color="Color.Success" Label="Звук" UncheckedColor="Color.Error" />
                 @if (GlobalParameters.Labyrinth.IsSoundOn)
                 {
-                    <MudSlider @bind-Value="@GlobalParameters.Labyrinth.SoundVolume" Class="pr-2" Max="1.0f" Min="0f" Size="Size.Medium" Step="0.01f" T="float" ValueLabel="true" ValueLabelFormat="0%" />
+                    <MudSlider @bind-Value="@GlobalParameters.Labyrinth.SoundVolume"
+                               Class="pr-2"
+                               Max="1.0f"
+                               Min="0f"
+                               Size="Size.Medium"
+                               Step="0.01f"
+                               T="float"
+                               ValueLabel="true"
+                               ValueLabelFormat="0%" />
                 }
             </MudStack>
             <MudStack>
@@ -38,9 +42,9 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Отмена</MudButton>
-        <MudButton Color="Color.Warning" Disabled="@_processing" OnClick="Reset">Сбросить</MudButton>
-        <MudButton Color="Color.Success" Disabled="@_processing" OnClick="Update">
-            @if (_processing)
+        <MudButton Color="Color.Warning" Disabled="@_isProcessing" OnClick="Reset">Сбросить</MudButton>
+        <MudButton Color="Color.Success" Disabled="@_isProcessing" OnClick="UpdateAsync">
+            @if (_isProcessing)
             {
                 <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
             }
@@ -51,40 +55,3 @@
         </MudButton>
     </DialogActions>
 </MudDialog>
-
-@code {
-
-    [CascadingParameter]
-    public required MudDialogInstance MudDialog { get; set; }
-
-    private bool _processing;
-
-    private async Task Update()
-    {
-        _processing = true;
-
-        try
-        {
-            await LocalStorage.SetItemAsync(LabyrinthParameters.LocalStorageKey, GlobalParameters.Labyrinth);
-            SnackbarService.Add("Сохранено!", Severity.Success);
-            MudDialog.Close();
-        }
-        catch
-        {
-            SnackbarService.Add("Не удалось сохранить", Severity.Error);
-        }
-
-        _processing = false;
-    }
-
-    private void Reset()
-    {
-        GlobalParameters.Labyrinth = new LabyrinthParameters();
-    }
-
-    private void Cancel()
-    {
-        MudDialog.Cancel();
-    }
-
-}

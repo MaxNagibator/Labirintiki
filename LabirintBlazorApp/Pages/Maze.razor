@@ -16,7 +16,16 @@
 
 <div class="workspace" hidden="@(!IsInit)">
     <div class="header-panel">
-        <MudText Typo="Typo.h4">Labirint!</MudText>
+        @if (IsInit)
+        {
+            <div class="score-panel">
+                <MudStack AlignItems="AlignItems.Center" Row>
+                    <MudIcon Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.Bitcoin" Size="Size.Large" />
+                    <MudText Color="Color.Warning" Typo="Typo.h4">@_labyrinth.Runner.Score.ToString("N0")</MudText>
+                </MudStack>
+            </div>
+        }
+
         <MudButton OnClick="() => _isSettingsHidden = !_isSettingsHidden"
                    Size="Size.Large"
                    StartIcon="@MaterialDesignIcons.Normal.Cog"
@@ -28,13 +37,6 @@
 
     @if (IsInit)
     {
-        <div class="score-panel">
-            <MudStack AlignItems="AlignItems.Center" Row>
-                <MudIcon Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.Bitcoin" Size="Size.Large" />
-                <MudText Color="Color.Warning" Typo="Typo.h4">@_labyrinth.Runner.Score.ToString("N0")</MudText>
-            </MudStack>
-        </div>
-
         <div class="game">
             <div class="main-panel">
                 <div class="ability-panel">

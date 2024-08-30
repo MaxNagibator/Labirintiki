@@ -9,4 +9,5 @@ public interface IControlSchemeService
     IEnumerable<IControlScheme> AvailableSchemes { get; }
     void RegisterScheme(IControlScheme scheme);
     void UnregisterScheme(IControlScheme scheme);
+    void Reset();
 }

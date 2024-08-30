@@ -66,9 +66,14 @@ public class ControlSchemeService : IControlSchemeService
             return;
         }
 
-        _currentScheme = _controlSchemes.FirstOrDefault() ?? new ClassicScheme();
+        Reset();
         SaveCurrentSchemeAsync().ConfigureAwait(false);
         NotifySchemeChanged();
+    }
+
+    public void Reset()
+    {
+        _currentScheme = _controlSchemes.FirstOrDefault() ?? new ClassicScheme();
     }
 
     private void NotifySchemeChanged()

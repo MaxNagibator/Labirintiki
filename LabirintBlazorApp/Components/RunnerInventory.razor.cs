@@ -123,9 +123,12 @@ public partial class RunnerInventory : RenderComponent, IAsyncDisposable
         await ForceRenderAsync();
     }
 
-    private void OnClicked(Key activateKey)
+    private void OnClicked(Item item)
     {
-        Interceptor.OnKeyDown(activateKey);
+        if (item.ControlSettings != null)
+        {
+            Interceptor.OnKeyDown(ControlScheme.GetActivateKey(item.ControlSettings));
+        }
     }
 
     private void InitializeItems()

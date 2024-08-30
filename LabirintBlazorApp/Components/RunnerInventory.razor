@@ -19,14 +19,17 @@
                             @(animatedStack.GetAnimation())"
                  @onanimationend="() => AnimationCompleted(animatedStack)">
 
-                <img src="@item.Icon" alt="@item.DisplayName">
+                <img alt="@item.DisplayName"
+                     src="@item.Icon"
+                     title="Использовать предмет"
+                     @onclick="() => OnClicked(item)">
                 <div class="item-name"
                      @onmouseout="HideDescription"
                      @onmouseover="() => ShowDescription(item)">
                     @item.DisplayName
                 </div>
-                <div class="count">@stack.Count</div>
-                <div class="max-count">@(stack.IsInfinite ? "∞" : stack.MaxCount)</div>
+                <div class="count" title="Текущие количество в инвентаре">@stack.Count</div>
+                <div class="max-count" title="Максимальной количество в инвентаре">@(stack.IsInfinite ? "∞" : stack.MaxCount)</div>
             </div>
 
             @{
@@ -34,7 +37,7 @@
 
                 if (control != null)
                 {
-                    <div class="keyboard-button" @onclick="() => OnClicked(control.ActivateKey)">
+                    <div class="keyboard-button" title="Использовать предмет" @onclick="() => OnClicked(item)">
                         <span>
                             @ControlScheme.GetActivateKey(control).DisplaySymbol
                         </span>
