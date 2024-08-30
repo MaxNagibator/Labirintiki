@@ -23,7 +23,7 @@ public partial class MazeFloor : MazeComponent
                 int left = topLeft.X + i * tileSize;
                 int top = topLeft.Y + j * tileSize;
 
-                sequence.DrawSprite("/images/tiles/floor.png", tile[i, j] / 6, tile[i, j] % 6, left, top, tileSize);
+                sequence.DrawSprite("images/tiles/floor.png", tile[i, j] / 6, tile[i, j] % 6, left, top, tileSize);
             }
         }
     }

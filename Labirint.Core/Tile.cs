@@ -67,6 +67,11 @@ public class Tile(Labyrinth labyrinth)
     {
         Features ??= [];
 
+        if (Features.Any(tileFeature => tileFeature.DrawingSettings == feature.DrawingSettings))
+        {
+            return;
+        }
+
         Features.Add(feature);
     }
 

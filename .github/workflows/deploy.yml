@@ -1,0 +1,31 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy-to-github-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install .NET WASM Build Tools
+        run: dotnet workload install wasm-tools
+
+      - name: Publish .NET Core Project
+        run: dotnet publish ./LabirintBlazorApp/LabirintBlazorApp.csproj -c:Release -p:GHPages=true -o dist/Web --nologo
+
+      - name: Commit wwwroot to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: 'dist/Web/wwwroot'
+          branch: 'gh-pages'
+          clean: true
+          single-commit: true

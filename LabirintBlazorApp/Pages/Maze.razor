@@ -1,4 +1,5 @@
 @page "/labirint/{seed?}"
+
 @inject SoundService SoundService
 @inject AnimationService AnimationService
 
@@ -27,7 +28,7 @@
     @if (IsInit)
     {
         <div class="score-panel">
-            <MudStack Row AlignItems="AlignItems.Center">
+            <MudStack AlignItems="AlignItems.Center" Row>
                 <MudIcon Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.Bitcoin" Size="Size.Large" />
                 <MudText Color="Color.Warning" Typo="Typo.h4">@_labyrinth.Runner.Score.ToString("N0")</MudText>
             </MudStack>
@@ -40,11 +41,13 @@
                 </div>
 
                 <div class="field">
-                    <Animation Effect="AnimationService.AnimationEffect" Speed="TimeSpan.FromMilliseconds(200.0)" Delay="@Delay.None" IterationCount="1">
+                    <Animation Delay="@Delay.None" Effect="AnimationService.AnimationEffect" IterationCount="1" Speed="TimeSpan.FromMilliseconds(200.0)">
                         <CascadingValue Value="_renderParameter">
-                            <MazeFloor @ref="_mazeFloor" />
-                            <MazeWalls @ref="_mazeWalls" />
-                            <MazeEntities @ref="_mazeEntities" />
+                            <TouchInterceptor @ref="_touchInterceptor">
+                                <MazeFloor @ref="_mazeFloor" />
+                                <MazeWalls @ref="_mazeWalls" />
+                                <MazeEntities @ref="_mazeEntities" />
+                            </TouchInterceptor>
                         </CascadingValue>
 
                         @{
@@ -66,7 +69,7 @@
                                 <MudText Typo="Typo.h6">@(_labyrinth.Runner.Position.X + 1)</MudText>
                             </div>
 
-                            <img src="/images/runner.png"
+                            <img src="images/runner.png"
                                  style="position:absolute;
                                      z-index: 100;
                                      left: @(left)px;
@@ -85,7 +88,7 @@
         </div>
     }
 
-    <div hidden="@_isSettingsHidden" class="control-panel">
+    <div class="control-panel" hidden="@_isSettingsHidden">
         <MudStack Spacing="3">
             <MudText Typo="Typo.h5">Параметры: </MudText>
             <RandomGenerator @ref="_seeder" Seed="@Seed" Size="@_originalSize" Density="@_density" IsExitFound="@_isExitFound" />

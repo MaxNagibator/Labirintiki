@@ -24,7 +24,7 @@ public class Bomb : Item
     public override int MaxCount => 2;
 
     public override ControlSettings? ControlSettings { get; } = new(Key.KeyB, Key.ControlLeft);
-    public override SoundSettings? SoundSettings { get; } = new("/media/bomb.mp3", "bomb");
+    public override SoundSettings? SoundSettings { get; } = new("media/bomb.mp3", "bomb");
 
     public override int CalculateCountInMaze(int width, int height, int density)
     {

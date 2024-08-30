@@ -30,6 +30,7 @@ public static class AlignmentHelper
                 top -= offset / 2;
                 break;
 
+            case Alignment.Stretch:
             case Alignment.Center:
                 left -= offset / 2;
                 top -= offset / 2;

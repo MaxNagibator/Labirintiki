@@ -29,6 +29,7 @@ public partial class Maze : IAsyncDisposable
     private Labyrinth _labyrinth = null!;
     private RandomGenerator _seeder = null!;
     private Vision _vision = null!;
+    private TouchInterceptor? _touchInterceptor;
 
     [Parameter]
     public string? Seed { get; set; }
@@ -55,6 +56,11 @@ public partial class Maze : IAsyncDisposable
         _labyrinth.ExitFound -= OnExitFound;
         _labyrinth.ItemPickedUp -= OnItemPickedUp;
         _labyrinth.Runner.Inventory.ItemUsed -= OnItemUsed;
+
+        if (_touchInterceptor != null)
+        {
+            _touchInterceptor.Moved -= OnMoved;
+        }
 
         GC.SuppressFinalize(this);
     }
@@ -92,6 +98,16 @@ public partial class Maze : IAsyncDisposable
         }
 
         await GenerateAsync();
+
+        if (_touchInterceptor != null)
+        {
+            _touchInterceptor.Moved += OnMoved;
+        }
+    }
+
+    private void OnMoved(object? sender, Direction args)
+    {
+        _keyInterceptor?.OnKeyDown(args);
     }
 
     private async void OnRunnerMoved(object? sender, Position args)

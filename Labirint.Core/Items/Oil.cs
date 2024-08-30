@@ -21,7 +21,7 @@ public class Oil : ScoreItem
          """;
 
     public override int CostPerItem => 100_000;
-    public override SoundSettings? SoundSettings { get; } = new("/media/oil.mp3");
+    public override SoundSettings? SoundSettings { get; } = new("media/oil.mp3");
 
     public override int CalculateCountInMaze(int width, int height, int density)
     {

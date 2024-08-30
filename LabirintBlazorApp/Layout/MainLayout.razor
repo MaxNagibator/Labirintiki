@@ -21,7 +21,7 @@
                         DropShadow Size="Size.Small"
                         Color="Color.Info"
                         StartIcon="@Icons.Material.Rounded.Games"
-                        Label="Играть"/>
+                        Label="Играть" />
             }
             <MudIconButton Size="Size.Medium" OnClick="@DarkMode" Icon="@Icons.Material.Rounded.Brightness4" Color="Color.Inherit" />
             <MudIconButton Size="Size.Medium" OnClick="@OpenParameters" Icon="@Icons.Material.Rounded.Settings" Color="Color.Inherit" />
@@ -29,7 +29,7 @@
     </MudAppBar>
     <MudDrawer Variant="@DrawerVariant.Temporary" @bind-Open="@_drawerOpen">
         <MudStack Style="height:auto" AlignItems="AlignItems.Center" Justify="Justify.Center">
-            <MudImage Class="pa-1" Style="width:100%;" Fluid="true" ObjectPosition="ObjectPosition.Center" ObjectFit="ObjectFit.Cover" Src="/icon-512.png" />
+            <MudImage Class="pa-1" Style="width:100%;" Fluid="true" ObjectPosition="ObjectPosition.Center" ObjectFit="ObjectFit.Cover" Src="./icon-512.png" />
         </MudStack>
         <NavMenu />
     </MudDrawer>

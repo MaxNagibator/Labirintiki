@@ -64,25 +64,21 @@ public partial class KeyInterceptor : IAsyncDisposable
 
         if (PerformMove(code, out MoveEventArgs? move) && move != null)
         {
-            if (_waitItem != null)
-            {
-                AttackKeyDown?.Invoke(this, new AttackEventArgs
-                {
-                    Item = _waitItem,
-                    Direction = move.Direction,
-                    KeyCode = Key.Create(code)
-                });
-
-                ChangeWaitItem(null);
-            }
-
-            MoveKeyDown?.Invoke(this, move);
+            PerformMove(move);
         }
 
         if (PerformDigitKey(code, out DigitEventArgs? digit) && digit != null)
         {
             DigitKeyDown?.Invoke(this, digit);
         }
+    }
+
+    public void OnKeyDown(Direction direction)
+    {
+        PerformMove(new MoveEventArgs
+        {
+            Direction = direction
+        });
     }
 
     protected override void OnParametersSet()
@@ -110,6 +106,22 @@ public partial class KeyInterceptor : IAsyncDisposable
     {
         Initialize();
         StateHasChanged();
+    }
+
+    private void PerformMove(MoveEventArgs move)
+    {
+        if (_waitItem != null)
+        {
+            AttackKeyDown?.Invoke(this, new AttackEventArgs
+            {
+                Item = _waitItem,
+                Direction = move.Direction
+            });
+
+            ChangeWaitItem(null);
+        }
+
+        MoveKeyDown?.Invoke(this, move);
     }
 
     private void Initialize()
@@ -148,8 +160,7 @@ public partial class KeyInterceptor : IAsyncDisposable
 
         args = new AttackEventArgs
         {
-            Item = item,
-            KeyCode = Key.Create(code)
+            Item = item
         };
 
         return true;
@@ -166,8 +177,7 @@ public partial class KeyInterceptor : IAsyncDisposable
 
         args = new MoveEventArgs
         {
-            Direction = direction,
-            KeyCode = Key.Create(code)
+            Direction = direction
         };
 
         return true;

@@ -6,25 +6,27 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
         <LangVersion>default</LangVersion>
+        <EmccMaximumHeapSize>268435456</EmccMaximumHeapSize>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BlazorAnimation" Version="2.2.0" />
-        <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
-        <PackageReference Include="Bromix.MudBlazor.MaterialDesignIcons" Version="7.4.47.56" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.8" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.8" PrivateAssets="all" />
-        <PackageReference Include="MudBlazor" Version="7.6.0" />
-        <PackageReference Include="MudBlazor.ThemeManager" Version="2.0.0" />
-        <PackageReference Include="System.Text.Json" Version="8.0.4" />
+        <PackageReference Include="BlazorAnimation" Version="2.2.0"/>
+        <PackageReference Include="Blazored.LocalStorage" Version="4.5.0"/>
+        <PackageReference Include="Bromix.MudBlazor.MaterialDesignIcons" Version="7.4.47.56"/>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.8"/>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.8" PrivateAssets="all"/>
+        <PackageReference Include="MudBlazor" Version="7.6.0"/>
+        <PackageReference Include="MudBlazor.ThemeManager" Version="2.0.0"/>
+        <PackageReference Include="PublishSPAforGitHubPages.Build" Version="2.2.0"/>
+        <PackageReference Include="System.Text.Json" Version="8.0.4"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+        <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Labirint.Core\Labirint.Core.csproj" />
+        <ProjectReference Include="..\Labirint.Core\Labirint.Core.csproj"/>
     </ItemGroup>
 
 </Project>

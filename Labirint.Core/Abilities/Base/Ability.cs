@@ -18,7 +18,7 @@ public abstract class Ability
     /// <summary>
     ///     Изображение.
     /// </summary>
-    public virtual string Icon => $"/images/abilities/{Name}.png";
+    public virtual string Icon => $"images/abilities/{Name}.png";
 
     /// <summary>
     ///     Безлимитная способность.
