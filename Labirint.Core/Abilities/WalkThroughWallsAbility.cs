@@ -5,7 +5,7 @@
 /// </summary>
 public class WalkThroughWallsAbility : Ability
 {
-    public override string Name => "WalkThroughWalls";
+    public override string Name => "walk-through-walls";
 
     public override string DisplayName => "Сквозь стены";
 

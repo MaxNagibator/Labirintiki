@@ -1,4 +1,5 @@
 @page "/labirint/{seed?}"
+@using Direction = Direction
 
 @inject SoundService SoundService
 @inject AnimationService AnimationService
@@ -51,31 +52,40 @@
                         </CascadingValue>
 
                         @{
-                            Position draw = _vision.GetDraw(_labyrinth.Runner.Position) * _boxSize + _wallWidth;
-                            (int offset, int entitySize) = AlignmentHelper.CalculateOffset(_boxSize, _wallWidth, 0.5);
+                            Runner runner = _labyrinth.Runner;
+                            Position draw = _vision.GetDraw(runner.Position) * _boxSize + _wallWidth;
+                            (int offset, int entitySize) = AlignmentHelper.CalculateOffset(_boxSize, _wallWidth, 0.9);
                             (int left, int top) = AlignmentHelper.CalculatePosition(Alignment.Center, draw, offset);
 
+                            _runnerScaleX = runner.LastDirection switch
+                            {
+                                Direction.Right => 1,
+                                Direction.Left => -1,
+                                var _ => _runnerScaleX
+                            };
+
                             <div style="position:absolute;
-                                z-index: 100;
-                                left: @(-30)px;
-                                top: @(top - 4)px;">
-                                <MudText Typo="Typo.h6">@(_labyrinth.Runner.Position.Y + 1)</MudText>
+                                        z-index: 100;
+                                        left: @(-30)px;
+                                        top: @(top - 4)px;">
+                                <MudText Typo="Typo.h6">@(runner.Position.Y + 1)</MudText>
                             </div>
 
                             <div style="position:absolute;
-                                z-index: 100;
-                                left: @(left + 4)px;
-                                top: @(-30)px;">
-                                <MudText Typo="Typo.h6">@(_labyrinth.Runner.Position.X + 1)</MudText>
+                                        z-index: 100;
+                                        left: @(left + 4)px;
+                                        top: @(-30)px;">
+                                <MudText Typo="Typo.h6">@(runner.Position.X + 1)</MudText>
                             </div>
 
                             <img src="images/runner.png"
                                  style="position:absolute;
-                                     z-index: 100;
-                                     left: @(left)px;
-                                     top: @(top)px;
-                                     width: @(entitySize)px;
-                                     height: @(entitySize)px;"
+                                        z-index: 100;
+                                        left: @(left)px;
+                                        top: @(top)px;
+                                        width: @(entitySize)px;
+                                        height: @(entitySize)px;
+                                        transform: scaleX(@_runnerScaleX) scaleY(1);"
                                  alt="Бегун" />
                         }
                     </Animation>

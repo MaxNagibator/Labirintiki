@@ -20,6 +20,8 @@ public partial class Maze : IAsyncDisposable
     private int _boxSize;
     private int _wallWidth;
 
+    private int _runnerScaleX = 1;
+
     private MazeFloor? _mazeFloor;
     private MazeWalls? _mazeWalls;
     private MazeEntities? _mazeEntities;

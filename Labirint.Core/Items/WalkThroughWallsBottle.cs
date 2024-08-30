@@ -8,7 +8,7 @@ namespace Labirint.Core.Items;
 /// </summary>
 public class WalkThroughWallsBottle : Item
 {
-    public override string Name => "walk-trhought-walls-bottle";
+    public override string Name => "walk-through-walls-bottle";
     public override string DisplayName => "Сквозь стены";
 
     public override string Description =>
@@ -21,12 +21,9 @@ public class WalkThroughWallsBottle : Item
 
     public override bool UseAfterPickup => true;
 
-    public override ControlSettings? ControlSettings { get; } = new(Key.KeyT);
-    public override SoundSettings? SoundSettings { get; } = null;
-
-    public virtual WorldItem GetWorldItem(WorldItemParameters parameters)
+    public override WorldItem GetWorldItem(WorldItemParameters parameters)
     {
-        return new WorldItem(this, Image, Alignment.Center, 0.5)
+        return new WorldItem(this, Image, Alignment.BottomCenter, 0.5)
         {
             AfterPlace = AfterPlace
         };
