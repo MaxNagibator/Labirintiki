@@ -21,17 +21,14 @@ public class WalkThroughWallsBottle : Item
 
     public override bool UseAfterPickup => true;
 
-    public override WorldItem GetWorldItem(WorldItemParameters parameters)
-    {
-        return new WorldItem(this, Image, Alignment.BottomCenter, 0.5)
-        {
-            AfterPlace = AfterPlace
-        };
-    }
-
     public override int CalculateCountInMaze(int width, int height, int density)
     {
         return (width + height) * density / 400 / 4;
+    }
+
+    protected override WorldItem GetWorldItem(WorldItemParameters parameters)
+    {
+        return new WorldItem(this, Image, Alignment.BottomCenter, 0.5);
     }
 
     protected override void AfterUse(Position position, Direction? direction, Labyrinth labyrinth)

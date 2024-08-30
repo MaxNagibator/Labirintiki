@@ -17,7 +17,7 @@ internal class TestAbility(int? moveCount = null) : Ability
 }
 
 [TestFixture]
-public class RunnerAbilityTest : BaseLabyrinthTests
+public class RunnerAbilityTest : LabyrinthTestsBase
 {
     [Test]
     [TestCase(null)]

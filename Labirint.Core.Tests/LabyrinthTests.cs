@@ -22,7 +22,7 @@ internal class TestItem(int count) : Item
 }
 
 [TestFixture]
-public class LabyrinthTests : BaseLabyrinthTests
+public class LabyrinthTests : LabyrinthTestsBase
 {
     /// <summary>
     ///     Тестирует правильное распределение остатков предметов в лабиринте.
@@ -33,7 +33,6 @@ public class LabyrinthTests : BaseLabyrinthTests
     /// <param name="height">Высота лабиринта</param>
     /// <param name="counts">Массив количеств предметов для распределения</param>
     [Test]
-    [Ignore("Не в рабочем состоянии")]
     [TestCase(2, 2, 1, 2)]
     [TestCase(2, 2, 2, 2)]
     [TestCase(2, 2, 1, 1, 1, 1)]
@@ -51,14 +50,12 @@ public class LabyrinthTests : BaseLabyrinthTests
         {
             int expectedCount = Math.Min(item.Count, Math.Min(placedCount + item.Count, width * height - 1 - placedCount));
 
-            // int count = _labyrinth.Enumerate()
-            //     .Where(tile => tile.WorldItem != null)
-            //     .Count(tile => tile.WorldItem!.Image.Contains(item.Name));
-            //
-            // placedCount += count;
-            //
-            // Console.WriteLine($"{item.Name}({item.Count}): {count}/{expectedCount}");
-            // Assert.That(count, Is.EqualTo(expectedCount));
+            int count = Labyrinth.GetInMazeCount(item);
+
+            placedCount += count;
+
+            Console.WriteLine($"{item.Name}({item.Count}): {count}/{expectedCount}");
+            Assert.That(count, Is.EqualTo(expectedCount));
         }
 
         Console.WriteLine($"Всего: {placedCount}/{allCount}");
@@ -73,7 +70,6 @@ public class LabyrinthTests : BaseLabyrinthTests
     /// <param name="density">Плотность стен в лабиринте</param>
     /// <remarks>Была ошибка, что выдавались только песочки.</remarks>
     [Test]
-    [Ignore("Не в рабочем состоянии")]
     [TestCase(16, 16, 40)]
     [TestCase(32, 32, 80)]
     [TestCase(128, 128, 10)]
@@ -86,12 +82,10 @@ public class LabyrinthTests : BaseLabyrinthTests
             Item item = itemStack.Item;
             int expectedCount = itemStack.Item.CalculateCountInMaze(width, height, density);
 
-            //  int count = _labyrinth.Enumerate()
-            //      .Where(tile => tile.WorldItem != null)
-            //      .Count(tile => tile.WorldItem!.Image.Contains(item.Name));
-            //
-            //  Console.WriteLine($"{item.Name}: {count}/{expectedCount}");
-            //  Assert.That(count, Is.EqualTo(expectedCount));
+            int count = Labyrinth.GetInMazeCount(item);
+
+            Console.WriteLine($"{item.Name}: {count}/{expectedCount}");
+            Assert.That(count, Is.EqualTo(expectedCount));
         }
     }
 

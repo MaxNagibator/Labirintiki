@@ -1,6 +1,6 @@
 ﻿namespace Labirint.Core.Tests;
 
-public class BaseLabyrinthTests
+public abstract class LabyrinthTestsBase
 {
     protected const int DefaultWidth = 16;
     protected const int DefaultHeight = 16;

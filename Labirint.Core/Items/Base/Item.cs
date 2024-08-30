@@ -12,7 +12,7 @@ public abstract class Item
     public abstract int MaxCount { get; }
 
     /// <summary>
-    /// Используется сразу после подбора.
+    ///     Используется сразу после подбора.
     /// </summary>
     public virtual bool UseAfterPickup => false;
 
@@ -21,14 +21,6 @@ public abstract class Item
 
     public virtual ControlSettings? ControlSettings => null;
     public virtual SoundSettings? SoundSettings => null;
-
-    public virtual WorldItem GetWorldItem(WorldItemParameters parameters)
-    {
-        return new WorldItem(this, Image, Alignment.Center, 0.9)
-        {
-            AfterPlace = AfterPlace
-        };
-    }
 
     public void Use(Position position, Direction? direction, Labyrinth labyrinth)
     {
@@ -45,6 +37,14 @@ public abstract class Item
         {
             yield return GetWorldItem(parameters);
         }
+    }
+
+    protected virtual WorldItem GetWorldItem(WorldItemParameters parameters)
+    {
+        return new WorldItem(this, Image, Alignment.Center, 0.9)
+        {
+            AfterPlace = AfterPlace
+        };
     }
 
     protected virtual void AfterUse(Position position, Direction? direction, Labyrinth labyrinth)

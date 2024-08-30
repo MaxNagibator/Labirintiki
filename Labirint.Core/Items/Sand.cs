@@ -34,15 +34,12 @@ public class Sand : ScoreItem
         return (width + height) / 2;
     }
 
-    public override WorldItem GetWorldItem(WorldItemParameters parameters)
+    protected override WorldItem GetWorldItem(WorldItemParameters parameters)
     {
-        WorldItem item = base.GetWorldItem(parameters);
-
         int count = parameters.Random.Generator.Next(MinSize, MaxSize + 1);
 
         return new WorldItem(this, Image, Alignment.BottomCenter, count / 10d)
         {
-            AfterPlace = item.AfterPlace,
             PickUpCount = count % MinSize + 1
         };
     }
