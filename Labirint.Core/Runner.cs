@@ -25,6 +25,11 @@ public class Runner : IDisposable
 
     public IReadOnlyList<RunnerAbility> Abilities => _abilities;
 
+    /// <summary>
+    /// Последний ход в лабиринте.
+    /// </summary>
+    public Direction LastDirection { get; private set; }
+
     public void AddAbility(Ability ability)
     {
         _abilities.Add(new RunnerAbility(ability));
@@ -32,6 +37,7 @@ public class Runner : IDisposable
 
     public void Move(Direction direction)
     {
+        LastDirection = direction;
         Position += direction;
 
         foreach (RunnerAbility ability in _abilities)
