@@ -2,7 +2,6 @@
 using LabirintBlazorApp.Components;
 using LabirintBlazorApp.Parameters;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 
 namespace LabirintBlazorApp.Pages;
 
@@ -30,7 +29,7 @@ public partial class Maze : IAsyncDisposable
     private Labyrinth _labyrinth = null!;
     private RandomGenerator _seeder = null!;
     private Vision _vision = null!;
-    private MazeClickHandler _mazeClickHandler = null!;
+    private TouchInterceptor? _touchInterceptor;
 
     [Parameter]
     public string? Seed { get; set; }
@@ -57,6 +56,11 @@ public partial class Maze : IAsyncDisposable
         _labyrinth.ExitFound -= OnExitFound;
         _labyrinth.ItemPickedUp -= OnItemPickedUp;
         _labyrinth.Runner.Inventory.ItemUsed -= OnItemUsed;
+
+        if (_touchInterceptor != null)
+        {
+            _touchInterceptor.Moved -= OnMoved;
+        }
 
         GC.SuppressFinalize(this);
     }
@@ -95,7 +99,15 @@ public partial class Maze : IAsyncDisposable
 
         await GenerateAsync();
 
-        _mazeClickHandler = new MazeClickHandler(_mazeWalls.CanvasWidth, _mazeWalls.CanvasHeight);
+        if (_touchInterceptor != null)
+        {
+            _touchInterceptor.Moved += OnMoved;
+        }
+    }
+
+    private void OnMoved(object? sender, Direction args)
+    {
+        _keyInterceptor?.OnKeyDown(args);
     }
 
     private async void OnRunnerMoved(object? sender, Position args)
@@ -150,16 +162,6 @@ public partial class Maze : IAsyncDisposable
 
         await ForceRender();
         StateHasChanged();
-    }
-
-    private void OnFieldClicked(MouseEventArgs args)
-    {
-        Direction direction = _mazeClickHandler.GetDirection((int)args.OffsetX, (int)args.OffsetY);
-
-        if (direction != Direction.None)
-        {
-            _keyInterceptor?.OnKeyDown(direction);
-        }
     }
 
     private async Task GenerateAsync()

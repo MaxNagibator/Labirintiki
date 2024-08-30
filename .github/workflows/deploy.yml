@@ -28,3 +28,4 @@ jobs:
           folder: 'dist/Web/wwwroot'
           branch: 'gh-pages'
           clean: true
+          single-commit: true

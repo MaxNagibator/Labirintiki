@@ -6,6 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
         <LangVersion>default</LangVersion>
+        <EmccMaximumHeapSize>268435456</EmccMaximumHeapSize>
     </PropertyGroup>
 
     <ItemGroup>

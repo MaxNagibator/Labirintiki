@@ -1,6 +1,6 @@
 {
-  "name": "Labyrinth.Blazor",
-  "short_name": "Labyrinth.Blazor",
+  "name": "Лабиринтик (Blazor)",
+  "short_name": "Лабиринтик",
   "id": "./",
   "start_url": "./",
   "display": "standalone",
