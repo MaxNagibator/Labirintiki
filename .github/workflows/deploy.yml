@@ -20,7 +20,7 @@ jobs:
         run: dotnet workload install wasm-tools
 
       - name: Publish .NET Core Project
-        run: dotnet publish ./LabirintBlazorApp/LabirintBlazorApp.csproj -c:Release -p:GHPages=true -o dist/Web --nologo
+        run: dotnet publish ./Labirint.Web/Labirint.Web.csproj -c:Release -p:GHPages=true -o dist/Web --nologo
 
       - name: Commit wwwroot to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
