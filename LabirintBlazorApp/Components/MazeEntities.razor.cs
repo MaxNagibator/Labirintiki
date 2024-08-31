@@ -1,5 +1,5 @@
-﻿using Labirint.Core.TileFeatures.Base;
-using Labirint.Core.TileFeatures.Common;
+﻿using Labirint.Core.TileFeatures.Common;
+using LabirintBlazorApp.Common.Extensions;
 
 namespace LabirintBlazorApp.Components;
 
@@ -9,21 +9,17 @@ public partial class MazeEntities : MazeComponent
 
     protected override void DrawInner(int x, int y, DrawSequence sequence)
     {
-        IEnumerable<TileFeature>? tileFeatures = Maze[x, y]
+        IEnumerable<DrawingSettings>? settings = Maze[x, y]
             .Features
             ?.Where(feature => feature.DrawingSettings != null)
             .DistinctBy(feature => feature.DrawingSettings)
-            .OrderBy(feature => feature.DrawingSettings!.Order);
+            .OrderBy(feature => feature.DrawingSettings!.Order)
+            .Select(feature => feature.DrawingSettings!);
 
-        foreach (TileFeature feature in tileFeatures ?? [])
+        foreach (DrawingSettings setting in settings ?? [])
         {
-            DrawingSettings settings = feature.DrawingSettings!;
-
-            Position draw = Vision.GetDraw((x, y)) * BoxSize + WallWidth;
-            (int offset, int entitySize) = AlignmentHelper.CalculateOffset(BoxSize, settings.Alignment == Alignment.Stretch ? 0 : WallWidth, settings.Scale);
-            (int left, int top) = AlignmentHelper.CalculatePosition(settings.Alignment, draw, offset);
-
-            sequence.DrawImage(settings.ImageSource, left, top, entitySize, entitySize);
+            Position draw = Vision.GetDraw((x, y));
+            sequence.DrawImage(setting, BoxSize, WallWidth, draw);
         }
     }
 }

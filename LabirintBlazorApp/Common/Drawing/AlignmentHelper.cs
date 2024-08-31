@@ -1,17 +1,32 @@
-﻿namespace LabirintBlazorApp.Common.Drawing;
+﻿using Labirint.Core.TileFeatures.Common;
+
+namespace LabirintBlazorApp.Common.Drawing;
 
 public static class AlignmentHelper
 {
-    public static (int offset, int entitySize) CalculateOffset(int boxSize, int wallWidth, double scale)
+    public static (int entitySize, Position drawPosition) GetAlignmentParameters(int boxSize, int wallWidth, double scale, Position position, Alignment alignment)
+    {
+        (int offset, int entitySize) = CalculateOffset(boxSize, alignment == Alignment.Stretch ? 0 : wallWidth, scale);
+        Position drawPosition = CalculatePosition(alignment, position * boxSize + wallWidth, offset);
+
+        return (entitySize, drawPosition);
+    }
+
+    public static (int entitySize, Position drawPosition) GetAlignmentParameters(int boxSize, int wallWidth, Position position, DrawingSettings settings)
+    {
+        return GetAlignmentParameters(boxSize, wallWidth, settings.Scale, position, settings.Alignment);
+    }
+
+    private static (int offset, int entitySize) CalculateOffset(int boxSize, int wallWidth, double scale)
     {
         int entityBoxSize = boxSize - wallWidth;
         int entitySize = (int)(entityBoxSize * scale);
         return (entitySize - entityBoxSize, entitySize);
     }
 
-    public static Position CalculatePosition(Alignment alignment, Position draw, int offset)
+    private static Position CalculatePosition(Alignment alignment, Position position, int offset)
     {
-        (int left, int top) = draw;
+        (int left, int top) = position;
 
         switch (alignment)
         {

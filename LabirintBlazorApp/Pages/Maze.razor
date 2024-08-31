@@ -55,9 +55,9 @@
 
                         @{
                             Runner runner = _labyrinth.Runner;
-                            Position draw = _vision.GetDraw(runner.Position) * _boxSize + _wallWidth;
-                            (int offset, int entitySize) = AlignmentHelper.CalculateOffset(_boxSize, _wallWidth, 0.9);
-                            (int left, int top) = AlignmentHelper.CalculatePosition(Alignment.Center, draw, offset);
+                            double scale = 0.9;
+                            Position position = _vision.GetDraw(runner.Position);
+                            (int entitySize, Position drawPosition) = AlignmentHelper.GetAlignmentParameters(_boxSize, _wallWidth, scale, position, Alignment.Center);
 
                             _runnerScaleX = runner.LastDirection switch
                             {
@@ -69,13 +69,13 @@
                             <div style="position:absolute;
                                         z-index: 100;
                                         left: @(-30)px;
-                                        top: @(top - 4)px;">
+                                        top: @(drawPosition.Y - 4)px;">
                                 <MudText Typo="Typo.h6">@(runner.Position.Y + 1)</MudText>
                             </div>
 
                             <div style="position:absolute;
                                         z-index: 100;
-                                        left: @(left + 4)px;
+                                        left: @(drawPosition.X + 4)px;
                                         top: @(-30)px;">
                                 <MudText Typo="Typo.h6">@(runner.Position.X + 1)</MudText>
                             </div>
@@ -83,8 +83,8 @@
                             <img src="images/runner.png"
                                  style="position:absolute;
                                         z-index: 100;
-                                        left: @(left)px;
-                                        top: @(top)px;
+                                        left: @(drawPosition.X)px;
+                                        top: @(drawPosition.Y)px;
                                         width: @(entitySize)px;
                                         height: @(entitySize)px;
                                         transform: scaleX(@_runnerScaleX) scaleY(1);"
