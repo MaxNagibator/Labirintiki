@@ -67,11 +67,6 @@ public class Tile(Labyrinth labyrinth)
     {
         Features ??= [];
 
-        if (Features.Any(tileFeature => tileFeature.DrawingSettings == feature.DrawingSettings))
-        {
-            return;
-        }
-
         Features.Add(feature);
     }
 
@@ -93,7 +88,6 @@ public class Tile(Labyrinth labyrinth)
 
         foreach (TileFeature feature in Features)
         {
-            // TODO Возможно костыль с передачей лабиринта
             if (feature.TryPickUp(labyrinth))
             {
                 item = feature;

@@ -1,7 +1,7 @@
 ﻿namespace Labirint.Core.Tests;
 
 [TestFixture]
-public class TileTests
+public class TileTests : LabyrinthTestsBase
 {
     private static IEnumerable<TestCaseData> TestCases
     {
@@ -9,7 +9,7 @@ public class TileTests
         {
             Direction[] directions = [Direction.None, Direction.Left, Direction.Top, Direction.Right, Direction.Bottom];
 
-            IEnumerable<(Direction direction, int count)> combinedDirections = GetCombinedDirections(directions.Where(direction => direction != Direction.None).ToArray());
+            IEnumerable<(Direction direction, int count)> combinedDirections = directions.Where(direction => direction != Direction.None).GetCombinedDirections();
 
             foreach ((Direction direction, int count) in combinedDirections)
             {
@@ -27,30 +27,10 @@ public class TileTests
         }
     }
 
-    private static IEnumerable<(Direction direction, int count)> GetCombinedDirections(Direction[] directions)
-    {
-        int totalSubsets = 1 << directions.Length;
-
-        for (int i = 1; i < totalSubsets; i++)
-        {
-            (Direction direction, int count) combination = new();
-
-            for (int j = 0; j < directions.Length; j++)
-            {
-                if ((i & 1 << j) != 0)
-                {
-                    combination = (combination.direction |= directions[j], combination.count + 1);
-                }
-            }
-
-            yield return combination;
-        }
-    }
-
     [TestCaseSource(nameof(TestCases))]
     public void CanAddWallTest(Direction existingWalls, Direction directionToAdd, bool expectedResult)
     {
-        Tile tile = new(default)
+        Tile tile = new(Labyrinth)
         {
             Walls = existingWalls
         };

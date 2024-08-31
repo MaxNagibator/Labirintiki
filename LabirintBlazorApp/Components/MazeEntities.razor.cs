@@ -9,17 +9,13 @@ public partial class MazeEntities : MazeComponent
 
     protected override void DrawInner(int x, int y, DrawSequence sequence)
     {
-        IOrderedEnumerable<TileFeature>? tileFeatures = Maze[x, y]
+        IEnumerable<TileFeature>? tileFeatures = Maze[x, y]
             .Features
             ?.Where(feature => feature.DrawingSettings != null)
-            .OrderBy(feature => feature.DrawingSettings?.Order);
+            .DistinctBy(feature => feature.DrawingSettings)
+            .OrderBy(feature => feature.DrawingSettings!.Order);
 
-        if (tileFeatures == null)
-        {
-            return;
-        }
-
-        foreach (TileFeature feature in tileFeatures)
+        foreach (TileFeature feature in tileFeatures ?? [])
         {
             DrawingSettings settings = feature.DrawingSettings!;
 
