@@ -1,4 +1,7 @@
-﻿namespace Labirint.Core;
+﻿using Labirint.Core.Abilities;
+using Labirint.Core.Abilities.Base;
+
+namespace Labirint.Core;
 
 /// <summary>
 ///     Бегущий по лабиринту.
@@ -32,11 +35,25 @@ public class Runner : IDisposable
 
     public void AddAbility(Ability ability)
     {
-        _abilities.Add(new RunnerAbility(ability));
+        var currentAbility = _abilities.SingleOrDefault(x => x.Active && x.Properties.Name == ability.Name);
+        if (currentAbility != null)
+        {
+            currentAbility.Prolongation2();
+        }
+        else
+        {
+            _abilities.Add(new RunnerAbility(ability));
+        }
     }
 
-    public void Move(Direction direction)
+    public bool Move(Direction direction)
     {
+        if (direction == Direction.All
+            || (_labyrinth[Position].ContainsWall(direction) && !ContainsAbility((x) => x.IsIgnoreWalls)))
+        {
+            return false;
+        }
+
         LastDirection = direction;
         Position += direction;
 
@@ -44,6 +61,12 @@ public class Runner : IDisposable
         {
             ability.Hit(_labyrinth[Position], direction);
         }
+        return true;
+    }
+
+    private bool ContainsAbility(Func<Ability, bool> func)
+    {
+        return _abilities.Any(x => x.ContainsAbility(func));
     }
 
     public void UseItem(Item item, Direction? direction)

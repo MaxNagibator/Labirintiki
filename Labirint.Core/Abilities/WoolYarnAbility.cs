@@ -14,6 +14,8 @@ public class WoolYarnAbility : Ability
 
     public override int? MoveCount => 100;
 
+    public override AbilityProlongation Prolongation => AbilityProlongation.Sum;
+
     public override void Hit(Tile tile, Direction direction)
     {
         Position prevTilePosition = tile.Labyrinth.Runner.Position - direction;

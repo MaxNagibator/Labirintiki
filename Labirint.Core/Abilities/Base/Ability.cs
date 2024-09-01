@@ -35,5 +35,18 @@ public abstract class Ability
     /// </summary>
     /// <param name="tile">Клетка в которую мы перешли.</param>
     /// <param name="direction">Направление, по которому мы двигались.</param>
-    public abstract void Hit(Tile tile, Direction direction);
+    public virtual void Hit(Tile tile, Direction direction)
+    {
+
+    }
+
+    /// <summary>
+    /// Способность позволяет ходить сквозь стены.
+    /// </summary>
+    public virtual bool IsIgnoreWalls => false;
+
+    /// <summary>
+    ///     Продление способности.
+    /// </summary>
+    public abstract AbilityProlongation Prolongation { get; }
 }

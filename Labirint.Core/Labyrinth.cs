@@ -117,12 +117,12 @@ public class Labyrinth
     /// <param name="direction">Направление перемещения</param>
     public void Move(Direction direction)
     {
-        if (direction == Direction.All || this[Runner.Position].ContainsWall(direction))
+        var isMoved = Runner.Move(direction);
+        if (!isMoved)
         {
             return;
         }
 
-        Runner.Move(direction);
         RunnerMoved?.Invoke(this, Runner.Position);
 
         Tile tile = this[Runner.Position];

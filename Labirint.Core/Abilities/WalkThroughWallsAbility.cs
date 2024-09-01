@@ -11,7 +11,7 @@ public class WalkThroughWallsAbility : Ability
 
     public override int? MoveCount => 5;
 
-    public override void Hit(Tile tile, Direction direction)
-    {
-    }
+    public override bool IsIgnoreWalls => true;
+
+    public override AbilityProlongation Prolongation => AbilityProlongation.Reset;
 }

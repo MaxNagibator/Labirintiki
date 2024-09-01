@@ -1,4 +1,5 @@
-﻿using Labirint.Core.Abilities.Base;
+﻿using Labirint.Core.Abilities;
+using Labirint.Core.Abilities.Base;
 
 namespace Labirint.Core.Tests;
 
@@ -9,6 +10,8 @@ internal class TestAbility(int? moveCount = null) : Ability
 
     public override int? MoveCount { get; } = moveCount;
     public int HitCount { get; private set; }
+
+    public override AbilityProlongation Prolongation => AbilityProlongation.Sum;
 
     public override void Hit(Tile tile, Direction direction)
     {
