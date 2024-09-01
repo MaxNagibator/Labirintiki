@@ -33,7 +33,6 @@ public class WalkThroughWallsBottle : Item
 
     protected override void AfterUse(Position position, Direction? direction, Labyrinth labyrinth)
     {
-        // todo сделать способность продлеваемой или перезапуск до максимума: опционально
         WalkThroughWallsAbility track = new();
         labyrinth.Runner.AddAbility(track);
     }

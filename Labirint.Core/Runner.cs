@@ -32,7 +32,7 @@ public class Runner : IDisposable
 
     public void AddAbility(Ability ability)
     {
-        RunnerAbility? currentAbility = _abilities.SingleOrDefault(x => x.Active && x.Properties.Name == ability.Name);
+        RunnerAbility? currentAbility = _abilities.SingleOrDefault(runnerAbility => runnerAbility.Properties.Name == ability.Name);
 
         if (currentAbility != null)
         {
@@ -46,9 +46,10 @@ public class Runner : IDisposable
 
     public bool Move(Direction direction)
     {
+        // TODO Можно выйти за границы лабиринта
         if (direction == Direction.All
             || _labyrinth[Position].ContainsWall(direction)
-            && ContainsAbility(ability => ability.IsIgnoreWalls) == false)
+            && ContainsActiveAbility(ability => ability.IsIgnoreWalls) == false)
         {
             return false;
         }
@@ -91,8 +92,8 @@ public class Runner : IDisposable
         Score += amount;
     }
 
-    private bool ContainsAbility(Func<Ability, bool> predicate)
+    private bool ContainsActiveAbility(Func<Ability, bool> predicate)
     {
-        return _abilities.Any(ability => ability.ContainsAbility(predicate));
+        return _abilities.Any(ability => ability.Active && predicate(ability.Properties));
     }
 }

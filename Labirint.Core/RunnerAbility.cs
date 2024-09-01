@@ -9,23 +9,9 @@ public class RunnerAbility(Ability ability)
 
     public Ability Properties => ability;
 
-    // todo убрать проперти, которые можно получить из ability
-    public string DisplayName => ability.DisplayName;
-
-    public string Icon => ability.Icon;
-
-    public bool IsUnlimitedMoveCount => ability.IsUnlimitedMoveCount;
-
     public int LostCount => _lostCount ?? 0;
 
     public bool Active => _lostCount is not 0;
-
-    public AbilityProlongation Prolongation => ability.Prolongation;
-
-    public bool ContainsAbility(Func<Ability, bool> func)
-    {
-        return Active && func(ability);
-    }
 
     public void Hit(Tile tile, Direction direction)
     {
