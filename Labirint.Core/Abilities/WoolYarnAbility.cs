@@ -1,4 +1,5 @@
-﻿using Labirint.Core.Extensions;
+﻿using Labirint.Core.Abilities.Prolongations;
+using Labirint.Core.Extensions;
 using Labirint.Core.TileFeatures;
 
 namespace Labirint.Core.Abilities;
@@ -14,7 +15,7 @@ public class WoolYarnAbility : Ability
 
     public override int? MoveCount => 100;
 
-    public override AbilityProlongation Prolongation => AbilityProlongation.Sum;
+    public override AbilityProlongation Prolongation { get; } = new SumProlongation();
 
     public override void Hit(Tile tile, Direction direction)
     {

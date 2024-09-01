@@ -42,6 +42,12 @@ public partial class Maze : IAsyncDisposable
     [SupplyParameterFromQuery(Name = RandomGenerator.DensityQueryName)]
     public int? MazeDensity { get; set; }
 
+    [Inject]
+    private SoundService SoundService { get; set; } = null!;
+
+    [Inject]
+    private AnimationService AnimationService { get; set; } = null!;
+
     // Проверка на null и инициализацию (дополнительная проверка, если флаг выставили в true, а значение у не null полей не выставили)
     private bool IsInit => _isInit && _labyrinth != null && _seeder != null && _vision != null && _renderParameter != null;
 
@@ -120,7 +126,6 @@ public partial class Maze : IAsyncDisposable
         await SoundService.PlayAsync("step");
 
         await ForceRender();
-        StateHasChanged();
     }
 
     private void OnExitFound(object? sender, EventArgs args)
@@ -161,9 +166,7 @@ public partial class Maze : IAsyncDisposable
     private async void OnItemUsed(object? sender, Item item)
     {
         await SoundService.PlayAsync(item.SoundSettings?.UseSound);
-
         await ForceRender();
-        StateHasChanged();
     }
 
     private async Task GenerateAsync()
@@ -197,8 +200,10 @@ public partial class Maze : IAsyncDisposable
 
     private async Task ForceRender()
     {
-        await (_mazeFloor?.ForceRenderAsync() ?? Task.CompletedTask);
-        await (_mazeWalls?.ForceRenderAsync() ?? Task.CompletedTask);
-        await (_mazeEntities?.ForceRenderAsync() ?? Task.CompletedTask);
+        await Task.WhenAll(_mazeFloor?.ForceRenderAsync() ?? Task.CompletedTask,
+                _mazeWalls?.ForceRenderAsync() ?? Task.CompletedTask,
+                _mazeEntities?.ForceRenderAsync() ?? Task.CompletedTask)
+            .ContinueWith(_ => StateHasChanged())
+            .ConfigureAwait(false);
     }
 }

@@ -1,7 +1,4 @@
-﻿using Labirint.Core.Abilities;
-using Labirint.Core.Abilities.Base;
-
-namespace Labirint.Core;
+﻿namespace Labirint.Core;
 
 /// <summary>
 ///     Бегущий по лабиринту.
@@ -35,10 +32,11 @@ public class Runner : IDisposable
 
     public void AddAbility(Ability ability)
     {
-        var currentAbility = _abilities.SingleOrDefault(x => x.Active && x.Properties.Name == ability.Name);
+        RunnerAbility? currentAbility = _abilities.SingleOrDefault(x => x.Active && x.Properties.Name == ability.Name);
+
         if (currentAbility != null)
         {
-            currentAbility.Prolongation2();
+            currentAbility.Prolong();
         }
         else
         {
@@ -49,7 +47,8 @@ public class Runner : IDisposable
     public bool Move(Direction direction)
     {
         if (direction == Direction.All
-            || (_labyrinth[Position].ContainsWall(direction) && !ContainsAbility((x) => x.IsIgnoreWalls)))
+            || _labyrinth[Position].ContainsWall(direction)
+            && ContainsAbility(ability => ability.IsIgnoreWalls) == false)
         {
             return false;
         }
@@ -61,12 +60,8 @@ public class Runner : IDisposable
         {
             ability.Hit(_labyrinth[Position], direction);
         }
-        return true;
-    }
 
-    private bool ContainsAbility(Func<Ability, bool> func)
-    {
-        return _abilities.Any(x => x.ContainsAbility(func));
+        return true;
     }
 
     public void UseItem(Item item, Direction? direction)
@@ -94,5 +89,10 @@ public class Runner : IDisposable
     private void OnScoreIncreased(object? sender, int amount)
     {
         Score += amount;
+    }
+
+    private bool ContainsAbility(Func<Ability, bool> predicate)
+    {
+        return _abilities.Any(ability => ability.ContainsAbility(predicate));
     }
 }

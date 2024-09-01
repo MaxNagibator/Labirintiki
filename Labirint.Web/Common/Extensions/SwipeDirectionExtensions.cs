@@ -1,5 +1,4 @@
 ﻿using MudBlazor;
-using Direction = Labirint.Core.Common.Direction;
 
 namespace Labirint.Web.Common.Extensions;
 

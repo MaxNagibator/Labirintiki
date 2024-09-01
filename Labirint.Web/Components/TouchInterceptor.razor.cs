@@ -4,7 +4,6 @@ using Labirint.Web.Parameters;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
-using Direction = Labirint.Core.Common.Direction;
 
 namespace Labirint.Web.Components;
 

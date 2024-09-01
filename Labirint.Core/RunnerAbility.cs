@@ -1,6 +1,4 @@
-﻿using Labirint.Core.Abilities;
-
-namespace Labirint.Core;
+﻿namespace Labirint.Core;
 
 /// <summary>
 ///     Способность бегуна.
@@ -44,23 +42,13 @@ public class RunnerAbility(Ability ability)
         ability.Hit(tile, direction);
     }
 
-    public void Prolongation2()
+    public void Prolong()
     {
-        if (_lostCount == null)
+        if (_lostCount == null || ability.MoveCount == null || ability.IsUnlimitedMoveCount)
         {
             return;
         }
 
-        switch (ability.Prolongation)
-        {
-            case AbilityProlongation.Sum:
-                _lostCount += ability.MoveCount;
-                break;
-            case AbilityProlongation.Reset:
-                _lostCount = ability.MoveCount;
-                break;
-            default:
-                throw new NotImplementedException("for type " + ability.Prolongation);
-        }
+        ability.Prolongation.Prolong(ref _lostCount, ability.MoveCount.Value);
     }
 }
