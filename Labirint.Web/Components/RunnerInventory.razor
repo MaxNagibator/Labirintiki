@@ -1,0 +1,70 @@
+﻿@using Labirint.Core.Items.Common
+@using Labirint.Web.Common.Animation
+@inherits RenderComponent
+
+<MudStack Row Spacing="3">
+    @foreach (AnimatedStack animatedStack in _stackCache.Values)
+    {
+        ItemStack stack = animatedStack.Stack;
+        Item item = stack.Item;
+
+        if (stack.Count <= 0 && animatedStack.IsIdle)
+        {
+            continue;
+        }
+
+        <div class="inventory-item-container">
+            <div class="inventory-item
+                            @(stack.IsInfinite ? " score" : string.Empty)
+                            @(animatedStack.GetAnimation())"
+                 @onanimationend="() => AnimationCompleted(animatedStack)">
+
+                <img alt="@item.DisplayName"
+                     src="@item.Icon"
+                     title="Использовать предмет"
+                     @onclick="() => OnClicked(item)">
+                <div class="item-name"
+                     @onmouseout="HideDescription"
+                     @onmouseover="() => ShowDescription(item)">
+                    @item.DisplayName
+                </div>
+                <div class="count" title="Текущие количество в инвентаре">@stack.Count</div>
+                <div class="max-count" title="Максимальной количество в инвентаре">@(stack.IsInfinite ? "∞" : stack.MaxCount)</div>
+            </div>
+
+            @{
+                ControlSettings? control = item.ControlSettings;
+
+                if (control != null)
+                {
+                    <div class="keyboard-button" title="Использовать предмет" @onclick="() => OnClicked(item)">
+                        <span>
+                            @ControlScheme.GetActivateKey(control).DisplaySymbol
+                        </span>
+                    </div>
+                }
+            }
+        </div>
+    }
+</MudStack>
+
+@if (_showDescription && _currentItem != null)
+{
+    <MudPopover AnchorOrigin="Origin.BottomCenter" Open="@_showDescription" Paper Style="max-width: 600px" TransformOrigin="Origin.TopCenter">
+        <MudCard Outlined>
+            <MudCardContent>
+                @foreach (string paragraph in _currentItem.Description.Split("\n"))
+                {
+                    if (paragraph.StartsWith("---", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        <MudDivider Class="my-2" DividerType="DividerType.FullWidth" Light Style="height: 2px;" />
+                    }
+                    else
+                    {
+                        <MudText Align="Align.Justify">@paragraph</MudText>
+                    }
+                }
+            </MudCardContent>
+        </MudCard>
+    </MudPopover>
+}

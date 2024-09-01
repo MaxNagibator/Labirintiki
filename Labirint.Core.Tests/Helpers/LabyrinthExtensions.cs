@@ -12,4 +12,12 @@ internal static class LabyrinthExtensions
             }
         }
     }
+
+    internal static int GetInMazeCount(this Labyrinth labyrinth, Item item)
+    {
+        return labyrinth.Enumerate()
+            .SelectMany(tile => tile.Features ?? [])
+            .Where(feature => feature.DrawingSettings != null)
+            .Count(feature => feature.DrawingSettings!.ImageSource.Contains(item.Name, StringComparison.InvariantCultureIgnoreCase));
+    }
 }

@@ -26,7 +26,7 @@ public class Runner : IDisposable
     public IReadOnlyList<RunnerAbility> Abilities => _abilities;
 
     /// <summary>
-    /// Последний ход в лабиринте.
+    ///     Последний ход в лабиринте.
     /// </summary>
     public Direction LastDirection { get; private set; }
 
@@ -62,6 +62,8 @@ public class Runner : IDisposable
     {
         Position = (0, 0);
         Score = 0;
+        LastDirection = Direction.None;
+
         Inventory.Clear();
         _abilities.Clear();
     }

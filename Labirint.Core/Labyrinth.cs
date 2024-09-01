@@ -18,7 +18,7 @@ public class Labyrinth
         _itemPlacer = new ItemPlacer(_seeder, (x, y, item) =>
         {
             this[x, y].AddFeature(item);
-            item.AfterPlace.Invoke((x, y), this);
+            item.AfterPlace?.Invoke((x, y), this);
         });
 
         Runner = new Runner((0, 0), this, new Inventory());

@@ -1,0 +1,65 @@
+﻿.workspace {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: auto;
+    padding: 0 40px 20px;
+}
+
+@media (max-width: 890px) {
+    .workspace {
+        align-items: stretch;
+        flex-direction: column;
+        justify-content: stretch;
+    }
+}
+
+.game {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin: auto;
+}
+
+.main-panel {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.inventory-panel {
+    min-height: 140px;
+}
+
+.ability-panel {
+    min-height: 78px;
+}
+
+.score-panel {
+    width: 100%;
+}
+
+.field {
+    position: relative;
+    margin: 40px 40px 20px;
+    transition: box-shadow 0.3s ease-in-out;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3), inset 0 0 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+.field:hover {
+    box-shadow: 0 0 30px 15px rgba(0, 0, 0, 0.5);
+}
+
+.control-panel {
+    margin: 40px 0;
+}
+
+.header-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}

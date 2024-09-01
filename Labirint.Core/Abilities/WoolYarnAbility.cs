@@ -1,7 +1,5 @@
-﻿using Labirint.Core.Common;
-using Labirint.Core.Extensions;
+﻿using Labirint.Core.Extensions;
 using Labirint.Core.TileFeatures;
-using System.Net;
 
 namespace Labirint.Core.Abilities;
 
@@ -10,7 +8,7 @@ namespace Labirint.Core.Abilities;
 /// </summary>
 public class WoolYarnAbility : Ability
 {
-    public override string Name => "WoolYarnTrack";
+    public override string Name => "wool-yarn-track";
 
     public override string DisplayName => "След нити";
 
@@ -18,8 +16,8 @@ public class WoolYarnAbility : Ability
 
     public override void Hit(Tile tile, Direction direction)
     {
-        Position prevTilePostion = tile.Labyrinth.Runner.Position - direction;
-        Tile prevTile = tile.Labyrinth[prevTilePostion];
+        Position prevTilePosition = tile.Labyrinth.Runner.Position - direction;
+        Tile prevTile = tile.Labyrinth[prevTilePosition];
 
         prevTile.AddFeature(new WoolYarnFeature(direction));
         tile.AddFeature(new WoolYarnFeature(direction.GetOppositeDirection()));

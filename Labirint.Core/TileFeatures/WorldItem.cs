@@ -3,7 +3,7 @@
 public class WorldItem(Item item, string imageSource, Alignment alignment, double scale)
     : TileFeature
 {
-    public required Action<Position, Labyrinth> AfterPlace { get; init; }
+    public Action<Position, Labyrinth>? AfterPlace { get; init; }
     public int? PickUpCount { get; init; }
 
     public override bool RemoveAfterSuccessPickUp => true;
