@@ -1,7 +1,9 @@
 ﻿using Labirint.Core.TileFeatures.Base;
 using Labirint.Web.Components;
+using Labirint.Web.Components.Dialogs;
 using Labirint.Web.Parameters;
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 
 namespace Labirint.Web.Pages;
 
@@ -47,6 +49,9 @@ public partial class Maze : IAsyncDisposable
 
     [Inject]
     private AnimationService AnimationService { get; set; } = null!;
+
+    [Inject]
+    private IDialogService DialogService { get; set; } = null!;
 
     // Проверка на null и инициализацию (дополнительная проверка, если флаг выставили в true, а значение у не null полей не выставили)
     private bool IsInit => _isInit && _labyrinth != null && _seeder != null && _vision != null && _renderParameter != null;
@@ -130,6 +135,7 @@ public partial class Maze : IAsyncDisposable
 
     private void OnExitFound(object? sender, EventArgs args)
     {
+        DialogService.Show<WinDialog>("Вот и конец");
         _isExitFound = true;
     }
 
