@@ -13,6 +13,7 @@ public partial class Maze : IAsyncDisposable
     private const int MaxSize = 500;
 
     private bool _isExitFound;
+    private bool _isContinueGame;
     private bool _isInit;
     private bool _isSettingsHidden = true;
 
@@ -133,10 +134,28 @@ public partial class Maze : IAsyncDisposable
         await ForceRender();
     }
 
-    private void OnExitFound(object? sender, EventArgs args)
+    private async void OnExitFound(object? sender, EventArgs args)
     {
-        DialogService.Show<WinDialog>("Вот и конец");
+        if (_isContinueGame)
+        {
+            return;
+        }
+
         _isExitFound = true;
+
+        DialogParameters<WinDialog> parameters = new()
+        {
+            { dialog => dialog.OnRestart, GenerateAsync },
+            { dialog => dialog.Seeder, _seeder }
+        };
+
+        IDialogReference reference = await DialogService.ShowAsync<WinDialog>("Вот и конец", parameters);
+        _isContinueGame = await reference.GetReturnValueAsync<bool>();
+
+        if (_isContinueGame)
+        {
+            _isExitFound = false;
+        }
     }
 
     private async void OnItemPickedUp(object? sender, TileFeature args)
@@ -186,6 +205,7 @@ public partial class Maze : IAsyncDisposable
         _seeder.Reload();
 
         _isExitFound = false;
+        _isContinueGame = false;
 
         _originalSize = Math.Max(MinSize, Math.Min(MaxSize, _originalSize));
 

@@ -21,6 +21,8 @@ public partial class RandomGenerator : IRandom
 
     public Random Generator => _random ?? Random.Shared;
 
+    public string Link => GetShareLink();
+
     [Parameter]
     public string? Seed { get; set; }
 
@@ -47,12 +49,9 @@ public partial class RandomGenerator : IRandom
 
     private bool IsGenerateRequired => _currentSeed < 0;
 
-    // Можно добавить кеширование, но это уже экономия на спичках
-    private string Link => GetShareLink();
-
-    public void Reload()
+    public void Reload(bool force = false)
     {
-        if (string.IsNullOrWhiteSpace(_userSeed))
+        if (force || string.IsNullOrWhiteSpace(_userSeed))
         {
             ReloadWithRandomSeed();
             return;
@@ -83,6 +82,7 @@ public partial class RandomGenerator : IRandom
 
     private void ReloadWithRandomSeed()
     {
+        _userSeed = null;
         _currentSeed = Random.Shared.Next();
         _random = new Random(_currentSeed);
         StateHasChanged();
