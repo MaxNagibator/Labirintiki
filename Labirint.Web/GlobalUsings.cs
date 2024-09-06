@@ -7,3 +7,5 @@ global using Labirint.Web.Components.Base;
 global using Labirint.Web.Services;
 global using Labirint.Web.Services.Base;
 global using Microsoft.JSInterop;
+global using Direction = Labirint.Core.Common.Direction;
+global using Position = Labirint.Core.Common.Position;

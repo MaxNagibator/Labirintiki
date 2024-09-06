@@ -1,4 +1,6 @@
-﻿namespace Labirint.Core.Abilities;
+﻿using Labirint.Core.Abilities.Prolongations;
+
+namespace Labirint.Core.Abilities;
 
 /// <summary>
 ///     Прохождение сквозь стены.
@@ -13,5 +15,5 @@ public class WalkThroughWallsAbility : Ability
 
     public override bool IsIgnoreWalls => true;
 
-    public override AbilityProlongation Prolongation => AbilityProlongation.Reset;
+    public override AbilityProlongation Prolongation { get; } = new ResetProlongation();
 }

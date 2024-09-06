@@ -117,8 +117,7 @@ public class Labyrinth
     /// <param name="direction">Направление перемещения</param>
     public void Move(Direction direction)
     {
-        var isMoved = Runner.Move(direction);
-        if (!isMoved)
+        if (Runner.Move(direction) == false)
         {
             return;
         }

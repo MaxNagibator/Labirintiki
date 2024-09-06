@@ -1,7 +1,9 @@
 ﻿using Labirint.Core.TileFeatures.Base;
 using Labirint.Web.Components;
+using Labirint.Web.Components.Dialogs;
 using Labirint.Web.Parameters;
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 
 namespace Labirint.Web.Pages;
 
@@ -11,6 +13,7 @@ public partial class Maze : IAsyncDisposable
     private const int MaxSize = 500;
 
     private bool _isExitFound;
+    private bool _isContinueGame;
     private bool _isInit;
     private bool _isSettingsHidden = true;
 
@@ -41,6 +44,15 @@ public partial class Maze : IAsyncDisposable
 
     [SupplyParameterFromQuery(Name = RandomGenerator.DensityQueryName)]
     public int? MazeDensity { get; set; }
+
+    [Inject]
+    private SoundService SoundService { get; set; } = null!;
+
+    [Inject]
+    private AnimationService AnimationService { get; set; } = null!;
+
+    [Inject]
+    private IDialogService DialogService { get; set; } = null!;
 
     // Проверка на null и инициализацию (дополнительная проверка, если флаг выставили в true, а значение у не null полей не выставили)
     private bool IsInit => _isInit && _labyrinth != null && _seeder != null && _vision != null && _renderParameter != null;
@@ -120,12 +132,30 @@ public partial class Maze : IAsyncDisposable
         await SoundService.PlayAsync("step");
 
         await ForceRender();
-        StateHasChanged();
     }
 
-    private void OnExitFound(object? sender, EventArgs args)
+    private async void OnExitFound(object? sender, EventArgs args)
     {
+        if (_isContinueGame)
+        {
+            return;
+        }
+
         _isExitFound = true;
+
+        DialogParameters<WinDialog> parameters = new()
+        {
+            { dialog => dialog.OnRestart, GenerateAsync },
+            { dialog => dialog.Seeder, _seeder }
+        };
+
+        IDialogReference reference = await DialogService.ShowAsync<WinDialog>("Вот и конец", parameters);
+        _isContinueGame = await reference.GetReturnValueAsync<bool>();
+
+        if (_isContinueGame)
+        {
+            _isExitFound = false;
+        }
     }
 
     private async void OnItemPickedUp(object? sender, TileFeature args)
@@ -161,9 +191,7 @@ public partial class Maze : IAsyncDisposable
     private async void OnItemUsed(object? sender, Item item)
     {
         await SoundService.PlayAsync(item.SoundSettings?.UseSound);
-
         await ForceRender();
-        StateHasChanged();
     }
 
     private async Task GenerateAsync()
@@ -177,6 +205,7 @@ public partial class Maze : IAsyncDisposable
         _seeder.Reload();
 
         _isExitFound = false;
+        _isContinueGame = false;
 
         _originalSize = Math.Max(MinSize, Math.Min(MaxSize, _originalSize));
 
@@ -197,8 +226,10 @@ public partial class Maze : IAsyncDisposable
 
     private async Task ForceRender()
     {
-        await (_mazeFloor?.ForceRenderAsync() ?? Task.CompletedTask);
-        await (_mazeWalls?.ForceRenderAsync() ?? Task.CompletedTask);
-        await (_mazeEntities?.ForceRenderAsync() ?? Task.CompletedTask);
+        await Task.WhenAll(_mazeFloor?.ForceRenderAsync() ?? Task.CompletedTask,
+                _mazeWalls?.ForceRenderAsync() ?? Task.CompletedTask,
+                _mazeEntities?.ForceRenderAsync() ?? Task.CompletedTask)
+            .ContinueWith(_ => StateHasChanged())
+            .ConfigureAwait(false);
     }
 }
