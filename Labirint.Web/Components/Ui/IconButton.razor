@@ -1,0 +1,65 @@
+﻿<button type="button"
+        class="@CssClass"
+        title="@Title"
+        aria-label="@Title"
+        disabled="@Disabled"
+        @onclick="OnClick"
+        @ref="Element">
+    <Icon Name="@Icon" Size="@Size" />
+</button>
+
+@code {
+
+    public ElementReference Element { get; private set; }
+
+    [Parameter]
+    [EditorRequired]
+    public required string Icon { get; set; }
+
+    [Parameter]
+    public int Size { get; set; } = 20;
+
+    [Parameter]
+    public UiVariant Variant { get; set; } = UiVariant.Text;
+
+    [Parameter]
+    public UiTone Tone { get; set; } = UiTone.None;
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private string CssClass
+    {
+        get
+        {
+            List<string> classes = ["ui-btn", "ui-btn--icon"];
+
+            if (Variant != UiVariant.None)
+            {
+                classes.Add($"ui-btn--{Variant.ToString().ToLowerInvariant()}");
+            }
+
+            if (Tone != UiTone.None)
+            {
+                classes.Add($"ui-btn--{Tone.ToString().ToLowerInvariant()}");
+            }
+
+            if (string.IsNullOrWhiteSpace(Class) == false)
+            {
+                classes.Add(Class);
+            }
+
+            return string.Join(' ', classes);
+        }
+    }
+
+}

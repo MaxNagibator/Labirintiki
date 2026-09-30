@@ -1,0 +1,29 @@
+﻿@using Microsoft.AspNetCore.Components
+
+<svg class="ui-icon @Class"
+     width="@Size"
+     height="@Size"
+     viewBox="0 0 24 24"
+     fill="none"
+     stroke="currentColor"
+     stroke-width="1.5"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     aria-hidden="true"
+     focusable="false">
+    @((MarkupString)IconCatalog.Get(Name))
+</svg>
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public required string Name { get; set; }
+
+    [Parameter]
+    public int Size { get; set; } = 20;
+
+    [Parameter]
+    public string? Class { get; set; }
+
+}

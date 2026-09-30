@@ -13,11 +13,11 @@ public class ItemPlacer(IRandom seeder, Action<int, int, WorldItem> placeItemAct
     {
         _itemCounts.Clear();
         _requiredItems.Clear();
-        _parameters = new WorldItemParameters(seeder, width, height, density);
+        _parameters = new(seeder, width, height, density);
 
-        int length = width * height - 1;
+        var length = width * height - 1;
 
-        int totalItemsCount = FillItemCounts(placeableItems);
+        var totalItemsCount = FillItemCounts(placeableItems);
 
         if (totalItemsCount > length)
         {
@@ -26,7 +26,7 @@ public class ItemPlacer(IRandom seeder, Action<int, int, WorldItem> placeItemAct
 
         EnqueueRequiredItems();
 
-        int[] indexes = ShuffleIndexes(length);
+        var indexes = ShuffleIndexes(length);
         PlaceItemsOnMap(width, indexes);
     }
 
@@ -34,14 +34,14 @@ public class ItemPlacer(IRandom seeder, Action<int, int, WorldItem> placeItemAct
     {
         if (_parameters == null)
         {
-            throw new Exception($"Невозможно сосчитать количество предметов из-за отсутствующий {nameof(WorldItemParameters)}");
+            throw new($"Невозможно сосчитать количество предметов из-за отсутствующий {nameof(WorldItemParameters)}");
         }
 
-        int totalItemsCount = 0;
+        var totalItemsCount = 0;
 
-        foreach (Item item in placeableItems)
+        foreach (var item in placeableItems)
         {
-            int count = item.GetItemsForPlace(_parameters).Count();
+            var count = item.CalculateCountInMaze(_parameters.Width, _parameters.Height, _parameters.Density);
             _itemCounts[item] = count;
             totalItemsCount += count;
         }
@@ -51,24 +51,24 @@ public class ItemPlacer(IRandom seeder, Action<int, int, WorldItem> placeItemAct
 
     private void ReduceItemCounts(int length, int totalItemsCount, int width, int height, int density)
     {
-        double reductionFactor = (double)length / totalItemsCount;
-        int reducedItemCount = 0;
+        var reductionFactor = (double)length / totalItemsCount;
+        var reducedItemCount = 0;
 
-        foreach ((Item item, int count) in _itemCounts)
+        foreach (var (item, count) in _itemCounts)
         {
-            int reducedCount = (int)Math.Floor(count * reductionFactor);
+            var reducedCount = (int)Math.Floor(count * reductionFactor);
             reducedItemCount += reducedCount;
             _itemCounts[item] = reducedCount;
         }
 
-        foreach ((Item item, int count) in _itemCounts)
+        foreach (var (item, count) in _itemCounts)
         {
             if (length - reducedItemCount <= 0)
             {
                 break;
             }
 
-            int maxCount = item.CalculateCountInMaze(width, height, density);
+            var maxCount = item.CalculateCountInMaze(width, height, density);
 
             if (maxCount <= count)
             {
@@ -84,12 +84,12 @@ public class ItemPlacer(IRandom seeder, Action<int, int, WorldItem> placeItemAct
     {
         if (_parameters == null)
         {
-            throw new Exception($"Невозможно добавить предметы в очередь из-за отсутствующий {nameof(WorldItemParameters)}");
+            throw new($"Невозможно добавить предметы в очередь из-за отсутствующий {nameof(WorldItemParameters)}");
         }
 
-        foreach ((Item item, int count) in _itemCounts)
+        foreach (var (item, count) in _itemCounts)
         {
-            foreach (WorldItem worldItem in item.GetItemsForPlace(_parameters).Take(count))
+            foreach (var worldItem in item.GetItemsForPlace(_parameters).Take(count))
             {
                 _requiredItems.Enqueue(worldItem);
             }
@@ -98,11 +98,11 @@ public class ItemPlacer(IRandom seeder, Action<int, int, WorldItem> placeItemAct
 
     private int[] ShuffleIndexes(int length)
     {
-        int[] indexes = Enumerable.Range(1, length).ToArray();
+        var indexes = Enumerable.Range(1, length).ToArray();
 
-        for (int i = 0; i < _requiredItems.Count - 1; i++)
+        for (var i = 0; i < _requiredItems.Count - 1; i++)
         {
-            int j = seeder.Generator.Next(i + 1, length);
+            var j = seeder.Generator.Next(i + 1, length);
             (indexes[i], indexes[j]) = (indexes[j], indexes[i]);
         }
 
@@ -111,15 +111,15 @@ public class ItemPlacer(IRandom seeder, Action<int, int, WorldItem> placeItemAct
 
     private void PlaceItemsOnMap(int width, int[] indexes)
     {
-        int placingItemsCount = _requiredItems.Count;
+        var placingItemsCount = _requiredItems.Count;
 
-        for (int i = 0; i < placingItemsCount && i < indexes.Length; i++)
+        for (var i = 0; i < placingItemsCount && i < indexes.Length; i++)
         {
-            int index = indexes[i];
-            int x = index / width;
-            int y = index % width;
+            var index = indexes[i];
+            var x = index % width;
+            var y = index / width;
 
-            if (_requiredItems.TryDequeue(out WorldItem? placeable))
+            if (_requiredItems.TryDequeue(out var placeable))
             {
                 placeItemAction.Invoke(x, y, placeable);
             }

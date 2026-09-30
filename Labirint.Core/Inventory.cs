@@ -2,12 +2,11 @@
 
 public class Inventory
 {
-    private static Item[]? _allItems;
     private readonly Dictionary<Item, ItemStack> _items;
 
     public Inventory()
     {
-        _items = GetAllDerivedItems().ToDictionary(item => item, item => new ItemStack(item));
+        _items = ItemCatalog.Items.ToDictionary(item => item, item => new ItemStack(item));
     }
 
     public event EventHandler? InventoryCleared;
@@ -17,26 +16,24 @@ public class Inventory
     public event EventHandler<Item>? ItemCantUsed;
     public event EventHandler<Item>? ItemUsed;
 
-    public event EventHandler<int>? ScoreIncreased;
-
     /// <summary>
-    ///     Все доступные предметы.
+    /// Все доступные предметы.
     /// </summary>
     public IEnumerable<Item> AllItems => _items.Keys;
 
     /// <summary>
-    ///     Все стеки предметов в инвентаре.
+    /// Все стеки предметов в инвентаре.
     /// </summary>
     public IEnumerable<ItemStack> Stacks => _items.Values;
 
     public bool CanUse(Item item)
     {
-        return _items.TryGetValue(item, out ItemStack? stack) && stack.CanUse();
+        return _items.TryGetValue(item, out var stack) && stack.CanUse();
     }
 
     public void Use(Item item, Position position, Direction? direction, Labyrinth labyrinth)
     {
-        if (_items.TryGetValue(item, out ItemStack? stack) == false)
+        if (_items.TryGetValue(item, out var stack) == false)
         {
             return;
         }
@@ -53,7 +50,7 @@ public class Inventory
 
     public bool TryAdd(Item item, int count = 1)
     {
-        if (_items.TryGetValue(item, out ItemStack? stack) == false)
+        if (_items.TryGetValue(item, out var stack) == false)
         {
             return false;
         }
@@ -64,38 +61,21 @@ public class Inventory
             return false;
         }
 
-        // TODO Убрать проверку на основе типа
-        if (item is ScoreItem scoreItem)
-        {
-            ScoreIncreased?.Invoke(this, scoreItem.CostPerItem * count);
-        }
-
         ItemAdded?.Invoke(this, item);
 
         return true;
     }
 
     /// <summary>
-    ///     Сбросить количество всех предметов в инвентаре к значению по умолчанию.
+    /// Сбросить количество всех предметов в инвентаре к значению по умолчанию.
     /// </summary>
     public void Clear()
     {
-        foreach (ItemStack stack in Stacks)
+        foreach (var stack in Stacks)
         {
             stack.Reset();
         }
 
         InventoryCleared?.Invoke(this, EventArgs.Empty);
-    }
-
-    private IEnumerable<Item> GetAllDerivedItems()
-    {
-        return _allItems ??= typeof(Item).Assembly
-            .GetTypes()
-            .Where(type => type.IsSubclassOf(typeof(Item)) && type.IsAbstract == false)
-            .Select(type => (Item)Activator.CreateInstance(type)!)
-            .OrderByDescending(item => item.ControlSettings != null)
-            .ThenByDescending(item => item.MaxCount)
-            .ToArray();
     }
 }

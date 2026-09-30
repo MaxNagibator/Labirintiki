@@ -1,32 +1,37 @@
 ﻿namespace Labirint.Core;
 
 /// <summary>
-///     Клетка лабиринта.
+/// Клетка лабиринта.
 /// </summary>
 public class Tile(Labyrinth labyrinth)
 {
     /// <summary>
-    ///     Лабиринт.
+    /// Лабиринт.
     /// </summary>
     public Labyrinth Labyrinth => labyrinth;
 
     /// <summary>
-    ///     Особенности клетки.
+    /// Особенности клетки.
     /// </summary>
     public List<TileFeature>? Features { get; set; }
 
     /// <summary>
-    ///     Направления стенок клетки.
+    /// Направления стенок клетки.
     /// </summary>
     public Direction Walls { get; set; }
 
     /// <summary>
-    ///     Является ли клетка выходом.
+    /// Является ли клетка выходом.
     /// </summary>
     public bool IsExit { get; set; }
 
+    public override string ToString()
+    {
+        return $"{nameof(Walls)}: {Walls}, {nameof(Features)}: {Features?.Count}, {nameof(IsExit)}: {IsExit}";
+    }
+
     /// <summary>
-    ///     Содержит ли клетка стенку с указанного направления.
+    /// Содержит ли клетка стенку с указанного направления.
     /// </summary>
     /// <param name="direction">Направление проверки.</param>
     /// <returns>True, если стенка присутствует; иначе false.</returns>
@@ -36,7 +41,7 @@ public class Tile(Labyrinth labyrinth)
     }
 
     /// <summary>
-    ///     Добавить стенку в указанном направлении.
+    /// Добавить стенку в указанном направлении.
     /// </summary>
     /// <param name="direction">Направление добавления стенки.</param>
     public void AddWall(Direction direction)
@@ -50,7 +55,7 @@ public class Tile(Labyrinth labyrinth)
     }
 
     /// <summary>
-    ///     Удалить стенку в указанном направлении.
+    /// Удалить стенку в указанном направлении.
     /// </summary>
     /// <param name="direction">Направление удаления стенки.</param>
     public void RemoveWall(Direction direction)
@@ -71,7 +76,7 @@ public class Tile(Labyrinth labyrinth)
     }
 
     /// <summary>
-    ///     Попробовать подобрать предмет, находящийся в клетке.
+    /// Попробовать подобрать предмет, находящийся в клетке.
     /// </summary>
     /// <param name="item">Подобранный предмет, если операция успешна; иначе null.</param>
     /// <returns>True, если предмет был успешно подобран; иначе false.</returns>
@@ -84,45 +89,34 @@ public class Tile(Labyrinth labyrinth)
             return false;
         }
 
-        List<TileFeature> newFeatures = [];
-
-        foreach (TileFeature feature in Features)
+        for (var index = 0; index < Features.Count; index++)
         {
-            if (feature.TryPickUp(labyrinth))
-            {
-                item = feature;
+            var feature = Features[index];
 
-                if (feature.RemoveAfterSuccessPickUp)
-                {
-                }
-                else
-                {
-                    newFeatures.Add(feature);
-                }
-            }
-            else
+            if (feature.TryPickUp(labyrinth) == false)
             {
-                newFeatures.Add(feature);
+                continue;
+            }
+
+            item = feature;
+
+            if (feature.RemoveAfterSuccessPickUp)
+            {
+                Features.RemoveAt(index);
+                index--;
             }
         }
-
-        Features = newFeatures;
 
         return item != null;
     }
 
     /// <summary>
-    ///     Приведет ли добавление стены по указанному направлению к созданию ячейки со всеми закрытыми сторонами.
+    /// Приведет ли добавление стены по указанному направлению к созданию ячейки со всеми закрытыми сторонами.
     /// </summary>
     /// <param name="direction">Направление стены</param>
     /// <returns>True, если не приведет, иначе False</returns>
     public bool CanAddWall(Direction direction)
     {
         return direction != Direction.None && (ContainsWall(direction) || (Walls | direction) == Direction.All) == false;
-    }
-
-    public override string ToString()
-    {
-        return $"{nameof(Walls)}: {Walls}, {nameof(Features)}: {Features?.Count}, {nameof(IsExit)}: {IsExit}";
     }
 }

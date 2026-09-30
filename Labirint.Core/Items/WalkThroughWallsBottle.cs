@@ -4,7 +4,7 @@ using Labirint.Core.TileFeatures;
 namespace Labirint.Core.Items;
 
 /// <summary>
-///     Зелье прохождения сквозь стены.
+/// Зелье прохождения сквозь стены.
 /// </summary>
 public class WalkThroughWallsBottle : Item
 {
@@ -19,16 +19,23 @@ public class WalkThroughWallsBottle : Item
     public override int DefaultCount => 0;
     public override int MaxCount => 1;
 
-    public override bool UseAfterPickup => true;
+    public override bool IsUsedOnPickup => true;
 
     public override int CalculateCountInMaze(int width, int height, int density)
     {
         return (width + height) * density / 400 / 4;
     }
 
+    public override bool TryPickUp(int count, IPickupContext context)
+    {
+        context.Use(this);
+
+        return true;
+    }
+
     protected override WorldItem GetWorldItem(WorldItemParameters parameters)
     {
-        return new WorldItem(this, Image, Alignment.BottomCenter, 0.5);
+        return new(this, Image, Alignment.BottomCenter, 0.5);
     }
 
     protected override void AfterUse(Position position, Direction? direction, Labyrinth labyrinth)

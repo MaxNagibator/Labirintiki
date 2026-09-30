@@ -1,0 +1,37 @@
+﻿<label class="ui-switch @Class">
+    <input class="ui-switch__input"
+           type="checkbox"
+           checked="@Value"
+           @onchange="OnChangeAsync" />
+
+    <span class="ui-switch__track">
+        <span class="ui-switch__knob"></span>
+    </span>
+
+    @if (string.IsNullOrEmpty(Label) == false)
+    {
+        <span class="ui-switch__label">@Label</span>
+    }
+</label>
+
+@code {
+
+    [Parameter]
+    public bool Value { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> ValueChanged { get; set; }
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private async Task OnChangeAsync(ChangeEventArgs args)
+    {
+        Value = args.Value is true;
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+}

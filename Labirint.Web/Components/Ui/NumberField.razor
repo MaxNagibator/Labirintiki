@@ -1,0 +1,17 @@
+﻿<div class="ui-field @Class">
+    @if (string.IsNullOrEmpty(Label) == false)
+    {
+        <label class="ui-field__label" for="@_id">@Label</label>
+    }
+
+    <input id="@_id"
+           class="ui-input"
+           type="number"
+           min="@Min"
+           max="@Max"
+           value="@_text"
+           inputmode="numeric"
+           aria-label="@(string.IsNullOrEmpty(Label) ? AriaLabel : null)"
+           @oninput="OnInputAsync"
+           @onblur="OnBlurAsync" />
+</div>

@@ -1,47 +1,47 @@
 ﻿namespace Labirint.Core.Abilities.Base;
 
 /// <summary>
-///     Способность.
+/// Способность.
 /// </summary>
 public abstract class Ability
 {
     /// <summary>
-    ///     Наименование.
+    /// Наименование.
     /// </summary>
     public abstract string Name { get; }
 
     /// <summary>
-    ///     Описание.
+    /// Описание.
     /// </summary>
     public abstract string DisplayName { get; }
 
     /// <summary>
-    ///     Изображение.
+    /// Изображение.
     /// </summary>
-    public virtual string Icon => $"images/abilities/{Name}.png";
+    public virtual string Icon => $"images/abilities/{Name}.webp";
 
     /// <summary>
-    ///     Безлимитная способность.
+    /// Безлимитная способность.
     /// </summary>
     public bool IsUnlimitedMoveCount => MoveCount == null;
 
     /// <summary>
-    ///     Количество зарядов. (один ход = -1 заряд).
+    /// Количество зарядов. (один ход = -1 заряд).
     /// </summary>
     public virtual int? MoveCount => null;
 
     /// <summary>
-    ///     Способность позволяет ходить сквозь стены.
+    /// Способность позволяет ходить сквозь стены.
     /// </summary>
     public virtual bool IsIgnoreWalls => false;
 
     /// <summary>
-    ///     Продление способности.
+    /// Продление способности.
     /// </summary>
     public abstract AbilityProlongation Prolongation { get; }
 
     /// <summary>
-    ///     Что же делает способность.
+    /// Что же делает способность.
     /// </summary>
     /// <param name="tile">Клетка в которую мы перешли.</param>
     /// <param name="direction">Направление, по которому мы двигались.</param>

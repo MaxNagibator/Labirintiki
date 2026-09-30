@@ -1,0 +1,36 @@
+﻿.ui-dialog-backdrop {
+    position: fixed;
+    z-index: var(--z-dialog);
+    display: grid;
+    padding: var(--s-4);
+    inset: 0;
+    place-items: center;
+    overscroll-behavior: contain;
+    background: color-mix(in srgb, var(--bg-sunken) 82%, transparent);
+    backdrop-filter: blur(3px);
+}
+
+.ui-dialog-backdrop:focus {
+    outline: none;
+}
+
+.ui-dialog-panel {
+    display: flex;
+    overflow: hidden;
+    flex-direction: column;
+    width: 100%;
+    max-width: calc(100vw - var(--s-6));
+    max-height: calc(100vh - var(--s-7));
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-3);
+    background: var(--bg-raised);
+    grid-area: 1 / 1;
+}
+
+.ui-dialog-panel--small { width: 420px; }
+.ui-dialog-panel--medium { width: 640px; }
+.ui-dialog-panel--large { width: 900px; }
+
+.ui-dialog-panel--auto {
+    width: auto;
+}

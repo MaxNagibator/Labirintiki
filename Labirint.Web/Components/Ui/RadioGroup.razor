@@ -1,0 +1,48 @@
+﻿@typeparam T
+
+<CascadingValue Value="this" IsFixed="true">
+    <div class="ui-stack ui-stack--2" role="radiogroup" aria-labelledby="@AriaLabelledBy">
+        @ChildContent
+    </div>
+</CascadingValue>
+
+@code {
+
+    [Parameter]
+    public T? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<T> ValueChanged { get; set; }
+
+    [Parameter]
+    public string? Name { get; set; }
+
+    [Parameter]
+    public string? AriaLabelledBy { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public required RenderFragment ChildContent { get; set; }
+
+    internal string GroupName => Name ?? _fallbackName;
+
+    private readonly string _fallbackName = $"rg-{Guid.NewGuid():N}";
+
+    internal bool IsSelected(T candidate)
+    {
+        return EqualityComparer<T>.Default.Equals(Value, candidate);
+    }
+
+    internal async Task SelectAsync(T candidate)
+    {
+        if (IsSelected(candidate))
+        {
+            return;
+        }
+
+        Value = candidate;
+        await ValueChanged.InvokeAsync(candidate);
+        StateHasChanged();
+    }
+
+}

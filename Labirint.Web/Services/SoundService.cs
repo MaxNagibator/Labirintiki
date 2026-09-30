@@ -1,16 +1,20 @@
-﻿using Labirint.Web.Parameters;
+﻿namespace Labirint.Web.Services;
 
-namespace Labirint.Web.Services;
-
-public class SoundService(IJSRuntime jsRuntime)
+public class SoundService(IJSRuntime jsRuntime, LabyrinthParametersService parametersService)
 {
-    public ValueTask PlayAsync(string? soundType)
+    public void Play(string? soundType)
     {
-        if (string.IsNullOrWhiteSpace(soundType) || GlobalParameters.Labyrinth.IsSoundOn == false)
+        if (string.IsNullOrWhiteSpace(soundType) || parametersService.Current.IsSoundOn == false)
         {
-            return ValueTask.CompletedTask;
+            return;
         }
 
-        return jsRuntime.InvokeVoidAsync("playSound", soundType, GlobalParameters.Labyrinth.SoundVolume);
+        try
+        {
+            ((IJSInProcessRuntime)jsRuntime).InvokeVoid("playSound", soundType, parametersService.Current.SoundVolume);
+        }
+        catch (JSException)
+        {
+        }
     }
 }

@@ -1,77 +1,63 @@
-﻿using Blazored.LocalStorage;
-using Labirint.Web.Common.Control.Schemes;
+﻿using Labirint.Web.Common.Control.Schemes;
+using Microsoft.Extensions.Logging;
 
 namespace Labirint.Web.Services;
 
-public class ControlSchemeService : IControlSchemeService
+public class ControlSchemeService
 {
     private const string LocalStorageKey = nameof(ControlSchemeService);
 
-    private readonly List<IControlScheme> _controlSchemes;
-    private readonly ILocalStorageService _localStorage;
+    private readonly IReadOnlyList<IControlScheme> _controlSchemes;
+    private readonly LocalStorageService _localStorage;
+    private readonly ILogger<ControlSchemeService> _logger;
     private IControlScheme _currentScheme;
+    private bool _isChosenByUser;
 
-    public ControlSchemeService(ILocalStorageService localStorage)
+    public ControlSchemeService(LocalStorageService localStorage, ILogger<ControlSchemeService> logger)
     {
         _localStorage = localStorage;
+        _logger = logger;
 
         _controlSchemes =
         [
             new ClassicScheme(),
-            new AlternativeScheme()
+            new AlternativeScheme(),
         ];
 
-        _currentScheme = _controlSchemes.First();
-        LoadCurrentSchemeAsync().ConfigureAwait(false);
+        _currentScheme = _controlSchemes[0];
+        _ = LoadCurrentSchemeAsync();
     }
 
     public event EventHandler<IControlScheme>? ControlSchemeChanged;
 
-    public IControlScheme CurrentScheme
-    {
-        get => _currentScheme;
-        set
-        {
-            if (_controlSchemes.Contains(value))
-            {
-                _currentScheme = value;
-                SaveCurrentSchemeAsync().ConfigureAwait(false);
-                NotifySchemeChanged();
-            }
-            else
-            {
-                throw new ArgumentException($"Предоставленная схема управления «{value.Name}» не зарегистрирована.");
-            }
-        }
-    }
+    public IControlScheme CurrentScheme => _currentScheme;
 
     public IEnumerable<IControlScheme> AvailableSchemes => _controlSchemes;
 
-    public void RegisterScheme(IControlScheme scheme)
+    public IControlScheme DefaultScheme => _controlSchemes[0];
+
+    public async Task SetSchemeAsync(IControlScheme scheme)
     {
-        if (_controlSchemes.Contains(scheme))
+        if (_controlSchemes.Contains(scheme) == false)
         {
-            return;
+            throw new ArgumentException($"Предоставленная схема управления «{scheme.Name}» не зарегистрирована.", nameof(scheme));
         }
 
-        _controlSchemes.Add(scheme);
-    }
+        var wasChosenByUser = _isChosenByUser;
+        _isChosenByUser = true;
 
-    public void UnregisterScheme(IControlScheme scheme)
-    {
-        _controlSchemes.Remove(scheme);
-
-        if (_currentScheme != scheme)
+        try
         {
-            return;
+            await _localStorage.SetItemAsync(LocalStorageKey, scheme.Name);
+        }
+        catch
+        {
+            _isChosenByUser = wasChosenByUser;
+            throw;
         }
 
-        Reset();
-    }
-
-    public void Reset()
-    {
-        CurrentScheme = _controlSchemes.FirstOrDefault() ?? new ClassicScheme();
+        _currentScheme = scheme;
+        NotifySchemeChanged();
     }
 
     private void NotifySchemeChanged()
@@ -81,14 +67,24 @@ public class ControlSchemeService : IControlSchemeService
 
     private async Task LoadCurrentSchemeAsync()
     {
-        string? schemeName = await _localStorage.GetItemAsync<string>(LocalStorageKey);
+        string? schemeName;
 
-        if (schemeName == null)
+        try
+        {
+            schemeName = await _localStorage.GetItemAsync<string>(LocalStorageKey);
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Не удалось прочитать схему управления, остаётся схема по умолчанию");
+            return;
+        }
+
+        if (schemeName == null || _isChosenByUser)
         {
             return;
         }
 
-        IControlScheme? scheme = _controlSchemes.FirstOrDefault(controlScheme => controlScheme.Name == schemeName);
+        var scheme = _controlSchemes.FirstOrDefault(controlScheme => controlScheme.Name == schemeName);
 
         if (scheme == null)
         {
@@ -97,10 +93,5 @@ public class ControlSchemeService : IControlSchemeService
 
         _currentScheme = scheme;
         NotifySchemeChanged();
-    }
-
-    private async Task SaveCurrentSchemeAsync()
-    {
-        await _localStorage.SetItemAsync(LocalStorageKey, _currentScheme.Name);
     }
 }

@@ -64,7 +64,7 @@ public record Key
         ArrowUp, ArrowDown, ArrowLeft, ArrowRight,
         KeyA, KeyB, KeyC, KeyD, KeyE, KeyF, KeyG, KeyH, KeyI, KeyJ, KeyK, KeyL, KeyM, KeyN, KeyO, KeyP, KeyQ, KeyR, KeyS, KeyT, KeyU, KeyV, KeyW, KeyX, KeyY, KeyZ,
         Space, ControlLeft, ControlRight, ShiftLeft, ShiftRight, AltLeft, AltRight, Enter, Backspace, Escape, Tab,
-        CapsLock, Delete, Insert, Home, End, PageUp, PageDown, PrintScreen, ScrollLock, PauseBreak, NumLock
+        CapsLock, Delete, Insert, Home, End, PageUp, PageDown, PrintScreen, ScrollLock, PauseBreak, NumLock,
     ];
 
     private Key(string keyCode, string displaySymbol)
@@ -76,22 +76,22 @@ public record Key
     public string KeyCode { get; }
     public string DisplaySymbol { get; }
 
+    public static implicit operator string(Key key)
+    {
+        return key.KeyCode;
+    }
+
     public static Key Create(string input)
     {
         if (string.IsNullOrWhiteSpace(input))
         {
-            return new Key(Undefined.KeyCode, Undefined.DisplaySymbol);
+            return new(Undefined.KeyCode, Undefined.DisplaySymbol);
         }
 
-        string keyCode = input.Trim();
+        var keyCode = input.Trim();
 
         return All.Any(key => key.KeyCode.Equals(keyCode, StringComparison.CurrentCulture))
-            ? new Key(keyCode, All.First(key => key.KeyCode.Equals(keyCode, StringComparison.CurrentCulture)).DisplaySymbol)
+            ? new(keyCode, All.First(key => key.KeyCode.Equals(keyCode, StringComparison.CurrentCulture)).DisplaySymbol)
             : new Key(Undefined.KeyCode, Undefined.DisplaySymbol);
-    }
-
-    public static implicit operator string(Key key)
-    {
-        return key.KeyCode;
     }
 }

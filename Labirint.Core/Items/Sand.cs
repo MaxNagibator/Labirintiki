@@ -36,11 +36,11 @@ public class Sand : ScoreItem
 
     protected override WorldItem GetWorldItem(WorldItemParameters parameters)
     {
-        int count = parameters.Random.Generator.Next(MinSize, MaxSize + 1);
+        var count = parameters.Random.Generator.Next(MinSize, MaxSize + 1);
 
-        return new WorldItem(this, Image, Alignment.BottomCenter, count / 10d)
+        return new(this, Image, Alignment.BottomCenter, count / 10d)
         {
-            PickUpCount = count % MinSize + 1
+            PickUpCount = count % MinSize + 1,
         };
     }
 }

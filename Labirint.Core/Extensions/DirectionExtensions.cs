@@ -1,12 +1,12 @@
 ﻿namespace Labirint.Core.Extensions;
 
 /// <summary>
-///     Расширения для перечисления Direction.
+/// Расширения для перечисления Direction.
 /// </summary>
 public static class DirectionExtensions
 {
     /// <summary>
-    ///     Получить соседнюю позицию в заданном направлении.
+    /// Получить соседнюю позицию в заданном направлении.
     /// </summary>
     /// <param name="direction">Направление.</param>
     /// <param name="position">Текущая позиция.</param>
@@ -17,7 +17,7 @@ public static class DirectionExtensions
     }
 
     /// <summary>
-    ///     Получить противоположное направление.
+    /// Получить противоположное направление.
     /// </summary>
     /// <param name="direction">Направление.</param>
     /// <returns>Противоположное направление.</returns>
@@ -29,12 +29,12 @@ public static class DirectionExtensions
             Direction.Top => Direction.Bottom,
             Direction.Right => Direction.Left,
             Direction.Bottom => Direction.Top,
-            var _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null),
         };
     }
 
     /// <summary>
-    ///     Преобразовать направление в необходимое смещение для перемещения.
+    /// Преобразовать направление в необходимое смещение для перемещения.
     /// </summary>
     /// <param name="direction">Направление.</param>
     /// <returns>Смещение в виде позиции.</returns>
@@ -46,7 +46,7 @@ public static class DirectionExtensions
             Direction.Top => (0, -1),
             Direction.Right => (1, 0),
             Direction.Bottom => (0, 1),
-            var _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null),
         };
     }
 }

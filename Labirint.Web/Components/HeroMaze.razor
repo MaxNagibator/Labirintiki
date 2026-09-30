@@ -1,0 +1,52 @@
+﻿<div class="hero-maze">
+    <button aria-label="Показать другой лабиринт"
+            class="hero-maze__surface"
+            @onclick="Regenerate"
+            title="Другой лабиринт"
+            type="button">
+        <svg aria-hidden="true"
+             class="hero-maze__grid"
+             preserveAspectRatio="xMidYMid meet"
+             viewBox="-1 -1 @(_run.Side + 2) @(_run.Side + 2)"
+             xmlns="http://www.w3.org/2000/svg">
+            <rect class="hero-maze__floor"
+                  height="@_run.Side"
+                  width="@_run.Side"
+                  x="0"
+                  y="0" />
+
+            <g @key="_run.Seed"
+               style="@_run.Style">
+                <rect class="hero-maze__exit @(_run.IsSolved ? "hero-maze__exit--found" : null)"
+                      height="@_run.Exit.Size"
+                      width="@_run.Exit.Size"
+                      x="@_run.Exit.X"
+                      y="@_run.Exit.Y" />
+
+                <g class="hero-maze__walls">
+                    @foreach (var wall in _run.Walls)
+                    {
+                        <line style="animation-delay: @(wall.Delay)ms"
+                              x1="@wall.X1"
+                              y1="@wall.Y1"
+                              x2="@wall.X2"
+                              y2="@wall.Y2" />
+                    }
+                </g>
+
+                <path class="hero-maze__trail"
+                      d="@_run.TrailPath" />
+
+                <path class="hero-maze__tail"
+                      d="@_run.TrailPath" />
+
+                <circle class="hero-maze__runner"
+                        cx="0"
+                        cy="0"
+                        r="4" />
+            </g>
+        </svg>
+    </button>
+
+    <p class="t-label hero-maze__caption">Зерно @_run.Seed</p>
+</div>

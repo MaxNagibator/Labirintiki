@@ -1,0 +1,58 @@
+﻿.sheet-scrim {
+    position: fixed;
+    z-index: calc(var(--z-sheet) - 1);
+    inset: 0;
+    background: color-mix(in srgb, var(--bg-sunken) 82%, transparent);
+    backdrop-filter: blur(3px);
+}
+
+.sheet {
+    position: fixed;
+    z-index: var(--z-sheet);
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    visibility: hidden;
+    flex-direction: column;
+    width: min(380px, 100%);
+    transition: transform var(--dur-2) var(--ease), visibility 0s linear var(--dur-2);
+    border-left: 1px solid var(--border);
+    background: var(--bg-raised);
+    box-shadow: var(--shadow-sheet);
+    transform: translateX(100%);
+}
+
+.sheet--open {
+    visibility: visible;
+    transition: transform var(--dur-2) var(--ease), visibility 0s;
+    transform: translateX(0);
+}
+
+.sheet__head {
+    padding: var(--s-4);
+    border-bottom: 1px solid var(--border);
+}
+
+.sheet__body {
+    overflow-y: auto;
+    flex: 1 1 auto;
+    padding: var(--s-5) var(--s-4) var(--s-6);
+}
+
+@media (max-width: 899.98px) {
+    .sheet {
+        top: auto;
+        right: 0;
+        left: 0;
+        width: 100%;
+        max-height: 85vh;
+        border-left: 0;
+        border-top: 1px solid var(--border);
+        transform: translateY(100%);
+    }
+
+    .sheet--open {
+        transform: translateY(0);
+    }
+}

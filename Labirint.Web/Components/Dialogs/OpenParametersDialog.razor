@@ -1,57 +1,53 @@
 ﻿@using Labirint.Web.Parameters
-<MudDialog OnBackdropClick="UpdateAsync">
-    <TitleContent>
-        <MudText Typo="Typo.h6">
-            Параметры
-        </MudText>
-    </TitleContent>
-    <DialogContent>
-        <MudStack Spacing="2">
-            <ControlSchemeSwitcher @ref="_controlScheme" />
 
-            <MudStack AlignItems="AlignItems.Center" Row>
-                <MudSwitch @bind-Value="@GlobalParameters.Labyrinth.IsSoundOn" Color="Color.Success" Label="Звук" UncheckedColor="Color.Error" />
-                @if (GlobalParameters.Labyrinth.IsSoundOn)
+<Dialog>
+    <ChildContent>
+        <div class="ui-stack ui-stack--6">
+            <ControlSchemeSwitcher @bind-Value="_controlScheme" />
+
+            <div class="ui-stack">
+                <Switch @bind-Value="_parameters.IsSoundOn"
+                        Label="Звук" />
+                @if (_parameters.IsSoundOn)
                 {
-                    <MudSlider @bind-Value="@GlobalParameters.Labyrinth.SoundVolume"
-                               Class="pr-2"
-                               Max="1.0f"
-                               Min="0f"
-                               Size="Size.Medium"
-                               Step="0.01f"
-                               T="float"
-                               ValueLabel="true"
-                               ValueLabelFormat="0%" />
+                    <Slider @bind-Value="_parameters.SoundVolume"
+                            Label="Громкость"
+                            Max="1f"
+                            Min="0f"
+                            Step="0.01f"
+                            T="float"
+                            ValueLabelFormat="0%" />
                 }
-            </MudStack>
-            <MudStack>
-                <MudText>Цвет лабиринта</MudText>
-                <MudColorPicker @bind-Text="@GlobalParameters.Labyrinth.Color"
-                                ColorPickerMode="ColorPickerMode.HEX"
-                                PickerVariant="PickerVariant.Static"
-                                Rounded="true"
-                                ShowAlpha="true"
-                                ShowColorField="true"
-                                ShowInputs="true"
-                                ShowModeSwitch="true"
-                                ShowPreview="true"
-                                ShowSliders="true"
-                                ShowToolbar="true" />
-            </MudStack>
-        </MudStack>
-    </DialogContent>
-    <DialogActions>
-        <MudButton OnClick="Cancel">Отмена</MudButton>
-        <MudButton Color="Color.Warning" Disabled="@_isProcessing" OnClick="Reset">Сбросить</MudButton>
-        <MudButton Color="Color.Success" Disabled="@_isProcessing" OnClick="UpdateAsync">
+            </div>
+
+            <ColorField @bind-Value="_parameters.Color"
+                        FallbackValue="@LabyrinthParameters.DefaultColor"
+                        Label="Цвет лабиринта" />
+        </div>
+    </ChildContent>
+    <Actions>
+        <Button Disabled="_isProcessing"
+                OnClick="Reset"
+                Variant="UiVariant.Text">
+            Сбросить
+        </Button>
+
+        <div class="ui-spacer"></div>
+
+        <Button OnClick="Cancel">Отмена</Button>
+        <Button Disabled="_isProcessing"
+                OnClick="UpdateAsync"
+                Tone="UiTone.Accent"
+                Variant="UiVariant.Filled">
             @if (_isProcessing)
             {
-                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                <Spinner IsDecorative
+                         Size="18" />
             }
             else
             {
-                <MudText Typo="Typo.button">Сохранить</MudText>
+                <span>Сохранить</span>
             }
-        </MudButton>
-    </DialogActions>
-</MudDialog>
+        </Button>
+    </Actions>
+</Dialog>

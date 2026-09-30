@@ -1,15 +1,17 @@
-﻿using Labirint.Core.Items.Common;
-using Labirint.Web.Common.Animation;
+﻿using Labirint.Web.Common.Animation;
 using Labirint.Web.Common.Control.Schemes;
+using Labirint.Web.Components.Dialogs;
+using Labirint.Web.Services.Dialogs;
 using Microsoft.AspNetCore.Components;
 
 namespace Labirint.Web.Components;
 
-public partial class RunnerInventory : RenderComponent, IAsyncDisposable
+public partial class RunnerInventory : RenderComponent, IDisposable
 {
-    private Dictionary<Item, AnimatedStack> _stackCache = new();
-    private bool _showDescription;
-    private Item? _currentItem;
+    private InventoryAnimator _animator = null!;
+
+    private Item? _pendingFlight;
+    private Item? _pendingCast;
 
     [Parameter]
     [EditorRequired]
@@ -20,25 +22,56 @@ public partial class RunnerInventory : RenderComponent, IAsyncDisposable
     public required KeyInterceptor Interceptor { get; set; }
 
     [Inject]
-    public required IControlSchemeService SchemeService { get; set; }
+    public required ControlSchemeService SchemeService { get; set; }
 
-    private AnimatedStack? WaitItem { get; set; }
+    [Inject]
+    public required PickupFlightService PickupFlight { get; set; }
+
+    [Inject]
+    public required DialogService DialogService { get; set; }
 
     private IControlScheme ControlScheme => SchemeService.CurrentScheme;
 
-    public async ValueTask DisposeAsync()
+    public void Dispose()
     {
-        UnsubscribeEvents();
-        await Interceptor.DisposeAsync();
+        DialogService.CancelOwnedBy(this);
+
+        Interceptor.ChangedWaitItem -= OnChangedWaitItem;
+        Interceptor.DigitKeyDown -= OnDigitKeyDown;
+        SchemeService.ControlSchemeChanged -= OnSchemeChanged;
+
+        _animator.Changed -= OnAnimatorChanged;
+        _animator.PickupFlightRequested -= OnPickupFlightRequested;
+        _animator.CastFlightRequested -= OnCastFlightRequested;
+        _animator.Dispose();
 
         GC.SuppressFinalize(this);
     }
 
+    public bool TryStartCast(Item item)
+    {
+        return _animator.TryStartCast(item);
+    }
+
+    public void CancelCast(Item item)
+    {
+        _animator.CancelCast(item);
+    }
+
+    protected override void OnInitialized()
+    {
+        _animator = new InventoryAnimator(Inventory);
+        _animator.Changed += OnAnimatorChanged;
+        _animator.PickupFlightRequested += OnPickupFlightRequested;
+        _animator.CastFlightRequested += OnCastFlightRequested;
+
+        Interceptor.ChangedWaitItem += OnChangedWaitItem;
+        Interceptor.DigitKeyDown += OnDigitKeyDown;
+        SchemeService.ControlSchemeChanged += OnSchemeChanged;
+    }
+
     protected override Task OnFirstRenderAsyncInner()
     {
-        InitializeItems();
-        SubscribeEvents();
-
         return Task.CompletedTask;
     }
 
@@ -47,58 +80,53 @@ public partial class RunnerInventory : RenderComponent, IAsyncDisposable
         return Task.CompletedTask;
     }
 
-    private async void OnSchemeChanged(object? sender, IControlScheme scheme)
+    protected override async Task OnAfterRenderAsyncInner(bool firstRender)
     {
-        await ForceRenderAsync();
+        if (_pendingFlight != null)
+        {
+            var item = _pendingFlight;
+            _pendingFlight = null;
+
+            await PickupFlight.FlyAsync(item);
+        }
+
+        if (_pendingCast != null)
+        {
+            var item = _pendingCast;
+            _pendingCast = null;
+
+            await PickupFlight.CastAsync(item);
+        }
+    }
+
+    private void OnAnimatorChanged()
+    {
+        RunSafe(ForceRenderAsync);
+    }
+
+    private void OnPickupFlightRequested(Item item)
+    {
+        _pendingFlight = item;
+    }
+
+    private void OnCastFlightRequested(Item item)
+    {
+        _pendingCast = item;
+    }
+
+    private void OnSchemeChanged(object? sender, IControlScheme scheme)
+    {
+        RunSafe(ForceRenderAsync);
     }
 
     private void OnChangedWaitItem(object? sender, Item? item)
     {
-        if (item == null)
-        {
-            WaitItem?.RemoveState();
-            WaitItem = null;
-            return;
-        }
-
-        if (_stackCache.TryGetValue(item, out AnimatedStack? stack) == false)
-        {
-            return;
-        }
-
-        stack.AddState(AnimatedStack.State.Waiting);
-        WaitItem = stack;
-    }
-
-    private void OnItemAdded(object? sender, Item item)
-    {
-        AddStackAnimation(item, AnimatedStack.State.Added);
-    }
-
-    private void OnItemCantAdded(object? sender, Item item)
-    {
-        AddStackAnimation(item, AnimatedStack.State.CantAdd);
-    }
-
-    private void OnItemUsed(object? sender, Item item)
-    {
-        AddStackAnimation(item, AnimatedStack.State.Used);
-    }
-
-    private async void OnInventoryCleared(object? sender, EventArgs e)
-    {
-        InitializeItems();
-        await ForceRenderAsync();
-    }
-
-    private async void OnAnimateStateChanged(AnimatedStack.State state)
-    {
-        await ForceRenderAsync();
+        _animator.SetWaitItem(item);
     }
 
     private void OnDigitKeyDown(object? sender, DigitEventArgs args)
     {
-        ControlSettings? control = Inventory.Stacks
+        var control = Inventory.Stacks
             .Where(stack => stack.Count > 0)
             .ElementAtOrDefault(args.Digit - 1)
             ?.Item.ControlSettings;
@@ -109,18 +137,38 @@ public partial class RunnerInventory : RenderComponent, IAsyncDisposable
         }
     }
 
-    private async Task ShowDescription(Item item)
+    private string? GetKeySymbol(Item item)
     {
-        _showDescription = true;
-        _currentItem = item;
-        await ForceRenderAsync();
+        return item.ControlSettings == null
+            ? null
+            : ControlScheme.GetActivateKey(item.ControlSettings).DisplaySymbol;
     }
 
-    private async Task HideDescription()
+    private async Task ShowLoreAsync(Item item)
     {
-        _showDescription = false;
-        _currentItem = null;
-        await ForceRenderAsync();
+        var animatedStack = _animator.Find(item);
+
+        if (animatedStack == null)
+        {
+            return;
+        }
+
+        DialogParameters parameters = new()
+        {
+            [nameof(ItemLoreDialog.Item)] = item,
+            [nameof(ItemLoreDialog.Count)] = animatedStack.Stack.Count,
+            [nameof(ItemLoreDialog.IsInfinite)] = animatedStack.Stack.IsInfinite,
+        };
+
+        var result = await DialogService.ShowAsync<ItemLoreDialog>(this, item.DisplayName, parameters, new DialogOptions
+        {
+            Width = DialogWidth.Medium,
+        });
+
+        if (result.GetValue<bool>())
+        {
+            OnClicked(item);
+        }
     }
 
     private void OnClicked(Item item)
@@ -129,51 +177,5 @@ public partial class RunnerInventory : RenderComponent, IAsyncDisposable
         {
             Interceptor.OnKeyDown(ControlScheme.GetActivateKey(item.ControlSettings));
         }
-    }
-
-    private void InitializeItems()
-    {
-        _stackCache = Inventory.Stacks.ToDictionary(stack => stack.Item, stack => new AnimatedStack(stack));
-    }
-
-    private void SubscribeEvents()
-    {
-        Interceptor.ChangedWaitItem += OnChangedWaitItem;
-        Interceptor.DigitKeyDown += OnDigitKeyDown;
-        SchemeService.ControlSchemeChanged += OnSchemeChanged;
-        AnimatedStack.StateChanged += OnAnimateStateChanged;
-
-        Inventory.ItemAdded += OnItemAdded;
-        Inventory.ItemCantAdded += OnItemCantAdded;
-        Inventory.ItemUsed += OnItemUsed;
-        Inventory.InventoryCleared += OnInventoryCleared;
-    }
-
-    private void UnsubscribeEvents()
-    {
-        Interceptor.ChangedWaitItem -= OnChangedWaitItem;
-        Interceptor.DigitKeyDown -= OnDigitKeyDown;
-        SchemeService.ControlSchemeChanged -= OnSchemeChanged;
-        AnimatedStack.StateChanged -= OnAnimateStateChanged;
-
-        Inventory.ItemAdded -= OnItemAdded;
-        Inventory.ItemCantAdded -= OnItemCantAdded;
-        Inventory.ItemUsed -= OnItemUsed;
-        Inventory.InventoryCleared -= OnInventoryCleared;
-    }
-
-    private void AddStackAnimation(Item item, AnimatedStack.State animation)
-    {
-        if (_stackCache.TryGetValue(item, out AnimatedStack? stack) == false)
-        {
-            return;
-        }
-
-        stack.AddState(animation);
-    }
-
-    private void AnimationCompleted(AnimatedStack animatedStack)
-    {
-        animatedStack.RemoveState();
     }
 }

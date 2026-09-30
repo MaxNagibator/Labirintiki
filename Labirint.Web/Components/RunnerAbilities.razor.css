@@ -4,43 +4,47 @@
     flex-direction: column;
 }
 
-    .runner-ability-container .runner-ability {
-        position: relative;
-        overflow: hidden;
-        width: 64px;
-        height: 78px;
-        border-radius: 4px;
-        background-color: #ccc;
-    }
+.runner-ability-container .runner-ability {
+    position: relative;
+    overflow: hidden;
+    width: 64px;
+    height: 78px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    background: var(--bg-sunken);
+}
 
-        .runner-ability-container .runner-ability img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
+.runner-ability-container .runner-ability img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
 
-    .runner-ability-container .ability-name {
-        font-size: 11px;
-        position: absolute;
-        top: 0;
-        left: 0;
-        overflow: hidden;
-        padding: 2px 4px;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        color: #fff;
-        border-radius: 4px;
-        background-color: rgba(0, 0, 0, 0.4);
-    }
+.runner-ability-container .ability-name {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.04em;
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: 100%;
+    overflow: hidden;
+    padding: var(--s-1) calc(var(--s-1) * 1.5);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--text);
+    border-radius: var(--r-1);
+    background: color-mix(in srgb, var(--bg-raised) 80%, transparent);
+}
 
 .ability-lost-count {
-    font-size: 14px;
-    font-weight: bold;
+    font-size: 0.8125rem;
+    font-weight: 600;
     position: absolute;
     right: 0;
     bottom: 0;
-    padding: 2px 4px;
-    color: #fff;
-    border-radius: 4px;
-    background-color: rgba(0, 0, 0, 0.5);
+    padding: var(--s-1) calc(var(--s-1) * 1.5);
+    color: var(--gold);
+    border-radius: var(--r-1);
+    background: color-mix(in srgb, var(--bg-raised) 80%, transparent);
 }

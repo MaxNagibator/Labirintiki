@@ -1,22 +1,74 @@
-{
-  "name": "Лабиринтик (Blazor)",
-  "short_name": "Лабиринтик",
+﻿{
+  "name": "Лабиринт",
+  "short_name": "Лабиринт",
+  "description": "Браузерная игра-лабиринт: ищите выход, собирайте предметы, делитесь зерном партии.",
+  "lang": "ru",
+  "dir": "ltr",
   "id": "./",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#03173d",
+  "orientation": "any",
+  "categories": [ "games", "entertainment" ],
+  "background_color": "#14110d",
+  "theme_color": "#14110d",
   "prefer_related_applications": false,
   "icons": [
     {
       "src": "icon-512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any"
     },
     {
       "src": "icon-192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512-maskable.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Новая партия",
+      "short_name": "Новая партия",
+      "description": "Сгенерировать свежий лабиринт",
+      "url": "./labirint"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "images/screenshots/wide-maze.webp",
+      "type": "image/webp",
+      "sizes": "1280x720",
+      "form_factor": "wide",
+      "label": "Поиск выхода из лабиринта"
+    },
+    {
+      "src": "images/screenshots/wide-home.webp",
+      "type": "image/webp",
+      "sizes": "1280x720",
+      "form_factor": "wide",
+      "label": "Главная страница с живой заставкой"
+    },
+    {
+      "src": "images/screenshots/narrow-maze.webp",
+      "type": "image/webp",
+      "sizes": "365x761",
+      "form_factor": "narrow",
+      "label": "Поиск выхода из лабиринта"
+    },
+    {
+      "src": "images/screenshots/narrow-home.webp",
+      "type": "image/webp",
+      "sizes": "365x761",
+      "form_factor": "narrow",
+      "label": "Главная страница с живой заставкой"
     }
   ]
 }

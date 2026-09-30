@@ -1,0 +1,32 @@
+﻿<div class="ui-dialog @Class">
+    <div class="ui-dialog__head">
+        @if (TitleContent is not null)
+        {
+            @TitleContent
+        }
+        else
+        {
+            <h2 class="t-display-m">@Instance.Title</h2>
+        }
+
+        @if (Instance.Options.CloseButton)
+        {
+            <IconButton Icon="@IconCatalog.Close"
+                        OnClick="@Instance.Cancel"
+                        Title="Закрыть" />
+        }
+    </div>
+
+    <hr class="ui-hairline ui-dialog__rule" />
+
+    <div class="ui-dialog__body">
+        @ChildContent
+    </div>
+
+    @if (Actions is not null)
+    {
+        <div class="ui-dialog__actions">
+            @Actions
+        </div>
+    }
+</div>

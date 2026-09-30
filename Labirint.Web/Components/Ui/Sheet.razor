@@ -1,0 +1,25 @@
+﻿@if (IsOpen)
+{
+    <div class="sheet-scrim"
+         @onclick="CloseAsync"></div>
+}
+
+<div aria-hidden="@(IsOpen == false)"
+     aria-label="@Title"
+     aria-modal="true"
+     class="sheet @(IsOpen ? "sheet--open" : null)"
+     @onkeydown="OnKeyDown"
+     @ref="_sheet"
+     role="dialog"
+     tabindex="-1">
+    <div class="sheet__head ui-row ui-row--between">
+        <span class="t-display-m">@Title</span>
+        <IconButton Icon="@IconCatalog.Close"
+                    OnClick="CloseAsync"
+                    Title="@CloseTitle" />
+    </div>
+
+    <div class="sheet__body ui-stack ui-stack--5">
+        @ChildContent
+    </div>
+</div>

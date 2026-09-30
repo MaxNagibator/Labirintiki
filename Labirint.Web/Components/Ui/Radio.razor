@@ -1,0 +1,32 @@
+﻿@typeparam T
+
+<label class="ui-radio">
+    <input class="ui-radio__input"
+           type="radio"
+           name="@Group.GroupName"
+           checked="@Group.IsSelected(Value)"
+           @onchange="OnChangeAsync" />
+
+    <span class="ui-radio__mark"></span>
+
+    <span class="ui-radio__label">@ChildContent</span>
+</label>
+
+@code {
+
+    [CascadingParameter]
+    public required RadioGroup<T> Group { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public required T Value { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private async Task OnChangeAsync(ChangeEventArgs args)
+    {
+        await Group.SelectAsync(Value);
+    }
+
+}

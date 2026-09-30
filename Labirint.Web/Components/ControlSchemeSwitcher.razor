@@ -1,11 +1,17 @@
 ﻿@using Labirint.Web.Common.Control.Schemes
-<MudText>Схемы управления:</MudText>
 
-<MudRadioGroup @bind-Value="ControlSchemeService.CurrentScheme">
-    <MudStack Spacing="0">
-        @foreach (IControlScheme scheme in ControlSchemeService.AvailableSchemes)
-        {
-            <MudRadio Color="Color.Primary" Value="scheme">@scheme.Name</MudRadio>
-        }
-    </MudStack>
-</MudRadioGroup>
+<div class="ui-stack ui-stack--2">
+    <div class="t-label" id="@_labelId">Схема управления</div>
+
+    <RadioGroup AriaLabelledBy="@_labelId"
+                T="IControlScheme"
+                Value="Value"
+                ValueChanged="SwitchSchemeAsync">
+        <div class="ui-stack ui-stack--1">
+            @foreach (var scheme in ControlSchemeService.AvailableSchemes)
+            {
+                <Radio Value="scheme">@scheme.Name</Radio>
+            }
+        </div>
+    </RadioGroup>
+</div>

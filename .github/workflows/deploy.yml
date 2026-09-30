@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+﻿name: Deploy to GitHub Pages
 
 on:
   push:
@@ -14,13 +14,23 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'Directory.Build.props', 'global.json') }}
+          restore-keys: nuget-${{ runner.os }}-
 
       - name: Install .NET WASM Build Tools
         run: dotnet workload install wasm-tools
 
+      - name: Test
+        run: dotnet test --nologo
+
       - name: Publish .NET Core Project
-        run: dotnet publish ./Labirint.Web/Labirint.Web.csproj -c:Release -p:GHPages=true -o dist/Web --nologo
+        run: dotnet publish ./Labirint.Web/Labirint.Web.csproj -c:Release -p:GHPages=true "-p:SiteUrl=${{ vars.SITE_URL || format('https://{0}.github.io/{1}/', github.repository_owner, github.event.repository.name) }}" -o dist/Web --nologo
 
       - name: Commit wwwroot to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4

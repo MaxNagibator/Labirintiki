@@ -1,0 +1,26 @@
+﻿<span class="@CssClass"
+      style="--spinner-size: @(Size)px"
+      role="@Role"
+      aria-hidden="@AriaHidden"
+      aria-label="@AriaLabel"></span>
+
+@code {
+
+    [Parameter]
+    public int Size { get; set; } = 24;
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public bool IsDecorative { get; set; }
+
+    private string CssClass => string.IsNullOrWhiteSpace(Class) ? "ui-spinner" : $"ui-spinner {Class}";
+
+    private string? Role => IsDecorative ? null : "status";
+
+    private string? AriaHidden => IsDecorative ? "true" : null;
+
+    private string? AriaLabel => IsDecorative ? null : "Загрузка";
+
+}

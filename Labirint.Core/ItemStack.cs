@@ -10,9 +10,14 @@ public class ItemStack(Item item)
 
     public Item Item { get; } = item;
 
+    public override string ToString()
+    {
+        return $"{Item.Name} ({Count}/{MaxCount})";
+    }
+
     public bool TryAdd(int count)
     {
-        if (Count + count > MaxCount)
+        if (count <= 0 || (long)Count + count > MaxCount)
         {
             return false;
         }
@@ -51,10 +56,5 @@ public class ItemStack(Item item)
 
         Count -= count;
         return true;
-    }
-
-    public override string ToString()
-    {
-        return $"{Item.Name} ({Count}/{MaxCount})";
     }
 }

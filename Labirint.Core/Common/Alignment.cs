@@ -2,14 +2,15 @@
 
 public enum Alignment : byte
 {
-    TopLeft = 0,
-    TopCenter = 1,
-    TopRight = 2,
-    CenterLeft = 3,
-    Center = 4,
-    CenterRight = 5,
-    BottomLeft = 6,
-    BottomCenter = 7,
-    BottomRight = 8,
-    Stretch = 9
+    None = 0,
+    TopLeft = 1,
+    TopCenter = 2,
+    TopRight = 3,
+    CenterLeft = 4,
+    Center = 5,
+    CenterRight = 6,
+    BottomLeft = 7,
+    BottomCenter = 8,
+    BottomRight = 9,
+    Stretch = 10,
 }

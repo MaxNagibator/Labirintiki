@@ -1,51 +1,84 @@
-﻿.content-section {
-    margin-top: 20px;
-    padding: 20px;
-    border-radius: 10px;
-    background-color: #f9f9f9;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.content-section h2 {
-    color: #2c3e50;
-}
-
-.content-section ul {
-    padding: 0;
-    list-style-type: none;
-}
-
-.content-section ul li {
+﻿.home {
     display: flex;
+    flex-direction: column;
+    gap: var(--s-7);
+    max-width: var(--content-max);
+    margin: 0 auto;
+    padding: var(--s-6) var(--s-4) var(--s-8);
+}
+
+.hero {
+    display: grid;
     align-items: center;
-    margin: 10px 0;
-    padding: 10px;
-    border-radius: 5px;
-    background-color: #e8f0fe;
+    gap: var(--s-7);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 380px);
+    padding-bottom: var(--s-6);
+    border-bottom: 1px solid var(--border);
 }
 
-.content-section ul li::before {
-    font-family: "Font Awesome 5 Free", serif;
-    font-weight: 900;
-    margin-right: 10px;
-    content: "\f00c";
-    color: #3498db;
+.hero__standfirst {
+    max-width: 46ch;
+    margin: 0;
+    font-size: 1.0625rem;
+    color: var(--text-dim);
 }
 
-.content-section p.joke {
+.hero__plate {
     display: flex;
-    align-items: center;
-    margin: 10px 0;
-    padding: 10px;
-    border-radius: 5px;
-    background-color: #fff3cd;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    flex-direction: column;
+    gap: var(--s-2);
 }
 
-.content-section p.joke::before {
-    font-family: "Font Awesome 5 Free", serif;
-    font-weight: 900;
-    margin-right: 10px;
-    content: "\f118";
-    color: #ffc107;
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+    min-width: 0;
+}
+
+.section__eyebrow {
+    margin: 0;
+}
+
+.facts,
+.jokes {
+    column-gap: var(--s-7);
+    columns: 2;
+}
+
+.fact,
+.joke {
+    margin: 0 0 var(--s-4);
+    break-inside: avoid;
+}
+
+.joke {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    padding-left: var(--s-4);
+    color: var(--text-dim);
+    border-left: 2px solid var(--gold);
+}
+
+@media (max-width: 899.98px) {
+    .hero {
+        gap: var(--s-5);
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hero__plate {
+        max-width: 420px;
+    }
+
+    .facts,
+    .jokes {
+        columns: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .home {
+        gap: var(--s-6);
+        padding: var(--s-5) var(--s-3) var(--s-7);
+    }
 }

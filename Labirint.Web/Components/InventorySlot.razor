@@ -1,0 +1,72 @@
+﻿@{
+    var stack = Stack.Stack;
+    var item = stack.Item;
+
+    var countLabel = stack.IsInfinite
+        ? $"В инвентаре {Stack.DisplayCount}, предел не ограничен"
+        : $"В инвентаре {Stack.DisplayCount} из {stack.MaxCount}";
+
+    var keyLabel = string.IsNullOrEmpty(KeySymbol) ? string.Empty : $". Клавиша {KeySymbol}";
+
+    var useLabel = $"Использовать: {item.DisplayName}. {countLabel}{keyLabel}";
+}
+
+<div class="inventory-item-container">
+    <div class="inventory-item
+                    @(stack.IsInfinite ? " score" : string.Empty)
+                    @(Stack.GetAnimation())"
+         data-item="@item.Name"
+         style="--animate-duration: @(Stack.GetDuration())ms; --animate-delay: @(Stack.GetDelay())ms">
+
+        <button aria-label="@useLabel"
+                class="item-use"
+                @onclick="() => OnUse.InvokeAsync(item)"
+                title="Использовать предмет"
+                type="button">
+            <img alt=""
+                 aria-hidden="true"
+                 src="@item.Icon">
+        </button>
+        <img alt=""
+             aria-hidden="true"
+             class="item-flow"
+             src="@item.Icon">
+        <button class="item-name"
+                @onclick="() => OnLore.InvokeAsync(item)"
+                title="Открыть карточку предмета"
+                type="button">
+            @item.DisplayName
+        </button>
+        <div aria-hidden="true"
+             class="count t-data"
+             title="Текущее количество в инвентаре">@Stack.DisplayCount</div>
+        <div aria-hidden="true"
+             class="max-count t-data"
+             title="Максимальное количество в инвентаре">@(stack.IsInfinite ? "∞" : stack.MaxCount)</div>
+    </div>
+
+    @if (string.IsNullOrEmpty(KeySymbol) == false)
+    {
+        <kbd aria-hidden="true"
+             class="keyboard-key">
+            @KeySymbol
+        </kbd>
+    }
+</div>
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public required AnimatedStack Stack { get; set; }
+
+    [Parameter]
+    public string? KeySymbol { get; set; }
+
+    [Parameter]
+    public EventCallback<Item> OnUse { get; set; }
+
+    [Parameter]
+    public EventCallback<Item> OnLore { get; set; }
+
+}

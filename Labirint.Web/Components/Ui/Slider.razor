@@ -1,0 +1,81 @@
+﻿@typeparam T
+@using System.Globalization
+
+<div class="ui-field @Class">
+    @if (string.IsNullOrEmpty(Label) == false || ValueLabelFormat is not null)
+    {
+        <div class="ui-row ui-row--between ui-row--2">
+            @if (string.IsNullOrEmpty(Label) == false)
+            {
+                <label class="ui-field__label" for="@_id">@Label</label>
+            }
+
+            @if (ValueLabelFormat is not null)
+            {
+                <span class="t-label t-data">@FormattedValue</span>
+            }
+        </div>
+    }
+
+    <input id="@_id"
+           class="ui-range"
+           type="range"
+           min="@ToText(Min)"
+           max="@ToText(Max)"
+           step="@ToText(Step)"
+           value="@ToText(Value)"
+           aria-label="@(string.IsNullOrEmpty(Label) ? AriaLabel : null)"
+           @oninput="OnInputAsync" />
+</div>
+
+@code {
+
+    private readonly string _id = $"sl-{Guid.NewGuid():N}";
+
+    [Parameter]
+    public T Value { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<T> ValueChanged { get; set; }
+
+    [Parameter]
+    public T Min { get; set; } = default!;
+
+    [Parameter]
+    public T Max { get; set; } = default!;
+
+    [Parameter]
+    public T Step { get; set; } = default!;
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public string? AriaLabel { get; set; }
+
+    [Parameter]
+    public string? ValueLabelFormat { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private string FormattedValue => Convert.ToDouble(Value, CultureInfo.InvariantCulture)
+        .ToString(ValueLabelFormat, CultureInfo.InvariantCulture);
+
+    private static string ToText(T value)
+    {
+        return Convert.ToDouble(value, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
+    }
+
+    private async Task OnInputAsync(ChangeEventArgs args)
+    {
+        if (double.TryParse(args.Value?.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out double parsed) == false)
+        {
+            return;
+        }
+
+        Value = (T)Convert.ChangeType(parsed, typeof(T), CultureInfo.InvariantCulture);
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+}

@@ -1,3 +1,7 @@
 ﻿@inherits MazeComponent
 
-<canvas style="position: absolute; z-index: -5;" id="@CanvasId" width="@CanvasWidth" height="@CanvasHeight" @ref="CanvasRef"></canvas>
+<canvas height="@CanvasHeight"
+        id="@CanvasId"
+        @ref="CanvasRef"
+        style="position: absolute; z-index: 1;"
+        width="@CanvasWidth"></canvas>

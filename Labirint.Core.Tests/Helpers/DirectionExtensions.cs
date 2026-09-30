@@ -10,9 +10,9 @@ internal static class DirectionExtensions
     internal static IEnumerable<(Direction direction, int count)> GetCombinedDirections(this IEnumerable<Direction> directions)
     {
         IEnumerable<Direction> enumerable = directions as Direction[] ?? directions.ToArray();
-        int totalSubsets = 1 << enumerable.Count();
+        var totalSubsets = 1 << enumerable.Count();
 
-        for (int i = 1; i < totalSubsets; i++)
+        for (var i = 1; i < totalSubsets; i++)
         {
             (Direction direction, int count) combination = new();
 

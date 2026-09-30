@@ -1,0 +1,32 @@
+﻿.ui-color__picker {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    padding: var(--s-1);
+    cursor: pointer;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-2);
+    background: var(--bg-sunken);
+}
+
+.ui-color__picker::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.ui-color__picker::-webkit-color-swatch {
+    border: 0;
+    border-radius: var(--r-1);
+}
+
+.ui-color__picker::-moz-color-swatch {
+    border: 0;
+    border-radius: var(--r-1);
+}
+
+.ui-color__hex {
+    min-width: 0;
+}
+
+.ui-color__alpha {
+    margin-top: var(--s-2);
+}

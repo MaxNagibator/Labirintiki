@@ -1,0 +1,24 @@
+﻿@if (DialogService.Instances.Count > 0)
+{
+    <div class="ui-dialog-backdrop"
+         tabindex="-1"
+         @onclick="OnBackdropClick"
+         @onkeydown="OnKeyDown"
+         @onkeydown:stopPropagation>
+        @foreach (DialogInstance instance in DialogService.Instances)
+        {
+            <div @key="instance.Id"
+                 @ref="_panels[instance.Id]"
+                 class="ui-dialog-panel @GetWidthClass(instance)"
+                 role="dialog"
+                 aria-modal="true"
+                 aria-label="@instance.Title"
+                 @onclick:stopPropagation>
+                <CascadingValue Value="instance">
+                    <DynamicComponent Type="instance.ContentType"
+                                      Parameters="instance.Parameters" />
+                </CascadingValue>
+            </div>
+        }
+    </div>
+}

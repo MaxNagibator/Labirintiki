@@ -1,0 +1,202 @@
+﻿.field-frame {
+    --frame-pad: var(--s-6);
+    --field-border: 1px;
+
+    width: 100%;
+    max-width: calc(var(--maze-size) + var(--frame-pad) + 2 * var(--field-border));
+    margin: 0 auto;
+    padding: var(--frame-pad) 0 0 var(--frame-pad);
+}
+
+.field {
+    position: relative;
+    isolation: isolate;
+    width: 100%;
+    border: var(--field-border) solid var(--border-strong);
+    border-radius: var(--r-1);
+    background: radial-gradient(circle at 50% 50%, transparent 45%, color-mix(in srgb, var(--void-deep) 55%, transparent)), var(--void);
+    box-shadow: var(--shadow-pit);
+}
+
+.field ::deep .ui-swipe {
+    line-height: 0;
+}
+
+.field ::deep canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.maze-anim {
+    animation-duration: var(--dur-2);
+    animation-iteration-count: 1;
+    animation-timing-function: var(--ease);
+}
+
+.maze-anim--flip {
+    animation-name: mazeFlipIn;
+}
+
+.maze-anim--shake {
+    animation-name: mazeShake;
+}
+
+.maze-anim--tada {
+    animation-name: mazeTada;
+}
+
+.maze-anim--wobble {
+    animation-name: mazeWobble;
+}
+
+.maze-anim--jello {
+    animation-name: mazeJello;
+}
+
+.maze-anim--rubber {
+    animation-name: mazeRubberBand;
+}
+
+@keyframes mazeFlipIn {
+    0% {
+        opacity: 0;
+        transform: perspective(400px) rotateY(-90deg);
+    }
+    100% {
+        opacity: 1;
+        transform: perspective(400px) rotateY(0);
+    }
+}
+
+@keyframes mazeShake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-8px);
+    }
+    75% {
+        transform: translateX(8px);
+    }
+}
+
+@keyframes mazeTada {
+    0%, 100% {
+        transform: scale(1) rotate(0);
+    }
+    30% {
+        transform: scale(0.94) rotate(-3deg);
+    }
+    70% {
+        transform: scale(1.06) rotate(3deg);
+    }
+}
+
+@keyframes mazeWobble {
+    0%, 100% {
+        transform: translateX(0) rotate(0);
+    }
+    30% {
+        transform: translateX(-4%) rotate(-3deg);
+    }
+    70% {
+        transform: translateX(3%) rotate(2deg);
+    }
+}
+
+@keyframes mazeJello {
+    0%, 100% {
+        transform: skew(0, 0);
+    }
+    35% {
+        transform: skew(-6deg, -6deg);
+    }
+    70% {
+        transform: skew(3deg, 3deg);
+    }
+}
+
+@keyframes mazeRubberBand {
+    0%, 100% {
+        transform: scale(1, 1);
+    }
+    35% {
+        transform: scale(1.12, 0.88);
+    }
+    70% {
+        transform: scale(0.92, 1.08);
+    }
+}
+
+.ruler {
+    position: absolute;
+    z-index: 4;
+    display: flex;
+    font-size: 0.875rem;
+    line-height: 1;
+    transition: top var(--dur-2) var(--ease), left var(--dur-2) var(--ease);
+    color: var(--text-dim);
+}
+
+.ruler::after {
+    position: absolute;
+    content: "";
+    background: var(--accent-dim);
+}
+
+.ruler--row {
+    align-items: center;
+    justify-content: flex-end;
+    left: calc(-1 * var(--frame-pad));
+    width: var(--frame-pad);
+    height: var(--s-5);
+    padding-right: var(--s-3);
+    transform: translateY(-50%);
+}
+
+.ruler--row::after {
+    top: 50%;
+    right: var(--s-1);
+    width: var(--s-2);
+    height: 1px;
+}
+
+.ruler--column {
+    align-items: flex-end;
+    justify-content: center;
+    top: calc(-1 * var(--frame-pad));
+    width: var(--frame-pad);
+    height: var(--frame-pad);
+    padding-bottom: var(--s-3);
+    transform: translateX(-50%);
+}
+
+.ruler--column::after {
+    bottom: var(--s-1);
+    left: 50%;
+    width: 1px;
+    height: var(--s-2);
+}
+
+@media (min-width: 900px) {
+    /* TODO: 372px – замеренная высота экрана партии без канваса (шапка, инвентарь, отступы) минус рамка поля;
+       переход на расчёт от реальной высоты соседей – когда инвентарь или шапка начнут менять высоту на десктопе; пол 320px – ниже поле нечитаемо, на окне ниже ~690px страница прокручивается. */
+    .field-frame {
+        max-width: min(calc(var(--maze-size) + var(--frame-pad) + 2 * var(--field-border)), max(320px, calc(100dvh - 372px)));
+    }
+}
+
+@media (max-width: 480px) {
+    .field-frame {
+        --frame-pad: var(--s-5);
+    }
+
+    .ruler--row {
+        padding-right: var(--s-2);
+    }
+
+    .ruler--column {
+        padding-bottom: var(--s-2);
+    }
+}

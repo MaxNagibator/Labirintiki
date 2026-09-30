@@ -1,7 +1,7 @@
 ﻿namespace Labirint.Core.Abilities.Prolongations;
 
 /// <summary>
-///     Увеличиваем время путём добавления максимального времени способности.
+/// Увеличиваем время путём добавления максимального времени способности.
 /// </summary>
 public class SumProlongation : AbilityProlongation
 {

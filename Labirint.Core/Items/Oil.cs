@@ -32,15 +32,16 @@ public class Oil : ScoreItem
     {
         base.AfterPlace(position, labyrinth);
 
-        Position start = position - 1;
-        Position end = position + 1;
+        var start = position - 1;
+        var end = position + 1;
 
-        for (int x = start.X; x <= end.X; x++)
+        for (var x = start.X; x <= end.X; x++)
         {
-            for (int y = start.Y; y <= end.Y; y++)
+            for (var y = start.Y; y <= end.Y; y++)
             {
-                // Условие для создания формы в виде креста
-                if ((x == start.X || x == end.X) && (y == start.Y || y == end.Y))
+                var isDiagonal = (x == start.X || x == end.X) && (y == start.Y || y == end.Y);
+
+                if (isDiagonal)
                 {
                     continue;
                 }

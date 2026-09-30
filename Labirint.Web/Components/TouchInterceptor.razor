@@ -1,3 +1,20 @@
-﻿<MudSwipeArea OnSwipeEnd="OnSwipeEnd" PreventDefault @onclick="OnFieldClicked">
+﻿<SwipeArea OnSwipe="OnSwipe">
     @ChildContent
-</MudSwipeArea>
+
+    <button aria-label="Идти вверх"
+            class="touch-zone touch-zone--top"
+            @onclick="@(() => OnZoneClicked(Direction.Top))"
+            type="button"></button>
+    <button aria-label="Идти влево"
+            class="touch-zone touch-zone--left"
+            @onclick="@(() => OnZoneClicked(Direction.Left))"
+            type="button"></button>
+    <button aria-label="Идти вправо"
+            class="touch-zone touch-zone--right"
+            @onclick="@(() => OnZoneClicked(Direction.Right))"
+            type="button"></button>
+    <button aria-label="Идти вниз"
+            class="touch-zone touch-zone--bottom"
+            @onclick="@(() => OnZoneClicked(Direction.Bottom))"
+            type="button"></button>
+</SwipeArea>

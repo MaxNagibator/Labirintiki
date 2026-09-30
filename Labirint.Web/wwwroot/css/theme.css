@@ -1,0 +1,98 @@
+﻿:root {
+    --font-display: "Forum", Georgia, "Times New Roman", serif;
+    --font-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+    --s-1: 4px;
+    --s-2: 8px;
+    --s-3: 12px;
+    --s-4: 16px;
+    --s-5: 24px;
+    --s-6: 32px;
+    --s-7: 48px;
+    --s-8: 64px;
+
+    --r-1: 2px;
+    --r-2: 4px;
+    --r-3: 8px;
+
+    --rail-size: 80px;
+    --content-max: 1180px;
+
+    --ease: cubic-bezier(0.2, 0, 0, 1);
+    --dur-1: 120ms;
+    --dur-2: 220ms;
+    --dur-3: 420ms;
+
+    --z-rail: 20;
+    --z-sheet: 40;
+    --z-dialog: 60;
+    --z-toast: 80;
+}
+
+:root,
+[data-theme="dark"] {
+    --bg: #14110d;
+    --bg-raised: #1e1a14;
+    --bg-sunken: #0d0b08;
+    --bg-hover: #2a251c;
+    --void: #0b0906;
+    --void-deep: #000000;
+
+    --border: #352e24;
+    --border-strong: #4a4133;
+
+    --text: #e8e0d2;
+    --text-dim: #9a8f7c;
+    --text-faint: #918676;
+
+    --accent: #cf7b3c;
+    --accent-strong: #e59a5e;
+    --accent-dim: #8a4f22;
+    --accent-wash: #cf7b3c1f;
+
+    --gold: #d8a33a;
+    --danger: #c4392f;
+    --success: #6fa84b;
+    --warning: #d8a33a;
+
+    --wall: #a8442c;
+    --mark-plate: #0d0b08;
+
+    --on-accent: #1a0f06;
+    --shadow-pit: 0 18px 48px -24px #000000cc, inset 0 0 24px #00000080;
+    --shadow-sheet: 0 0 48px -12px #000000cc;
+}
+
+[data-theme="light"] {
+    --bg: #e9e2d2;
+    --bg-raised: #f3ede0;
+    --bg-sunken: #dcd3c0;
+    --bg-hover: #ded5c1;
+    --void: #241f18;
+    --void-deep: #0d0b08;
+
+    --border: #c3b79e;
+    --border-strong: #9c8e73;
+
+    --text: #241f18;
+    --text-dim: #5e5445;
+    --text-faint: #635a4b;
+
+    --accent: #9a4e18;
+    --accent-strong: #7d3d10;
+    --accent-dim: #d8a878;
+    --accent-wash: #9a4e181f;
+
+    --gold: #74530e;
+    --danger: #9b2c22;
+    --success: #4a7a2c;
+    --warning: #74530e;
+
+    --wall: #8f3520;
+    --mark-plate: #2a241b;
+
+    --on-accent: #f3ede0;
+    --shadow-pit: 0 18px 48px -28px #241f1866, inset 0 0 24px #241f1826;
+    --shadow-sheet: 0 0 48px -16px #241f1866;
+}

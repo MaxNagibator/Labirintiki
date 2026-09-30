@@ -1,19 +1,15 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿namespace Labirint.Web.Components.Base;
 
-namespace Labirint.Web.Components.Base;
-
-public abstract class RenderComponent : ComponentBase
+public abstract class RenderComponent : SafeComponent
 {
-    private bool _isShouldRender;
+    private bool _isRenderRequested;
 
     public async Task ForceRenderAsync()
     {
-        _isShouldRender = true;
-
         await OnRenderAsyncInner();
-        StateHasChanged();
 
-        _isShouldRender = false;
+        _isRenderRequested = true;
+        StateHasChanged();
     }
 
     protected sealed override async Task OnAfterRenderAsync(bool firstRender)
@@ -23,11 +19,24 @@ public abstract class RenderComponent : ComponentBase
             await OnFirstRenderAsyncInner();
             await ForceRenderAsync();
         }
+
+        await OnAfterRenderAsyncInner(firstRender);
+    }
+
+    protected virtual Task OnAfterRenderAsyncInner(bool firstRender)
+    {
+        return Task.CompletedTask;
     }
 
     protected sealed override bool ShouldRender()
     {
-        return _isShouldRender;
+        if (_isRenderRequested == false)
+        {
+            return false;
+        }
+
+        _isRenderRequested = false;
+        return true;
     }
 
     protected abstract Task OnRenderAsyncInner();

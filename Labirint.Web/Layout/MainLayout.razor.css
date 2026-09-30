@@ -1,77 +1,65 @@
-.page {
-    position: relative;
+﻿.rail {
+    position: fixed;
+    z-index: var(--z-rail);
+    top: 0;
+    bottom: 0;
+    left: 0;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    gap: var(--s-4);
+    width: var(--rail-size);
+    padding: var(--s-4) var(--s-2);
+    border-right: 1px solid var(--border);
+    background: var(--bg-raised);
+}
+
+.rail__mark {
+    display: block;
+    width: 34px;
+    height: 34px;
+    padding: 3px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    background: var(--mark-plate);
 }
 
 main {
-    flex: 1;
+    display: block;
+    max-width: var(--content-max);
+    margin-right: auto;
+    margin-left: auto;
+    padding: var(--s-5);
 }
 
-.sidebar {
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+main pre {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    overflow: auto;
+    margin-top: var(--s-4);
+    color: var(--text-dim);
 }
 
-.top-row {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    height: 3.5rem;
-    border-bottom: 1px solid #d6d5d5;
-    background-color: #f7f7f7;
-}
-
-.top-row ::deep a, .top-row ::deep .btn-link {
-    margin-left: 1.5rem;
-    white-space: nowrap;
-    text-decoration: none;
-}
-
-.top-row ::deep a:hover, .top-row ::deep .btn-link:hover {
-    text-decoration: underline;
-}
-
-.top-row ::deep a:first-child {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-@media (max-width: 640.98px) {
-    .top-row {
-        justify-content: space-between;
-    }
-
-    .top-row ::deep a, .top-row ::deep .btn-link {
-        margin-left: 0;
+@media (min-width: 900px) {
+    main {
+        margin-left: calc(var(--rail-size) + max(0px, (100vw - var(--rail-size) - var(--content-max)) / 2));
     }
 }
 
-@media (min-width: 641px) {
-    .page {
+@media (max-width: 899.98px) {
+    .rail {
+        top: auto;
+        right: 0;
         flex-direction: row;
+        gap: var(--s-2);
+        width: auto;
+        height: calc(var(--rail-size) + env(safe-area-inset-bottom));
+        padding: 0 var(--s-3) env(safe-area-inset-bottom);
+        border-right: 0;
+        border-top: 1px solid var(--border);
     }
 
-    .sidebar {
-        position: sticky;
-        top: 0;
-        width: 250px;
-        height: 100vh;
-    }
-
-    .top-row {
-        position: sticky;
-        z-index: 1;
-        top: 0;
-    }
-
-    .top-row.auth ::deep a:first-child {
-        flex: 1;
-        width: 0;
-        text-align: right;
-    }
-
-    .top-row, article {
-        padding-right: 1.5rem !important;
-        padding-left: 2rem !important;
+    main {
+        padding-bottom: calc(var(--rail-size) + var(--s-5) + env(safe-area-inset-bottom));
     }
 }

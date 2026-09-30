@@ -1,0 +1,38 @@
+﻿.share-head {
+    justify-content: space-between;
+    margin-bottom: var(--s-4);
+}
+
+.share-intro {
+    min-width: 0;
+}
+
+.share-motivation {
+    display: inline-flex;
+    flex: none;
+    padding: var(--s-1);
+    cursor: pointer;
+    transition: border-color var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    background: var(--bg-sunken);
+}
+
+.share-motivation:hover,
+.share-motivation--on {
+    border-color: var(--accent);
+    background: var(--accent-wash);
+}
+
+.share-motivation img {
+    display: block;
+    height: 40px;
+}
+
+.share-row ::deep .share-link {
+    flex: 1 1 auto;
+}
+
+.share-seed {
+    margin: var(--s-2) 0 0;
+}

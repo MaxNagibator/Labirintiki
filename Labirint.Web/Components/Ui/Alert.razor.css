@@ -1,0 +1,11 @@
+﻿.ui-alert__icon {
+    display: flex;
+    margin-top: var(--s-1);
+    color: var(--tone, var(--text));
+    flex: none;
+}
+
+.ui-alert__body {
+    color: var(--text);
+    min-width: 0;
+}

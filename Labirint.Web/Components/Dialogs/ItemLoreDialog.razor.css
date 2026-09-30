@@ -1,0 +1,255 @@
+﻿.lore-head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+    min-width: 0;
+}
+
+.lore-head__name {
+    margin: 0;
+    text-shadow: 0 0 28px color-mix(in srgb, var(--gold) 35%, transparent);
+}
+
+.lore {
+    padding: var(--s-1) 0 var(--s-2);
+    background: radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--gold) 9%, transparent), transparent 60%);
+}
+
+.lore-hero {
+    display: flex;
+    align-items: stretch;
+    gap: var(--s-5);
+    margin-bottom: var(--s-5);
+}
+
+.lore-relic {
+    position: relative;
+    display: grid;
+    flex: none;
+    width: 208px;
+    height: 208px;
+    place-items: center;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-3);
+    background: radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--gold) 24%, transparent), transparent 62%), var(--bg-sunken);
+    box-shadow: var(--shadow-pit), inset 0 0 48px color-mix(in srgb, var(--gold) 14%, transparent);
+}
+
+.lore-relic::before {
+    position: absolute;
+    content: "";
+    border: 1px solid color-mix(in srgb, var(--gold) 28%, transparent);
+    border-radius: var(--r-2);
+    inset: var(--s-2);
+}
+
+.lore-relic::after {
+    position: absolute;
+    content: "";
+    animation: loreHalo 6s var(--ease) infinite;
+    pointer-events: none;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--gold) 26%, transparent), transparent 70%);
+    inset: 14%;
+}
+
+.lore-relic__image {
+    position: relative;
+    width: 74%;
+    height: 74%;
+    animation: loreRise var(--dur-3) var(--ease) backwards;
+    object-fit: contain;
+    filter: drop-shadow(0 12px 20px color-mix(in srgb, var(--bg-sunken) 85%, transparent));
+}
+
+.lore-stats {
+    display: grid;
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    justify-content: start;
+    gap: var(--s-2);
+    grid-template-columns: repeat(auto-fit, minmax(150px, 220px));
+}
+
+.lore-stat {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--s-1);
+    padding: var(--s-4);
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    background: var(--bg-sunken);
+}
+
+.lore-stat dd {
+    margin: 0;
+}
+
+.lore-stat__value {
+    font-size: 1.5rem;
+    line-height: 1.1;
+    color: var(--gold);
+}
+
+.lore-stat__value--text {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    color: var(--text);
+}
+
+.lore-stat__of {
+    font-size: 0.875rem;
+    color: var(--text-dim);
+}
+
+.lore-stat__note {
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: var(--text-dim);
+}
+
+.lore-key {
+    font-size: 1.125rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    padding: var(--s-1) var(--s-2);
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-2);
+    background: var(--bg-sunken);
+    box-shadow: 0 2px 0 var(--border-strong);
+}
+
+.lore-text {
+    max-width: 66ch;
+    margin: 0 0 var(--s-3);
+}
+
+.lore-text:last-child {
+    margin-bottom: 0;
+}
+
+.lore-section--lead .lore-text {
+    font-size: 1.0625rem;
+}
+
+.lore-section--lead .lore-text:first-child::first-letter {
+    font-family: var(--font-display);
+    font-size: 3.4em;
+    line-height: 0.78;
+    float: left;
+    margin-right: var(--s-2);
+    color: var(--gold);
+}
+
+.lore-section--epilogue .lore-text {
+    font-style: italic;
+    color: var(--text-dim);
+}
+
+.lore-list {
+    display: flex;
+    max-width: 66ch;
+    flex-direction: column;
+    gap: var(--s-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.lore-list li {
+    position: relative;
+    padding-left: var(--s-5);
+}
+
+.lore-list li::before {
+    position: absolute;
+    top: 0.62em;
+    left: var(--s-2);
+    width: 7px;
+    height: 7px;
+    content: "";
+    transform: rotate(45deg);
+    border: 1px solid var(--gold);
+    background: color-mix(in srgb, var(--gold) 35%, transparent);
+}
+
+.lore-rule {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    margin: var(--s-5) 0;
+}
+
+.lore-rule::before,
+.lore-rule::after {
+    height: 1px;
+    content: "";
+    flex: 1 1 auto;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--gold) 45%, transparent));
+}
+
+.lore-rule::after {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--gold) 45%, transparent), transparent);
+}
+
+.lore-rule__gem {
+    width: 9px;
+    height: 9px;
+    flex: none;
+    transform: rotate(45deg);
+    border: 1px solid var(--gold);
+    background: color-mix(in srgb, var(--gold) 30%, transparent);
+}
+
+@media (max-width: 640px) {
+    .lore-hero {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .lore-relic {
+        width: 160px;
+        height: 160px;
+        align-self: center;
+    }
+
+    .lore-stats {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lore-relic::after,
+    .lore-relic__image {
+        animation: none;
+    }
+}
+
+@keyframes loreHalo {
+    0%,
+    100% {
+        transform: scale(0.94);
+        opacity: 0.55;
+    }
+    50% {
+        transform: scale(1.06);
+        opacity: 1;
+    }
+}
+
+@keyframes loreRise {
+    0% {
+        transform: translateY(10px) scale(0.92);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}

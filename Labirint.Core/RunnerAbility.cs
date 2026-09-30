@@ -1,7 +1,7 @@
 ﻿namespace Labirint.Core;
 
 /// <summary>
-///     Способность бегуна.
+/// Способность бегуна.
 /// </summary>
 public class RunnerAbility(Ability ability)
 {

@@ -1,7 +1,7 @@
 ﻿namespace Labirint.Core.Abilities.Prolongations;
 
 /// <summary>
-///     Устанавливаем время длительности способности до максимума.
+/// Устанавливаем время длительности способности до максимума.
 /// </summary>
 public class ResetProlongation : AbilityProlongation
 {

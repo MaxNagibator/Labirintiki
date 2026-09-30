@@ -5,7 +5,7 @@ using Labirint.Core.TileFeatures;
 namespace Labirint.Core.Abilities;
 
 /// <summary>
-///     След шерстяной нитки.
+/// След шерстяной нитки.
 /// </summary>
 public class WoolYarnAbility : Ability
 {
@@ -19,8 +19,8 @@ public class WoolYarnAbility : Ability
 
     public override void Hit(Tile tile, Direction direction)
     {
-        Position prevTilePosition = tile.Labyrinth.Runner.Position - direction;
-        Tile prevTile = tile.Labyrinth[prevTilePosition];
+        var prevTilePosition = tile.Labyrinth.Runner.Position - direction;
+        var prevTile = tile.Labyrinth[prevTilePosition];
 
         prevTile.AddFeature(new WoolYarnFeature(direction));
         tile.AddFeature(new WoolYarnFeature(direction.GetOppositeDirection()));

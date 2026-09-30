@@ -1,14 +1,15 @@
 ﻿using Labirint.Web.Common.Control.Schemes;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 
 namespace Labirint.Web.Components;
 
 public partial class KeyInterceptor : IAsyncDisposable
 {
-    private bool _isPause = false;
+    private readonly string _interceptorId = Guid.NewGuid().ToString("N");
+    private readonly KeyBindingMap _bindings = new();
 
-    private Dictionary<string, Direction> _moveDirections = new();
-    private Dictionary<string, Item> _itemUsed = new();
+    private bool _isPause;
 
     private DotNetObjectReference<KeyInterceptor>? _reference;
     private Item? _waitItem;
@@ -22,30 +23,47 @@ public partial class KeyInterceptor : IAsyncDisposable
     public required Inventory? Inventory { get; set; }
 
     [Inject]
-    public required IControlSchemeService SchemeService { get; set; }
+    public required ControlSchemeService SchemeService { get; set; }
 
     [Inject]
     public required IJSRuntime JSRuntime { get; set; }
+
+    [Inject]
+    public required ILogger<KeyInterceptor> Logger { get; set; }
+
+    public bool IsPaused => _isPause;
 
     private IControlScheme ControlScheme => SchemeService.CurrentScheme;
 
     public async ValueTask DisposeAsync()
     {
-        await JSRuntime.InvokeVoidAsync("finalizeKeyInterceptor");
-        _reference?.Dispose();
-
         SchemeService.ControlSchemeChanged -= OnSchemeChanged;
+
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("finalizeKeyInterceptor", _interceptorId);
+        }
+        catch (JSException exception)
+        {
+            Logger.LogError(exception, "Не удалось снять перехватчик клавиш");
+        }
+
+        _reference?.Dispose();
+        _reference = null;
+
         GC.SuppressFinalize(this);
     }
 
     public void InitializeItems()
     {
-        if (Inventory != null)
+        _bindings.RebuildItems(ControlScheme, Inventory);
+    }
+
+    public void ResetWaitItem()
+    {
+        if (_waitItem != null)
         {
-            _itemUsed = Inventory.AllItems
-                .Where(item => item.ControlSettings != null)
-                .Select(item => (ControlScheme.GetActivateKey(item.ControlSettings!).KeyCode, item))
-                .ToDictionary();
+            ChangeWaitItem(null);
         }
     }
 
@@ -57,27 +75,37 @@ public partial class KeyInterceptor : IAsyncDisposable
             return;
         }
 
-        if (_waitItem == null && PerformItemUse(code, out AttackEventArgs? attack) && attack != null)
+        if (_waitItem == null)
         {
-            AttackKeyDown?.Invoke(this, attack);
+            PerformItemUse(code);
         }
 
-        if (PerformMove(code, out MoveEventArgs? move) && move != null)
+        var direction = _bindings.FindDirection(code);
+
+        if (direction != null)
         {
-            PerformMove(move);
+            PerformMove(new()
+            {
+                Direction = direction.Value,
+            });
         }
 
-        if (PerformDigitKey(code, out DigitEventArgs? digit) && digit != null)
+        var digit = KeyBindingMap.FindDigit(code);
+
+        if (digit != null)
         {
-            DigitKeyDown?.Invoke(this, digit);
+            DigitKeyDown?.Invoke(this, new()
+            {
+                Digit = digit.Value,
+            });
         }
     }
 
     public void OnKeyDown(Direction direction)
     {
-        PerformMove(new MoveEventArgs
+        PerformMove(new()
         {
-            Direction = direction
+            Direction = direction,
         });
     }
 
@@ -90,7 +118,7 @@ public partial class KeyInterceptor : IAsyncDisposable
     {
         _reference = DotNetObjectReference.Create(this);
 
-        Initialize();
+        _bindings.Rebuild(ControlScheme, Inventory);
         SchemeService.ControlSchemeChanged += OnSchemeChanged;
     }
 
@@ -98,105 +126,64 @@ public partial class KeyInterceptor : IAsyncDisposable
     {
         if (firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("initializeKeyInterceptor", _reference);
+            await JSRuntime.InvokeVoidAsync("initializeKeyInterceptor", _reference, _interceptorId);
         }
     }
 
     private void OnSchemeChanged(object? sender, IControlScheme scheme)
     {
-        Initialize();
+        _bindings.Rebuild(ControlScheme, Inventory);
         StateHasChanged();
+    }
+
+    private void PerformItemUse(string code)
+    {
+        var item = _bindings.FindItem(code);
+
+        if (item == null || (Inventory?.CanUse(item) ?? false) == false)
+        {
+            return;
+        }
+
+        if (item.ControlSettings!.MoveRequired)
+        {
+            ChangeWaitItem(item);
+            return;
+        }
+
+        AttackKeyDown?.Invoke(this, new()
+        {
+            Item = item,
+        });
     }
 
     private void PerformMove(MoveEventArgs move)
     {
+        if (_isPause)
+        {
+            return;
+        }
+
         if (_waitItem != null)
         {
-            AttackKeyDown?.Invoke(this, new AttackEventArgs
+            var item = _waitItem;
+            ChangeWaitItem(null);
+
+            AttackKeyDown?.Invoke(this, new()
             {
-                Item = _waitItem,
-                Direction = move.Direction
+                Item = item,
+                Direction = move.Direction,
             });
 
-            ChangeWaitItem(null);
+            return;
         }
 
         MoveKeyDown?.Invoke(this, move);
-    }
-
-    private void Initialize()
-    {
-        InitializeItems();
-
-        _moveDirections = new Dictionary<string, Direction>
-        {
-            [ControlScheme.MoveLeft] = Direction.Left,
-            [ControlScheme.MoveUp] = Direction.Top,
-            [ControlScheme.MoveRight] = Direction.Right,
-            [ControlScheme.MoveDown] = Direction.Bottom
-        };
     }
 
     private void ChangeWaitItem(Item? item)
     {
         _waitItem = item;
         ChangedWaitItem?.Invoke(this, item);
-    }
-
-    private bool PerformItemUse(string code, out AttackEventArgs? args)
-    {
-        args = null;
-
-        if ((_itemUsed.TryGetValue(code, out Item? item) && (Inventory?.CanUse(item) ?? false)) == false)
-        {
-            return false;
-        }
-
-        if (item.ControlSettings!.MoveRequired && _waitItem == null)
-        {
-            ChangeWaitItem(item);
-            return false;
-        }
-
-        args = new AttackEventArgs
-        {
-            Item = item
-        };
-
-        return true;
-    }
-
-    private bool PerformMove(string code, out MoveEventArgs? args)
-    {
-        args = null;
-
-        if (_moveDirections.TryGetValue(code, out Direction direction) == false)
-        {
-            return false;
-        }
-
-        args = new MoveEventArgs
-        {
-            Direction = direction
-        };
-
-        return true;
-    }
-
-    private bool PerformDigitKey(string code, out DigitEventArgs? args)
-    {
-        args = null;
-
-        if ((code.StartsWith("Digit") && char.IsDigit(code[^1])) == false)
-        {
-            return false;
-        }
-
-        args = new DigitEventArgs
-        {
-            Digit = code[^1] - '0'
-        };
-
-        return true;
     }
 }

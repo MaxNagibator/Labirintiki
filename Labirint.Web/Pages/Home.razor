@@ -1,38 +1,50 @@
 ﻿@page "/"
 
-<PageTitle>Дом</PageTitle>
-<MudStack Spacing="3">
-    <MudText Typo="Typo.h4">Добро пожаловать!</MudText>
-    <MudGrid Spacing="2">
-        <MudItem xs="12" md="6">
-            <MudCard Elevation="0">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h5">(Не)забавные факты:</MudText>
-                    </CardHeaderContent>
-                </MudCardHeader>
-                <MudCardContent>
-                    @foreach (string fact in _facts)
-                    {
-                        <MudAlert NoIcon="true" Severity="Severity.Info" Class="my-3">@fact</MudAlert>
-                    }
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-        <MudItem xs="12" md="6">
-            <MudCard Elevation="0">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h5">(Не)смешные шутки</MudText>
-                    </CardHeaderContent>
-                </MudCardHeader>
-                <MudCardContent>
-                    @foreach (string joke in _jokes)
-                    {
-                        <MudAlert NoIcon="true" Severity="Severity.Warning" Class="my-3">@joke</MudAlert>
-                    }
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-    </MudGrid>
-</MudStack>
+<PageTitle>Лабиринт</PageTitle>
+
+@if (IsSharedGame == false)
+{
+    <div class="home">
+        <section class="hero">
+            <div class="hero__text ui-stack ui-stack--4">
+                <h1 class="t-display-xl">Лабиринт</h1>
+                <p class="t-body hero__standfirst">Стены ставит случай, выход один, нить кончается раньше, чем коридоры.</p>
+
+                <div>
+                    <Button OnClick="StartGame"
+                            StartIcon="@IconCatalog.Play"
+                            Tone="UiTone.Accent"
+                            Variant="UiVariant.Filled">
+                        Играть
+                    </Button>
+                </div>
+            </div>
+
+            <div class="hero__plate">
+                <HeroMaze Seed="HeroSeed" />
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="t-label section__eyebrow">(Не)забавные факты</h2>
+
+            <div class="facts">
+                @foreach (var fact in _facts)
+                {
+                    <p class="t-body fact">@fact</p>
+                }
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="t-label section__eyebrow">(Не)смешные шутки</h2>
+
+            <div class="jokes">
+                @foreach (var joke in _jokes)
+                {
+                    <p class="joke">@joke</p>
+                }
+            </div>
+        </section>
+    </div>
+}

@@ -1,0 +1,63 @@
+﻿.ui-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-3);
+    cursor: pointer;
+    min-width: 0;
+}
+
+.ui-switch__input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+    overflow: hidden;
+}
+
+.ui-switch__track {
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+    width: 36px;
+    height: 20px;
+    padding: 2px;
+    transition: background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-3);
+    background: var(--bg-sunken);
+}
+
+.ui-switch__knob {
+    width: 14px;
+    height: 14px;
+    transition: transform var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
+    border-radius: var(--r-1);
+    background: var(--text-faint);
+}
+
+.ui-switch__input:checked ~ .ui-switch__track {
+    border-color: var(--accent);
+    background: var(--accent-wash);
+}
+
+.ui-switch__input:checked ~ .ui-switch__track .ui-switch__knob {
+    transform: translateX(16px);
+    background: var(--accent);
+}
+
+.ui-switch__input:focus-visible ~ .ui-switch__track {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.ui-switch__label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+}

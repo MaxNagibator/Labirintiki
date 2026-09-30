@@ -1,23 +1,35 @@
-﻿using Blazored.LocalStorage;
+﻿using Labirint.Web.Common.Control.Schemes;
 using Labirint.Web.Parameters;
+using Labirint.Web.Services;
+using Labirint.Web.Services.Dialogs;
+using Labirint.Web.Services.Toasts;
 using Microsoft.AspNetCore.Components;
-using MudBlazor;
 
 namespace Labirint.Web.Components.Dialogs;
 
 public partial class OpenParametersDialog
 {
     private bool _isProcessing;
-    private ControlSchemeSwitcher _controlScheme = null!;
+    private IControlScheme _controlScheme = null!;
+    private LabyrinthParameters _parameters = new();
 
     [CascadingParameter]
-    public required MudDialogInstance MudDialog { get; set; }
+    public required DialogInstance Instance { get; set; }
 
     [Inject]
-    public required ISnackbar SnackbarService { get; set; }
+    public required ToastService ToastService { get; set; }
 
     [Inject]
-    public required ILocalStorageService LocalStorage { get; set; }
+    public required LabyrinthParametersService ParametersService { get; set; }
+
+    [Inject]
+    public required ControlSchemeService ControlSchemeService { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _parameters = ParametersService.Current.Clone();
+        _controlScheme = ControlSchemeService.CurrentScheme;
+    }
 
     private async Task UpdateAsync()
     {
@@ -25,13 +37,19 @@ public partial class OpenParametersDialog
 
         try
         {
-            await LocalStorage.SetItemAsync(LabyrinthParameters.LocalStorageKey, GlobalParameters.Labyrinth);
-            SnackbarService.Add("Сохранено!", Severity.Success);
-            MudDialog.Close();
+            if (ControlSchemeService.CurrentScheme != _controlScheme)
+            {
+                await ControlSchemeService.SetSchemeAsync(_controlScheme);
+            }
+
+            await ParametersService.SaveAsync(_parameters);
+
+            ToastService.Show("Сохранено!", UiSeverity.Success);
+            Instance.Close();
         }
         catch
         {
-            SnackbarService.Add("Не удалось сохранить", Severity.Error);
+            ToastService.Show("Не удалось сохранить", UiSeverity.Error);
         }
 
         _isProcessing = false;
@@ -39,12 +57,12 @@ public partial class OpenParametersDialog
 
     private void Reset()
     {
-        GlobalParameters.Labyrinth = new LabyrinthParameters();
-        _controlScheme.ControlSchemeService.Reset();
+        _parameters = new();
+        _controlScheme = ControlSchemeService.DefaultScheme;
     }
 
     private void Cancel()
     {
-        MudDialog.Cancel();
+        Instance.Cancel();
     }
 }

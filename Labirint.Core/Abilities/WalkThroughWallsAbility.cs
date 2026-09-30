@@ -3,7 +3,7 @@
 namespace Labirint.Core.Abilities;
 
 /// <summary>
-///     Прохождение сквозь стены.
+/// Прохождение сквозь стены.
 /// </summary>
 public class WalkThroughWallsAbility : Ability
 {

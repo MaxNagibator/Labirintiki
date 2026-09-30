@@ -1,0 +1,72 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+
+<div class="ui-field @Class">
+    @if (string.IsNullOrEmpty(Label) == false)
+    {
+        <label class="ui-field__label" for="@_id">@Label</label>
+    }
+
+    <input id="@_id"
+           class="ui-input"
+           type="text"
+           value="@Value"
+           placeholder="@Placeholder"
+           readonly="@ReadOnly"
+           aria-label="@(string.IsNullOrEmpty(Label) ? AriaLabel : null)"
+           @oninput="OnInputAsync"
+           @onblur="OnBlurAsync" />
+
+    @if (string.IsNullOrEmpty(HelperText) == false)
+    {
+        <span class="ui-field__helper">@HelperText</span>
+    }
+</div>
+
+@code {
+
+    private readonly string _id = $"tf-{Guid.NewGuid():N}";
+
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public string? AriaLabel { get; set; }
+
+    [Parameter]
+    public string? HelperText { get; set; }
+
+    [Parameter]
+    public string? Placeholder { get; set; }
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    [Parameter]
+    public EventCallback OnBlur { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private async Task OnInputAsync(ChangeEventArgs args)
+    {
+        if (ReadOnly)
+        {
+            return;
+        }
+
+        Value = args.Value?.ToString();
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+    private async Task OnBlurAsync(FocusEventArgs args)
+    {
+        await OnBlur.InvokeAsync();
+    }
+
+}

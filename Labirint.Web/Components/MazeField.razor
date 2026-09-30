@@ -1,0 +1,47 @@
+﻿@inherits SafeComponent
+
+<div class="field-frame"
+     style="--maze-size: @(Parameters.RenderRange)px">
+    <div class="field">
+        <div class="maze-anim @AnimationClass">
+            <CascadingValue Value="Parameters">
+                <TouchInterceptor @ref="_touchInterceptor">
+                    <MazeFloor @ref="_mazeFloor" />
+                    <MazeWalls @ref="_mazeWalls" />
+                    <MazeEntities @ref="_mazeEntities" />
+                </TouchInterceptor>
+            </CascadingValue>
+
+            @{
+                var runner = Parameters.Maze.Runner;
+                var position = Parameters.Vision.GetDraw(runner.Position);
+                var (entitySize, drawPosition) = AlignmentHelper.GetAlignmentParameters(Parameters.BoxSize, Parameters.WallWidth, RunnerScale, position, Alignment.Center);
+                var renderRange = Parameters.RenderRange;
+
+                _runnerScaleX = runner.LastDirection switch
+                {
+                    Direction.Right => 1,
+                    Direction.Left => -1,
+                    _ => _runnerScaleX,
+                };
+
+                <img alt="Бегун"
+                     data-runner
+                     src="images/runner.webp"
+                     style="position:absolute;
+                         z-index: 4;
+                         left: calc(100% * @(drawPosition.X) / @renderRange);
+                     top: calc(100% * @(drawPosition.Y) / @renderRange);
+                     width: calc(100% * @entitySize / @renderRange);
+                     height: calc(100% * @entitySize / @renderRange);
+                     transform: scaleX(@_runnerScaleX) scaleY(1);" />
+
+                <div class="ruler ruler--row t-data"
+                     style="top: calc(100% * @(drawPosition.Y + entitySize / 2) / @renderRange)">@(runner.Position.Y + 1)</div>
+
+                <div class="ruler ruler--column t-data"
+                     style="left: calc(100% * @(drawPosition.X + entitySize / 2) / @renderRange)">@(runner.Position.X + 1)</div>
+            }
+        </div>
+    </div>
+</div>

@@ -3,7 +3,7 @@
 namespace Labirint.Core.Items;
 
 /// <summary>
-///     Шерстяная нить.
+/// Шерстяная нить.
 /// </summary>
 public class WoolYarn : Item
 {

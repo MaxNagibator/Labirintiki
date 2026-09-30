@@ -1,0 +1,107 @@
+﻿<Dialog>
+    <TitleContent>
+        <div class="lore-head">
+            <span class="t-label">@Item.Kind</span>
+            <h2 class="t-display-l lore-head__name">@Item.DisplayName</h2>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        <div class="lore">
+            <div class="lore-hero">
+                <div class="lore-relic">
+                    <img alt="@Item.DisplayName"
+                         class="lore-relic__image"
+                         src="@Item.Image">
+                </div>
+
+                <dl class="lore-stats">
+                    <div class="lore-stat">
+                        <dt class="t-label">В сумке</dt>
+                        <dd class="t-data lore-stat__value">
+                            @(Count)<span class="lore-stat__of">/@(IsInfinite ? "∞" : Item.MaxCount.ToString())</span>
+                        </dd>
+                    </div>
+
+                    @if (Control != null)
+                    {
+                        <div class="lore-stat">
+                            <dt class="t-label">Клавиша</dt>
+                            <dd class="lore-stat__value">
+                                <span class="t-data lore-key">@ActivateSymbol</span>
+                            </dd>
+
+                            @if (Control.MoveRequired)
+                            {
+                                <dd class="lore-stat__note">затем шаг в сторону стены</dd>
+                            }
+                        </div>
+                    }
+
+                    @foreach (var stat in Item.Stats)
+                    {
+                        <div class="lore-stat">
+                            <dt class="t-label">@stat.Label</dt>
+                            <dd class="t-data lore-stat__value">
+                                @(stat.Value)@if (stat.Suffix != null)
+                                             {
+                                                 <span class="lore-stat__of">@stat.Suffix</span>
+                                             }
+                            </dd>
+                        </div>
+                    }
+
+                    @if (Item.IsUsedOnPickup)
+                    {
+                        <div class="lore-stat">
+                            <dt class="t-label">Применение</dt>
+                            <dd class="lore-stat__value lore-stat__value--text">сразу после подбора</dd>
+                        </div>
+                    }
+                </dl>
+            </div>
+
+            @for (var index = 0; index < _sections.Count; index++)
+            {
+                if (index > 0)
+                {
+                    <div aria-hidden="true"
+                         class="lore-rule">
+                        <span class="lore-rule__gem"></span>
+                    </div>
+                }
+
+                <section class="lore-section @GetSectionModifier(index)">
+                    @foreach (var block in _sections[index].Blocks)
+                    {
+                        if (block.Items.Count > 0)
+                        {
+                            <ul class="lore-list">
+                                @foreach (var line in block.Items)
+                                {
+                                    <li class="t-body">@line</li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p class="t-body lore-text">@block.Paragraph</p>
+                        }
+                    }
+                </section>
+            }
+        </div>
+    </ChildContent>
+    <Actions>
+        <Button OnClick="() => Instance.Cancel()">Закрыть</Button>
+
+        @if (CanUse)
+        {
+            <Button OnClick="Use"
+                    StartIcon="@IconCatalog.Play"
+                    Tone="UiTone.Accent"
+                    Variant="UiVariant.Filled">
+                Использовать
+            </Button>
+        }
+    </Actions>
+</Dialog>

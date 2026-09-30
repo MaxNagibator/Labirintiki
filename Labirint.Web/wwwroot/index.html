@@ -1,46 +1,113 @@
-<!DOCTYPE html>
-<html lang="ru">
+﻿<!DOCTYPE html>
+<html data-theme="dark"
+      lang="ru">
 
 <head>
     <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Лабиринтик</title>
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+          name="viewport" />
+    <meta content="#14110d"
+          name="theme-color" />
+    <meta content="Браузерная игра-лабиринт: ищите выход, собирайте предметы, делитесь зерном партии."
+          name="description" />
+    <meta content="yes"
+          name="mobile-web-app-capable" />
+    <meta content="yes"
+          name="apple-mobile-web-app-capable" />
+    <meta content="black"
+          name="apple-mobile-web-app-status-bar-style" />
+    <meta content="Лабиринт"
+          name="apple-mobile-web-app-title" />
+    <title>Лабиринт</title>
     <base href="/" />
 
-    <link href="css/app.css" rel="stylesheet" />
-    <link href="Labirint.Web.styles.css" rel="stylesheet" />
+    <meta content="website"
+          property="og:type" />
+    <meta content="Лабиринт"
+          property="og:title" />
+    <meta content="Браузерная игра-лабиринт: ищите выход, собирайте предметы, делитесь зерном партии."
+          property="og:description" />
+    <meta content="icon-512.png"
+          property="og:image" />
+    <meta content="summary"
+          name="twitter:card" />
 
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
-    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    <script type="importmap"></script>
+    <link rel="preload"
+          id="webassembly" />
+    <link as="font"
+          crossorigin
+          href="fonts/forum-cyrillic.woff2"
+          rel="preload"
+          type="font/woff2" />
+    <link as="font"
+          crossorigin
+          href="fonts/jetbrains-mono-cyrillic.woff2"
+          rel="preload"
+          type="font/woff2" />
 
-    <link href="favicon.png" rel="icon" type="image/png" />
-    <link href="manifest.webmanifest" rel="manifest" />
-    <link href="icon-512.png" rel="apple-touch-icon" sizes="512x512" />
-    <link href="icon-192.png" rel="apple-touch-icon" sizes="192x192" />
+    <link href="css/fonts.css"
+          rel="stylesheet" />
+    <link href="css/theme.css"
+          rel="stylesheet" />
+    <link href="css/ui.css"
+          rel="stylesheet" />
+    <link href="css/app.css"
+          rel="stylesheet" />
+    <link href="Labirint.Web.styles.css"
+          rel="stylesheet" />
+
+    <link href="favicon.png"
+          rel="icon"
+          type="image/png" />
+    <link href="manifest.webmanifest"
+          rel="manifest" />
+    <link href="icon-180.png"
+          rel="apple-touch-icon"
+          sizes="180x180" />
+
+    <script src="scripts/theme#[.{fingerprint}].js"></script>
 </head>
 
 <body>
     <div id="app">
-        <div class="loading-bg">
-            <img alt="Бегун>" class="rotating-image" src="images/runner.png">
-            <div class="loading-progress-text"></div>
+        <div class="boot">
+            <svg class="boot__thread"
+                 viewBox="0 0 200 200"
+                 aria-hidden="true">
+                <path d="M20 180 L20 20 L180 20 L180 180 L60 180 L60 60 L140 60 L140 140 L100 140" />
+            </svg>
+            <p class="boot__title">Лабиринт</p>
+            <p class="boot__progress"></p>
         </div>
     </div>
 
     <div id="blazor-error-ui">
         Произошло необработанное исключение.
-        <a class="reload" href="">Перезагрузить</a>
-        <a class="dismiss">🗙</a>
+        <a class="reload"
+           href="">Перезагрузить</a>
+        <button aria-label="Закрыть"
+                class="dismiss"
+                type="button">🗙</button>
     </div>
 
-    <script src="_framework/blazor.webassembly.js"></script>
-    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
-    <script src="_content/BlazorAnimation/blazorAnimationInterop.js"></script>
+    <script defer
+            src="scripts/page#[.{fingerprint}].js"></script>
+    <script defer
+            src="scripts/sounds#[.{fingerprint}].js"></script>
+    <script defer
+            src="scripts/canvasHelper#[.{fingerprint}].js"></script>
+    <script defer
+            src="scripts/keyInterceptor#[.{fingerprint}].js"></script>
+    <script defer
+            src="scripts/dialogHost#[.{fingerprint}].js"></script>
+    <script defer
+            src="scripts/pickupFlight#[.{fingerprint}].js"></script>
+    <script defer
+            src="scripts/appUpdate#[.{fingerprint}].js"></script>
 
-    <script>navigator.serviceWorker.register('service-worker.js');</script>
-
-    <script src="scripts/sounds.js"></script>
-    <script src="scripts/canvasHelper.js"></script>
+    <script defer
+            src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
 </body>
 
 </html>

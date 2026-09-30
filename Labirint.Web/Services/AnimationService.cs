@@ -1,26 +1,24 @@
-﻿using BlazorAnimation;
-
-namespace Labirint.Web.Services;
+﻿namespace Labirint.Web.Services;
 
 public class AnimationService
 {
-    private readonly AnimationEffect[] _animateEffects =
+    private const string EntranceClass = "maze-anim--flip";
+
+    private readonly string[] _effectClasses =
     [
-        Effect.ShakeX,
-        Effect.ShakeX,
-        Effect.Tada,
-        Effect.Wobble,
-        Effect.Jello,
-        Effect.RubberBand
+        "maze-anim--shake",
+        "maze-anim--tada",
+        "maze-anim--wobble",
+        "maze-anim--jello",
+        "maze-anim--rubber",
     ];
 
-    public AnimationEffect AnimationEffect { get; set; } = Effect.FlipInY;
+    public string EffectClass { get; private set; } = EntranceClass;
 
     public void StartRandomAnimationEffect()
     {
-        AnimationEffect = _animateEffects
-            .Where(effect => effect != AnimationEffect)
-            .ToArray()
-            [Random.Shared.Next(_animateEffects.Length - 2)];
+        string[] candidates = _effectClasses.Where(effectClass => effectClass != EffectClass).ToArray();
+
+        EffectClass = candidates[Random.Shared.Next(candidates.Length)];
     }
 }

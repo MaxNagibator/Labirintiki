@@ -5,18 +5,20 @@ public class Vision(int mazeWidth, int mazeHeight, int visionRange = 3)
     public int Range { get; } = visionRange;
 
     public Position Runner { get; private set; }
+    public Position Origin { get; private set; }
     public Position Start { get; private set; }
     public Position Finish { get; private set; }
 
     public void SetPosition(Position position)
     {
         Runner = position;
+        Origin = (position.X - Range, position.Y - Range);
 
-        int startX = Math.Max(0, position.X - Range);
-        int finishX = Math.Min(mazeWidth - 1, position.X + Range);
+        var startX = Math.Max(0, position.X - Range);
+        var finishX = Math.Min(mazeWidth - 1, position.X + Range);
 
-        int startY = Math.Max(0, position.Y - Range);
-        int finishY = Math.Min(mazeHeight - 1, position.Y + Range);
+        var startY = Math.Max(0, position.Y - Range);
+        var finishY = Math.Min(mazeHeight - 1, position.Y + Range);
 
         Start = (startX, startY);
         Finish = (finishX, finishY);
@@ -24,6 +26,6 @@ public class Vision(int mazeWidth, int mazeHeight, int visionRange = 3)
 
     public Position GetDraw(Position position)
     {
-        return position - Start;
+        return position - Origin;
     }
 }

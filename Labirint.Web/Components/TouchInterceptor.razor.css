@@ -1,0 +1,40 @@
+﻿.touch-zone {
+    position: absolute;
+    z-index: 5;
+    padding: 0;
+    cursor: pointer;
+    border: 0;
+    background: transparent;
+}
+
+.touch-zone:focus-visible {
+    outline-offset: -4px;
+}
+
+.touch-zone--top {
+    top: 0;
+    left: 25%;
+    width: 50%;
+    height: 25%;
+}
+
+.touch-zone--bottom {
+    bottom: 0;
+    left: 25%;
+    width: 50%;
+    height: 25%;
+}
+
+.touch-zone--left {
+    top: 25%;
+    left: 0;
+    width: 25%;
+    height: 50%;
+}
+
+.touch-zone--right {
+    top: 25%;
+    right: 0;
+    width: 25%;
+    height: 50%;
+}

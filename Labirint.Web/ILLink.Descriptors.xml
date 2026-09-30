@@ -1,0 +1,4 @@
+﻿<linker>
+  <assembly fullname="Labirint.Core" preserve="all" />
+  <assembly fullname="Labirint.Items.Flame" preserve="all" />
+</linker>

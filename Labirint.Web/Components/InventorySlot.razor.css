@@ -1,0 +1,406 @@
+﻿.inventory-item-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.inventory-item {
+    position: relative;
+    overflow: hidden;
+    width: 100px;
+    height: 100px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    background: var(--bg-sunken);
+}
+
+.inventory-item.score {
+    background: color-mix(in srgb, var(--gold) 25%, var(--bg-sunken));
+}
+
+.inventory-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.inventory-item .item-use {
+    position: absolute;
+    display: block;
+    padding: 0;
+    cursor: pointer;
+    border: 0;
+    background: none;
+    inset: 0;
+}
+
+.inventory-item .item-use:focus-visible {
+    outline-offset: -2px;
+}
+
+.inventory-item .item-flow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.inventory-item.added-animate {
+    animation: pickupGlow var(--animate-duration) var(--animate-delay, 0ms) var(--ease) backwards;
+    animation-iteration-count: 1;
+}
+
+.inventory-item.added-animate .item-flow {
+    animation: pickupFlow var(--animate-duration) var(--animate-delay, 0ms) var(--ease) backwards;
+    animation-iteration-count: 1;
+}
+
+.inventory-item.added-animate img:not(.item-flow) {
+    animation: pickupSettle var(--animate-duration) var(--animate-delay, 0ms) var(--ease) backwards;
+    animation-iteration-count: 1;
+}
+
+.inventory-item.added-animate .count {
+    animation: pickupCountPop var(--animate-duration) var(--animate-delay, 0ms) var(--ease) backwards;
+    animation-iteration-count: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .inventory-item.added-animate,
+    .inventory-item.added-animate img,
+    .inventory-item.added-animate .count {
+        animation-delay: 0ms !important;
+    }
+}
+
+.inventory-item.used-animate {
+    animation: useGlow var(--animate-duration) var(--ease);
+    animation-iteration-count: 1;
+}
+
+.inventory-item.used-animate img:not(.item-flow) {
+    animation: useSettle var(--animate-duration) var(--ease);
+    animation-iteration-count: 1;
+}
+
+.inventory-item.used-animate .count {
+    animation: useCountDrop var(--animate-duration) var(--ease);
+    animation-iteration-count: 1;
+}
+
+.inventory-item.max-count-animate {
+    animation: rejectGlow var(--animate-duration) var(--ease);
+    animation-iteration-count: 1;
+}
+
+.inventory-item.max-count-animate img:not(.item-flow) {
+    animation: rejectShove var(--animate-duration) var(--ease);
+    animation-iteration-count: 1;
+}
+
+.inventory-item.max-count-animate .count,
+.inventory-item.max-count-animate .max-count {
+    animation: rejectFlash var(--animate-duration) var(--ease);
+    animation-iteration-count: 1;
+}
+
+.inventory-item.cant-use-animate {
+    animation: emptyGlow var(--animate-duration) var(--ease);
+    animation-iteration-count: 1;
+}
+
+.inventory-item.cant-use-animate img:not(.item-flow) {
+    animation: emptyFade var(--animate-duration) var(--ease);
+    animation-iteration-count: 1;
+}
+
+.inventory-item.cant-use-animate .count {
+    animation: emptyCountFlash var(--animate-duration) var(--ease);
+    animation-iteration-count: 1;
+}
+
+.inventory-item.waiting-animate {
+    animation: waitingPulse var(--animate-duration) var(--ease);
+    animation-iteration-count: infinite;
+}
+
+.inventory-item.waiting-animate img:not(.item-flow) {
+    animation: waitingBreath var(--animate-duration) var(--ease);
+    animation-iteration-count: infinite;
+}
+
+.inventory-item .count {
+    font-size: 1rem;
+    font-weight: 600;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    padding: var(--s-1) calc(var(--s-1) * 1.5);
+    transform-origin: 100% 100%;
+    color: var(--gold);
+    border-radius: var(--r-1);
+    background: color-mix(in srgb, var(--bg-raised) 80%, transparent);
+}
+
+.inventory-item .max-count {
+    font-size: 0.75rem;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: var(--s-1) calc(var(--s-1) * 1.5);
+    transform-origin: 100% 0;
+    color: var(--text-dim);
+    border-radius: var(--r-1);
+    background: color-mix(in srgb, var(--bg-raised) 80%, transparent);
+}
+
+.inventory-item .item-name {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.04em;
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: 100%;
+    overflow: hidden;
+    padding: var(--s-1) calc(var(--s-1) * 1.5);
+    cursor: pointer;
+    transition: color var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
+    white-space: nowrap;
+    text-decoration: underline dotted color-mix(in srgb, var(--gold) 65%, transparent);
+    text-underline-offset: 3px;
+    text-overflow: ellipsis;
+    color: var(--text);
+    border: 0;
+    border-radius: var(--r-1);
+    background: color-mix(in srgb, var(--bg-raised) 80%, transparent);
+}
+
+.inventory-item .item-name:hover,
+.inventory-item .item-name:focus-visible {
+    color: var(--gold);
+    background: var(--bg-raised);
+}
+
+.keyboard-key {
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin-top: var(--s-1);
+    padding: 0;
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-2);
+    background: var(--bg-sunken);
+}
+
+@keyframes pickupFlow {
+    0% {
+        transform: scale(0.85);
+        opacity: 0.95;
+        filter: drop-shadow(0 0 10px var(--gold));
+    }
+    45% {
+        transform: scale(1.02);
+        opacity: 0.75;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0;
+        filter: drop-shadow(0 0 0 transparent);
+    }
+}
+
+@keyframes pickupSettle {
+    0% {
+        transform: scale(0.92);
+        opacity: 0.45;
+    }
+    45% {
+        transform: scale(1.08);
+        opacity: 1;
+    }
+    75% {
+        transform: scale(0.98);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes pickupGlow {
+    0% {
+        box-shadow: inset 0 0 0 transparent;
+        border-color: color-mix(in srgb, var(--gold) 50%, var(--border));
+    }
+    35% {
+        box-shadow: inset 0 0 24px color-mix(in srgb, var(--gold) 55%, transparent);
+        border-color: var(--gold);
+    }
+    100% {
+        box-shadow: inset 0 0 0 transparent;
+        border-color: var(--border);
+    }
+}
+
+@keyframes pickupCountPop {
+    0% {
+        transform: scale(1);
+    }
+    35% {
+        transform: scale(1.25);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes useGlow {
+    0% {
+        box-shadow: inset 0 0 24px color-mix(in srgb, var(--accent) 45%, transparent);
+        border-color: var(--accent);
+    }
+    100% {
+        box-shadow: inset 0 0 0 transparent;
+        border-color: var(--border);
+    }
+}
+
+@keyframes useSettle {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    30% {
+        transform: scale(0.86);
+        opacity: 0.4;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes useCountDrop {
+    0% {
+        transform: translateY(-40%) scale(1.15);
+        opacity: 0.25;
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes rejectGlow {
+    0%,
+    100% {
+        box-shadow: inset 0 0 0 transparent;
+        border-color: var(--border);
+    }
+    20%,
+    60% {
+        box-shadow: inset 0 0 24px color-mix(in srgb, var(--danger) 55%, transparent);
+        border-color: var(--danger);
+    }
+    40%,
+    80% {
+        box-shadow: inset 0 0 6px color-mix(in srgb, var(--danger) 20%, transparent);
+        border-color: color-mix(in srgb, var(--danger) 50%, var(--border));
+    }
+}
+
+@keyframes rejectShove {
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+    25% {
+        transform: translateY(-8%) scale(1.05);
+    }
+    45% {
+        transform: translateY(2%) scale(0.97);
+    }
+    70% {
+        transform: translateY(-3%) scale(1.01);
+    }
+}
+
+@keyframes rejectFlash {
+    30%,
+    70% {
+        transform: scale(1.15);
+        color: var(--danger);
+    }
+}
+
+@keyframes emptyGlow {
+    0% {
+        box-shadow: inset 0 0 20px color-mix(in srgb, var(--danger) 40%, transparent);
+        border-color: var(--danger);
+    }
+    35% {
+        box-shadow: inset 0 0 10px color-mix(in srgb, var(--danger) 20%, transparent);
+        border-color: color-mix(in srgb, var(--danger) 55%, var(--border));
+    }
+    100% {
+        box-shadow: inset 0 0 0 transparent;
+        border-color: var(--border);
+    }
+}
+
+@keyframes emptyFade {
+    0% {
+        transform: scale(0.94);
+        opacity: 0.3;
+        filter: grayscale(1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.55;
+        filter: grayscale(1);
+    }
+}
+
+@keyframes emptyCountFlash {
+    0%,
+    45% {
+        transform: scale(1.15);
+        color: var(--danger);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes waitingPulse {
+    0%,
+    100% {
+        box-shadow: inset 0 0 0 transparent;
+        border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+    }
+    50% {
+        box-shadow: inset 0 0 18px var(--accent-wash), 0 0 12px color-mix(in srgb, var(--accent) 35%, transparent);
+        border-color: var(--accent);
+    }
+}
+
+@keyframes waitingBreath {
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.85;
+    }
+    50% {
+        transform: scale(1.04);
+        opacity: 1;
+    }
+}

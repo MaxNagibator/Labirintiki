@@ -1,9 +1,9 @@
 ﻿namespace Labirint.Core;
 
 /// <summary>
-///     Бегущий по лабиринту.
+/// Бегущий по лабиринту.
 /// </summary>
-public class Runner : IDisposable
+public class Runner
 {
     private readonly List<RunnerAbility> _abilities;
     private readonly Labyrinth _labyrinth;
@@ -15,8 +15,12 @@ public class Runner : IDisposable
         Inventory = inventory;
 
         _abilities = [];
-        Inventory.ScoreIncreased += OnScoreIncreased;
     }
+
+    /// <summary>
+    /// Бегуну начислены очки.
+    /// </summary>
+    public event EventHandler<int>? ScoreIncreased;
 
     public Position Position { get; private set; }
     public int Score { get; private set; }
@@ -26,13 +30,13 @@ public class Runner : IDisposable
     public IReadOnlyList<RunnerAbility> Abilities => _abilities;
 
     /// <summary>
-    ///     Последний ход в лабиринте.
+    /// Последний ход в лабиринте.
     /// </summary>
     public Direction LastDirection { get; private set; }
 
     public void AddAbility(Ability ability)
     {
-        RunnerAbility? currentAbility = _abilities.SingleOrDefault(runnerAbility => runnerAbility.Properties.Name == ability.Name);
+        var currentAbility = _abilities.SingleOrDefault(runnerAbility => runnerAbility.Properties.Name == ability.Name);
 
         if (currentAbility != null)
         {
@@ -40,14 +44,14 @@ public class Runner : IDisposable
         }
         else
         {
-            _abilities.Add(new RunnerAbility(ability));
+            _abilities.Add(new(ability));
         }
     }
 
     public bool Move(Direction direction)
     {
-        // TODO Можно выйти за границы лабиринта
         if (direction == Direction.All
+            || _labyrinth.Contains(Position + direction) == false
             || _labyrinth[Position].ContainsWall(direction)
             && ContainsActiveAbility(ability => ability.IsIgnoreWalls) == false)
         {
@@ -57,7 +61,7 @@ public class Runner : IDisposable
         LastDirection = direction;
         Position += direction;
 
-        foreach (RunnerAbility ability in _abilities)
+        foreach (var ability in _abilities)
         {
             ability.Hit(_labyrinth[Position], direction);
         }
@@ -70,13 +74,6 @@ public class Runner : IDisposable
         Inventory.Use(item, Position, direction, _labyrinth);
     }
 
-    public void Dispose()
-    {
-        Inventory.ScoreIncreased -= OnScoreIncreased;
-
-        GC.SuppressFinalize(this);
-    }
-
     public void Reset()
     {
         Position = (0, 0);
@@ -87,9 +84,16 @@ public class Runner : IDisposable
         _abilities.Clear();
     }
 
-    private void OnScoreIncreased(object? sender, int amount)
+    internal void AddScore(int amount)
     {
-        Score += amount;
+        if (amount <= 0)
+        {
+            return;
+        }
+
+        Score = (int)Math.Min((long)Score + amount, int.MaxValue);
+
+        ScoreIncreased?.Invoke(this, amount);
     }
 
     private bool ContainsActiveAbility(Func<Ability, bool> predicate)

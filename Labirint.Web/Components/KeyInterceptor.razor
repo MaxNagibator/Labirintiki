@@ -1,19 +1,5 @@
-﻿<MudButton OnClick="() => _isPause = !_isPause"
-           Variant=" Variant.Outlined"
-           Color="@(_isPause ? Color.Success : Color.Warning)"
-           FullWidth>
-    @(_isPause ? "Играть" : "Остановить")
-</MudButton>
-
-<script>
-
-    let keyDownHandler;
-
-    window.initializeKeyInterceptor = dotNetHelper => {
-        keyDownHandler = e => dotNetHelper.invokeMethodAsync('OnKeyDown', e.code);       
-        document.addEventListener("keydown", keyDownHandler);
-    };
-
-    window.finalizeKeyInterceptor = () => document.removeEventListener("keydown", keyDownHandler)
-
-</script>
+﻿<Button FullWidth
+        OnClick="() => _isPause = _isPause == false"
+        StartIcon="@(_isPause ? IconCatalog.Play : IconCatalog.Pause)">
+    @(_isPause ? "Продолжить игру" : "Пауза")
+</Button>

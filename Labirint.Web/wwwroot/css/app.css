@@ -1,167 +1,190 @@
-html, body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+﻿*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }
 
-h1:focus {
+html {
+    color-scheme: dark;
+}
+
+html[data-theme="light"] {
+    color-scheme: light;
+}
+
+body {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+}
+
+*:hover {
+    scrollbar-color: color-mix(in srgb, var(--gold) 55%, var(--border-strong)) transparent;
+}
+
+@supports selector(::-webkit-scrollbar) {
+    *,
+    *:hover {
+        scrollbar-width: auto;
+        scrollbar-color: auto;
+    }
+
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    ::-webkit-scrollbar-track,
+    ::-webkit-scrollbar-corner,
+    ::-webkit-scrollbar-button {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-button {
+        display: none;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        border: 2px solid transparent;
+        border-radius: var(--r-3);
+        background: var(--border-strong);
+        background-clip: content-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: color-mix(in srgb, var(--gold) 55%, var(--border-strong));
+        background-clip: content-box;
+    }
+}
+
+h1, h2, h3, h4, h5, h6, p, figure {
+    margin: 0;
+}
+
+h1:focus,
+h1:focus-visible {
     outline: none;
 }
 
-a, .btn-link {
-    color: #0071c1;
+button {
+    font: inherit;
+    color: inherit;
 }
 
-.btn-primary {
-    color: #fff;
-    border-color: #1861ac;
-    background-color: #1b6ec2;
+a {
+    color: var(--accent);
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+code {
+    font-family: var(--font-mono);
+    color: var(--gold);
 }
 
-.content {
-    padding-top: 1.1rem;
+.boot {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+    gap: var(--s-4);
+    background: var(--bg);
 }
 
-.valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
+.boot__thread {
+    width: min(38vmin, 240px);
+    height: min(38vmin, 240px);
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 3;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: boot-thread 2.6s var(--ease) infinite;
 }
 
-.invalid {
-    outline: 1px solid red;
+@keyframes boot-thread {
+    0% {
+        stroke-dashoffset: 1000;
+    }
+    55%, 100% {
+        stroke-dashoffset: 0;
+    }
 }
 
-.validation-message {
-    color: red;
+.boot__title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    text-indent: 0.28em;
+    color: var(--text-dim);
+}
+
+.boot__progress {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    color: var(--text-faint);
+}
+
+.boot__progress::after {
+    content: var(--blazor-load-percentage-text, "Ожидайте");
 }
 
 #blazor-error-ui {
+    font-size: 0.875rem;
     position: fixed;
     z-index: 1000;
     bottom: 0;
     left: 0;
     display: none;
     width: 100%;
-    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
-    background: lightyellow;
-    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    padding: var(--s-3) var(--s-5);
+    color: var(--text);
+    border-top: 2px solid var(--danger);
+    background: var(--bg-raised);
 }
 
 #blazor-error-ui .dismiss {
+    font: inherit;
     position: absolute;
-    top: 0.5rem;
-    right: 0.75rem;
+    top: var(--s-3);
+    right: var(--s-4);
+    padding: 0;
     cursor: pointer;
+    color: var(--accent);
+    border: 0;
+    background: none;
 }
 
 .blazor-error-boundary {
-    padding: 1rem 1rem 1rem 3.7rem;
-    color: white;
-    background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNDkiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIG92ZXJmbG93PSJoaWRkZW4iPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDAiPjxyZWN0IHg9IjIzNSIgeT0iNTEiIHdpZHRoPSI1NiIgaGVpZ2h0PSI0OSIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMCkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yMzUgLTUxKSI+PHBhdGggZD0iTTI2My41MDYgNTFDMjY0LjcxNyA1MSAyNjUuODEzIDUxLjQ4MzcgMjY2LjYwNiA1Mi4yNjU4TDI2Ny4wNTIgNTIuNzk4NyAyNjcuNTM5IDUzLjYyODMgMjkwLjE4NSA5Mi4xODMxIDI5MC41NDUgOTIuNzk1IDI5MC42NTYgOTIuOTk2QzI5MC44NzcgOTMuNTEzIDI5MSA5NC4wODE1IDI5MSA5NC42NzgyIDI5MSA5Ny4wNjUxIDI4OS4wMzggOTkgMjg2LjYxNyA5OUwyNDAuMzgzIDk5QzIzNy45NjMgOTkgMjM2IDk3LjA2NTEgMjM2IDk0LjY3ODIgMjM2IDk0LjM3OTkgMjM2LjAzMSA5NC4wODg2IDIzNi4wODkgOTMuODA3MkwyMzYuMzM4IDkzLjAxNjIgMjM2Ljg1OCA5Mi4xMzE0IDI1OS40NzMgNTMuNjI5NCAyNTkuOTYxIDUyLjc5ODUgMjYwLjQwNyA1Mi4yNjU4QzI2MS4yIDUxLjQ4MzcgMjYyLjI5NiA1MSAyNjMuNTA2IDUxWk0yNjMuNTg2IDY2LjAxODNDMjYwLjczNyA2Ni4wMTgzIDI1OS4zMTMgNjcuMTI0NSAyNTkuMzEzIDY5LjMzNyAyNTkuMzEzIDY5LjYxMDIgMjU5LjMzMiA2OS44NjA4IDI1OS4zNzEgNzAuMDg4N0wyNjEuNzk1IDg0LjAxNjEgMjY1LjM4IDg0LjAxNjEgMjY3LjgyMSA2OS43NDc1QzI2Ny44NiA2OS43MzA5IDI2Ny44NzkgNjkuNTg3NyAyNjcuODc5IDY5LjMxNzkgMjY3Ljg3OSA2Ny4xMTgyIDI2Ni40NDggNjYuMDE4MyAyNjMuNTg2IDY2LjAxODNaTTI2My41NzYgODYuMDU0N0MyNjEuMDQ5IDg2LjA1NDcgMjU5Ljc4NiA4Ny4zMDA1IDI1OS43ODYgODkuNzkyMSAyNTkuNzg2IDkyLjI4MzcgMjYxLjA0OSA5My41Mjk1IDI2My41NzYgOTMuNTI5NSAyNjYuMTE2IDkzLjUyOTUgMjY3LjM4NyA5Mi4yODM3IDI2Ny4zODcgODkuNzkyMSAyNjcuMzg3IDg3LjMwMDUgMjY2LjExNiA4Ni4wNTQ3IDI2My41NzYgODYuMDU0N1oiIGZpbGw9IiNGRkU1MDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvZz48L3N2Zz4=) no-repeat 1rem/1.8rem, #b32121;
+    padding: var(--s-4);
+    color: var(--text);
+    border-left: 3px solid var(--danger);
+    background: var(--bg-raised);
 }
 
 .blazor-error-boundary::after {
-    content: "An error has occurred."
+    content: "Что-то сломалось.";
 }
 
-.loading-progress {
-    position: relative;
-    display: block;
-    width: 8rem;
-    height: 8rem;
-    margin: 50vh auto 1rem auto;
-}
-
-.loading-progress circle {
-    transform: rotate(-90deg);
-    transform-origin: 50% 50%;
-    fill: none;
-    stroke: #e0e0e0;
-    stroke-width: 0.6rem;
-}
-
-.loading-progress circle:last-child {
-    transition: stroke-dasharray 0.05s ease-in-out;
-    stroke: #1b6ec2;
-    stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
-}
-
-.loading-progress-text {
-    font-size: 4rem;
-    font-weight: bold;
+.visually-hidden {
     position: absolute;
-    text-align: center;
-    color: #bababe;
-    inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
-}
-
-.loading-progress-text:after {
-    content: var(--blazor-load-percentage-text, "Ожидайте");
-}
-
-code {
-    color: #c02d76;
-}
-
-.mud-nav-link:hover:not(.mud-nav-link-disable) {
-    cursor: pointer;
-    text-decoration: none;
-    color: var(--mud-palette-drawer-text);
-    background-color: var(--mud-palette-action-default-hover);
-}
-
-.docs-appbar-filter {
-    backdrop-filter: blur(12px);
-}
-
-.mud-appbar {
-    position: relative;
-    z-index: var(--mud-zindex-appbar);
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    box-sizing: border-box;
-    width: 100%;
-    transition: margin 225ms cubic-bezier(0, 0, .2, 1) 0ms, width 225ms cubic-bezier(0, 0, .2, 1) 0ms;
-    color: var(--mud-palette-appbar-text);
-    background-color: var(--mud-palette-appbar-background);
-}
-
-.mud-elevation-0 {
-    box-shadow: var(--mud-elevation-0);
-}
-
-.mud-theme-transparent {
-    color: inherit !important;
-    background-color: transparent !important;
-}
-
-.loading-bg {
-    position: absolute;
-    width: 100vw;
-    height: 100vh;
-    background-color: #1a1a27;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: cover;
-}
-
-.rotating-image {
-    position: absolute;
-    top: 50vh;
-    left: 50vw;
-    width: 30%;
-    height: auto;
-    transform: translate(-50%, -50%);
-    animation: rotate 10s linear infinite;
-}
-
-@keyframes rotate {
-    0% {
-        transform: translate(-50%, -50%) rotate(0deg);
-    }
-    100% {
-        transform: translate(-50%, -50%) rotate(360deg);
-    }
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    width: 1px;
+    height: 1px;
+    white-space: nowrap;
+    clip-path: inset(50%);
 }

@@ -1,0 +1,45 @@
+﻿.win-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3) var(--s-7);
+    margin: 0 0 var(--s-5);
+    padding-bottom: var(--s-4);
+    border-bottom: 1px solid var(--border);
+}
+
+.win-summary__cell {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+}
+
+.win-summary dt {
+    margin: 0;
+}
+
+.win-summary__value {
+    font-size: 1.75rem;
+    font-weight: 500;
+    line-height: 1.1;
+    margin: 0;
+    color: var(--gold);
+}
+
+.win-summary__value--dim {
+    color: var(--text-dim);
+}
+
+.win-text {
+    max-width: 62ch;
+    margin: 0 0 var(--s-4);
+}
+
+.win-text--shadow {
+    padding-left: var(--s-4);
+    color: var(--text-dim);
+    border-left: 2px solid var(--border-strong);
+}
+
+.win-text:last-child {
+    margin-bottom: 0;
+}

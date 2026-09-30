@@ -36,7 +36,7 @@ public record struct Position(int X, int Y)
 
     public static Position operator *(Position left, int right)
     {
-        return new Position(left.X * right, left.Y * right);
+        return new(left.X * right, left.Y * right);
     }
 
     public static bool operator >(Position left, Position right)
@@ -66,6 +66,6 @@ public record struct Position(int X, int Y)
 
     public static implicit operator Position((int X, int Y) position)
     {
-        return new Position(position.X, position.Y);
+        return new(position.X, position.Y);
     }
 }

@@ -1,27 +1,31 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using Labirint.Core.Interfaces;
+﻿using System.Globalization;
+using Labirint.Web.Common.Seeding;
+using Labirint.Web.Components.Dialogs;
+using Labirint.Web.Services.Dialogs;
 using Microsoft.AspNetCore.Components;
-using MudBlazor;
 
 namespace Labirint.Web.Components;
 
-public partial class RandomGenerator : IRandom
+public partial class RandomGenerator : IDisposable
 {
+    public const string SeedQueryName = "seed";
     public const string SizeQueryName = "s";
     public const string DensityQueryName = "d";
     private const string MazePageUrl = "labirint";
 
-    private bool _isShowMotivation;
-    private int _currentSeed;
+    private readonly SeedSource _seed = new();
 
-    private MudMessageBox? _messageBox;
-    private Random? _random;
-    private string? _userSeed;
+    private string? _appliedSeed;
 
-    public Random Generator => _random ?? Random.Shared;
+    public SeedSource Source => _seed;
 
     public string Link => GetShareLink();
+
+    public string RouteSeed => string.IsNullOrWhiteSpace(_seed.UserSeed) == false
+                               && _seed.UserSeed.All(symbol => symbol == '.') == false
+                               && SeedSource.ParseSeed(_seed.UserSeed) == _seed.CurrentSeed
+        ? _seed.UserSeed
+        : _seed.CurrentSeed.ToString(CultureInfo.InvariantCulture);
 
     [Parameter]
     public string? Seed { get; set; }
@@ -39,88 +43,84 @@ public partial class RandomGenerator : IRandom
     private NavigationManager NavigationManager { get; set; } = null!;
 
     [Inject]
-    private IDialogService DialogService { get; set; } = null!;
+    private DialogService DialogService { get; set; } = null!;
 
-    [Inject]
-    private IClipboardService ClipboardService { get; set; } = null!;
+    private bool IsGenerateRequired => _seed.IsGenerateRequired;
 
-    [Inject]
-    private ISnackbar SnackbarService { get; set; } = null!;
+    public static int? ParseQueryNumber(string? value)
+    {
+        return int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var number) ? number : null;
+    }
 
-    private bool IsGenerateRequired => _currentSeed < 0;
+    public static string BuildRouteLink(NavigationManager navigationManager, string seed, int? size, int? density)
+    {
+        var linkWithSeed = $"{navigationManager.BaseUri}{MazePageUrl}/{Uri.EscapeDataString(seed)}";
+
+        return navigationManager.GetUriWithQueryParameters(linkWithSeed, new Dictionary<string, object?>
+        {
+            [SizeQueryName] = size,
+            [DensityQueryName] = density,
+        });
+    }
+
+    public void Dispose()
+    {
+        DialogService.CancelOwnedBy(this);
+        GC.SuppressFinalize(this);
+    }
+
+    public void Repeat()
+    {
+        _seed.Repeat();
+        StateHasChanged();
+    }
 
     public void Reload(bool force = false)
     {
-        if (force || string.IsNullOrWhiteSpace(_userSeed))
+        _seed.Reload(force);
+        StateHasChanged();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (Seed == _appliedSeed)
         {
-            ReloadWithRandomSeed();
             return;
         }
 
-        _currentSeed = _userSeed.All(char.IsDigit)
-            ? int.Parse(_userSeed)
-            : GenerateSeed(_userSeed);
-
-        _random = new Random(_currentSeed);
-        StateHasChanged();
-    }
-
-    protected override void OnInitialized()
-    {
-        if (string.IsNullOrWhiteSpace(Seed) == false)
-        {
-            _userSeed = Seed;
-        }
-    }
-
-    private static int GenerateSeed(string input)
-    {
-        byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));
-        int result = BitConverter.ToInt32(hashBytes, 0);
-        return Math.Abs(result);
-    }
-
-    private void ReloadWithRandomSeed()
-    {
-        _userSeed = null;
-        _currentSeed = Random.Shared.Next();
-        _random = new Random(_currentSeed);
-        StateHasChanged();
+        _appliedSeed = Seed;
+        _seed.UserSeed = string.IsNullOrWhiteSpace(Seed) ? null : Seed;
     }
 
     private void ResetSeed()
     {
-        _currentSeed = -1;
+        _seed.ResetSeed();
         StateHasChanged();
+    }
+
+    public void ReplaceRoute(string seed, int size, int density)
+    {
+        _appliedSeed = seed;
+        NavigationManager.NavigateTo(BuildRouteLink(NavigationManager, seed, size, density), replace: true);
     }
 
     private string GetShareLink()
     {
-        string linkWithSeed = $"{NavigationManager.BaseUri}{MazePageUrl}/{_currentSeed}";
-
-        return NavigationManager.GetUriWithQueryParameters(linkWithSeed, new Dictionary<string, object?>
+        return NavigationManager.GetUriWithQueryParameters(NavigationManager.BaseUri, new Dictionary<string, object?>
         {
+            [SeedQueryName] = _seed.CurrentSeed.ToString(CultureInfo.InvariantCulture),
             [SizeQueryName] = Size,
-            [DensityQueryName] = Density
+            [DensityQueryName] = Density,
         });
     }
 
-    private void ShowMessageBox()
+    private async Task ShowShareDialogAsync()
     {
-        _messageBox?.ShowAsync();
-    }
-
-    private async Task CopyLink()
-    {
-        await ClipboardService.CopyToClipboard(Link);
-        SnackbarService.Add("Ссылка скопирована!", Severity.Success);
-    }
-
-    private void ToggleMotivation()
-    {
-        _isShowMotivation = !_isShowMotivation;
-
-        _messageBox?.Close();
-        _messageBox?.ShowAsync();
+        await DialogService.ShowAsync<ShareDialog>(this, "Поделиться лабиринтом", new DialogParameters
+        {
+            [nameof(ShareDialog.Link)] = Link,
+            [nameof(ShareDialog.UserSeed)] = _seed.UserSeed,
+            [nameof(ShareDialog.IsExitFound)] = IsExitFound,
+        }, new DialogOptions { Width = DialogWidth.Medium });
     }
 }

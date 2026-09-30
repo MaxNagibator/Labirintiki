@@ -1,26 +1,9 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
+﻿<Router AppAssembly="@typeof(App).Assembly"
+        NotFoundPage="typeof(Labirint.Web.Pages.NotFound)">
     <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        <RouteView DefaultLayout="@typeof(MainLayout)"
+                   RouteData="@routeData" />
+        <FocusOnNavigate RouteData="@routeData"
+                         Selector="h1" />
     </Found>
-
-    <Navigating>
-        <LayoutView Layout="@typeof(MainLayout)">
-            <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
-        </LayoutView>
-    </Navigating>
-
-    <NotFound>
-        <PageTitle>Нот фоунд</PageTitle>
-        <LayoutView Layout="@typeof(MainLayout)">
-            <MudAlert Severity="Severity.Warning" ContentAlignment="HorizontalAlignment.Center">Братан, видать адресочком ошибся</MudAlert>
-            <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-8">
-                <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">Ну, бывает такое</MudText>
-                <MudText Typo="Typo.body1" Align="Align.Center" Class="mb-6">Не расстраивайся, давай попробуем найти то, что ты искал?</MudText>
-                <MudNavLink Href=@("./")>
-                    <MudText Typo="Typo.body2" Align="Align.Center" Class="mb-6">Вернуться на главную </MudText>
-                </MudNavLink>
-            </MudContainer>
-        </LayoutView>
-    </NotFound>
 </Router>

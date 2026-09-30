@@ -1,9 +1,14 @@
 ﻿namespace Labirint.Web.Common.Drawing;
 
-public class Canvas2DContext(IJSObjectReference context, IJSRuntime jsRuntime)
+public class Canvas2DContext(IJSInProcessObjectReference context, IJSInProcessRuntime jsRuntime) : IDisposable
 {
-    public ValueTask DrawSequenceAsync(DrawSequence sequence)
+    public void Draw(DrawSequence sequence)
     {
-        return jsRuntime.InvokeVoidAsync("canvasHelper.drawCommands", context, sequence.ToList());
+        jsRuntime.InvokeVoid("canvasHelper.drawCommands", context, sequence.Build());
+    }
+
+    public void Dispose()
+    {
+        context.Dispose();
     }
 }

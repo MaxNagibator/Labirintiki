@@ -1,0 +1,58 @@
+﻿<div class="@CssClass" role="@Role">
+    @if (ShowIcon)
+    {
+        <span class="ui-alert__icon">
+            <Icon Name="@IconName" Size="18" />
+        </span>
+    }
+
+    <div class="ui-alert__body t-body-s">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public UiSeverity Severity { get; set; } = UiSeverity.Info;
+
+    [Parameter]
+    public bool ShowIcon { get; set; } = true;
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private string? Role => Severity is UiSeverity.Warning or UiSeverity.Error ? "alert" : null;
+
+    private string IconName => Severity switch
+    {
+        UiSeverity.Success => IconCatalog.Check,
+        UiSeverity.Warning => IconCatalog.Warning,
+        UiSeverity.Error => IconCatalog.Error,
+        _ => IconCatalog.Info,
+    };
+
+    private string CssClass
+    {
+        get
+        {
+            List<string> classes = ["ui-alert"];
+
+            if (Severity != UiSeverity.None)
+            {
+                classes.Add($"ui-alert--{Severity.ToString().ToLowerInvariant()}");
+            }
+
+            if (string.IsNullOrWhiteSpace(Class) == false)
+            {
+                classes.Add(Class);
+            }
+
+            return string.Join(' ', classes);
+        }
+    }
+
+}

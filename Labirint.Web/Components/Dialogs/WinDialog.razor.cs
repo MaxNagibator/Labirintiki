@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
-using MudBlazor;
+﻿using Labirint.Web.Services.Dialogs;
+using Microsoft.AspNetCore.Components;
 
 namespace Labirint.Web.Components.Dialogs;
 
@@ -9,23 +9,33 @@ public partial class WinDialog
     public required Func<Task> OnRestart { get; set; }
 
     [Parameter]
+    public required Func<Task> OnRepeat { get; set; }
+
+    [Parameter]
     public required RandomGenerator Seeder { get; set; }
 
-    [CascadingParameter]
-    private MudDialogInstance MudDialog { get; set; } = null!;
+    [Parameter]
+    public int Score { get; set; }
 
-    [Inject]
-    private NavigationManager NavigationManager { get; set; } = null!;
+    [Parameter]
+    public int MoveCount { get; set; }
+
+    [Parameter]
+    public int Size { get; set; }
+
+    [CascadingParameter]
+    private DialogInstance Instance { get; set; } = null!;
 
     private void Close()
     {
-        MudDialog.Close(true);
+        Instance.Close(true);
     }
 
-    private void RepeatGame()
+    private async Task RepeatGameAsync()
     {
-        NavigationManager.NavigateTo(Seeder.Link);
-        MudDialog.Close(false);
+        await OnRepeat();
+
+        Instance.Close(false);
     }
 
     private async Task RestartGameAsync()
@@ -33,6 +43,6 @@ public partial class WinDialog
         Seeder.Reload(true);
         await OnRestart();
 
-        MudDialog.Close(false);
+        Instance.Close(false);
     }
 }

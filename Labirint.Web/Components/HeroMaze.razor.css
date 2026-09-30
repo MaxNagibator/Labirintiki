@@ -1,0 +1,141 @@
+﻿.hero-maze {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+}
+
+.hero-maze__surface {
+    display: block;
+    width: 100%;
+    padding: 0;
+    cursor: pointer;
+    border: 0;
+    border-radius: var(--r-1);
+    background: none;
+}
+
+.hero-maze__grid {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.hero-maze__caption {
+    margin: 0;
+    text-align: right;
+}
+
+.hero-maze__floor {
+    fill: var(--bg-sunken);
+    stroke: var(--border);
+    stroke-width: 1;
+}
+
+.hero-maze__exit {
+    transform-box: fill-box;
+    transform-origin: center;
+    fill: var(--accent);
+    opacity: 0;
+    animation: hero-maze-appear var(--dur-3) var(--ease) 900ms forwards;
+}
+
+.hero-maze__exit--found {
+    animation: hero-maze-appear var(--dur-3) var(--ease) 900ms forwards,
+    hero-maze-found var(--dur-3) var(--ease) var(--found-delay) 2;
+}
+
+.hero-maze__walls line {
+    stroke: var(--wall);
+    stroke-width: 3;
+    stroke-linecap: square;
+    stroke-dasharray: 24;
+    stroke-dashoffset: 24;
+    animation: hero-maze-draw var(--dur-2) var(--ease) forwards;
+}
+
+.hero-maze__trail {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: var(--trail-length);
+    stroke-dashoffset: var(--trail-length);
+    opacity: 0.3;
+    animation: hero-maze-trail var(--trail-duration) linear var(--trail-delay) forwards;
+}
+
+[data-theme="light"] .hero-maze__trail {
+    opacity: 0.5;
+}
+
+.hero-maze__tail {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: var(--tail-length) var(--trail-length);
+    stroke-dashoffset: var(--tail-length);
+    opacity: 0.7;
+    animation: hero-maze-tail var(--trail-duration) linear var(--trail-delay) forwards;
+}
+
+.hero-maze__runner {
+    offset-path: var(--route);
+    offset-rotate: 0deg;
+    fill: var(--gold);
+    animation: hero-maze-runner var(--trail-duration) linear var(--trail-delay) forwards;
+}
+
+@keyframes hero-maze-draw {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes hero-maze-appear {
+    to { opacity: 1; }
+}
+
+@keyframes hero-maze-trail {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes hero-maze-tail {
+    to { stroke-dashoffset: calc(-1 * var(--trail-length)); }
+}
+
+@keyframes hero-maze-runner {
+    from { offset-distance: 0%; }
+    to { offset-distance: 100%; }
+}
+
+@keyframes hero-maze-found {
+    50% { transform: scale(1.6); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-maze__walls line {
+        stroke-dashoffset: 0;
+    }
+
+    .hero-maze__exit {
+        opacity: 1;
+    }
+
+    .hero-maze__exit,
+    .hero-maze__exit--found,
+    .hero-maze__runner,
+    .hero-maze__tail {
+        animation-name: none;
+    }
+
+    .hero-maze__trail {
+        stroke-dashoffset: 0;
+        opacity: 0.35;
+        animation-name: none;
+    }
+
+    .hero-maze__tail {
+        opacity: 0;
+    }
+}
